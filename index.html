@@ -157,7 +157,7 @@ function camStop(){camRunning=!1;if(camStream){camStream.getTracks().forEach(t=>
 /* ═══════════ STATE ═══════════ */
 let S={
   phase:'setup', xmlBoxes:null, masterData:null,
-  scannedBoxes:[], routeItems:[], shelved:{},
+  scannedBoxes:[], routeItems:[], unmatchedItems:[], shelved:{},
   currentIdx:0, error:null, scanMode:'manual',
   lastScanResult:null, // {type:'ok'|'fail', text:string}
 };
@@ -207,7 +207,7 @@ function buildRoute(){
     else all.push({vnr:item.vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:loc,parsedLoc:pl,physAisle:pa,cartPos:cp});
   })});
   const matched=all.filter(i=>i.parsedLoc),unmatched=all.filter(i=>!i.parsedLoc);
-  setState({routeItems:[...sSort(matched),...unmatched],shelved:{},currentIdx:0,phase:'shelve',scanMode:'manual',lastScanResult:null});
+  setState({routeItems:sSort(matched),unmatchedItems:unmatched,shelved:{},currentIdx:0,phase:'shelve',scanMode:'manual',lastScanResult:null});
 }
 
 function confirmEan(code){
@@ -217,8 +217,7 @@ function confirmEan(code){
 
   if(cur&&match(cur,code)){
     const p=S.shelved[cur.vnr]||0;S.shelved[cur.vnr]=p+1;
-    if(p+1>=cur.qty){const nx=S.routeItems.findIndex((it,idx)=>idx>S.currentIdx&&(S.shelved[it.vnr]||0)<it.qty);if(nx!==-1)S.currentIdx=nx}
-    setState({shelved:S.shelved,currentIdx:S.currentIdx,lastScanResult:{type:'ok',text:'✓ Kuitattu '+(p+1)+'/'+cur.qty}});return;
+    setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ Kuitattu '+(p+1)+'/'+cur.qty}});return;
   }
   const oi=S.routeItems.findIndex(it=>match(it,code));
   if(oi!==-1){
@@ -306,6 +305,31 @@ function render(){
             <div style="font-size:12px;color:#475569">${b.items.length} tuot. / ${b.items.reduce((s,i)=>s+i.qty,0)} kpl</div>
           </div>`).join('')}
         <button class="btn" style="margin-top:8px" onclick="buildRoute()">Muodosta hyllytysjärjestys →</button>
+      </div>
+
+      <div class="card">
+        <h2>Kärryn paikkajaottelu</h2>
+        ${(()=>{
+          const allItems=[];
+          S.scannedBoxes.forEach(box=>{box.items.forEach(item=>{
+            const m=S.masterData[item.vnr]||{},loc=m.location||null,pl=pLoc(loc),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+            const ex=allItems.find(i=>i.vnr===item.vnr);
+            if(ex)ex.qty+=item.qty;
+            else allItems.push({vnr:item.vnr,name:item.name||m.name||'?',qty:item.qty,location:loc,parsedLoc:pl,cartPos:cp});
+          })});
+          const noLoc=allItems.filter(i=>!i.parsedLoc);
+          return CZ.map(z=>{
+            const zItems=allItems.filter(i=>i.cartPos===z.pos&&i.parsedLoc);
+            if(!zItems.length)return'';
+            return`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid ${z.color};background:#fafbfc">
+              <div style="font-size:12px;font-weight:700;color:${z.color};margin-bottom:4px">Paikka ${z.pos} — ${zItems.length} tuotetta</div>
+              ${zItems.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${i.name} (${i.qty} kpl) → ${i.location}</div>`).join('')}
+            </div>`}).join('')
+            +(noLoc.length?`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid #94a3b8;background:#f8fafc">
+              <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:4px">UUSI-hylly — ${noLoc.length} tuotetta</div>
+              ${noLoc.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${i.name} (${i.qty} kpl)</div>`).join('')}
+            </div>`:'');
+        })()}
       </div>`:''}`;
 
     if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);
@@ -317,14 +341,18 @@ function render(){
     const ts=tShelved(),tq=tQty(),pct=tq>0?Math.round(ts/tq*100):0,allDone=ts>=tq&&tq>0;
     const cur=S.routeItems[S.currentIdx],cc=cur?(S.shelved[cur.vnr]||0):0,cd=cur?cc>=cur.qty:!1;
 
-    if(allDone){
+    if(allDone||!cur){
       camStop();
       app.innerHTML=`
         <div class="card text-center" style="padding:32px">
-          <div style="font-size:48px;margin-bottom:8px">✓</div>
-          <h2 style="color:#16a34a">Kaikki hyllytetty!</h2>
-          <p style="font-size:13px;color:#64748b">${tq} kpl / ${S.routeItems.length} tuotetta</p>
-          <button class="btn" style="margin-top:16px" onclick="camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null})">Uusi erä</button>
+          <div style="font-size:48px;margin-bottom:8px">${tq>0?'✓':'📦'}</div>
+          <h2 style="color:${tq>0?'#16a34a':'#1e293b'}">${tq>0?'Kaikki hyllytetty!':'Ei hyllytettäviä tuotteita'}</h2>
+          ${tq>0?`<p style="font-size:13px;color:#64748b">${tq} kpl / ${S.routeItems.length} tuotetta</p>`:''}
+          ${S.unmatchedItems.length>0?`<div style="margin-top:12px;padding:10px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;font-size:13px;color:#92400e">
+            ⚠ ${S.unmatchedItems.length} tuotetta UUSI-hyllyyn:<br>
+            ${S.unmatchedItems.map(i=>`${i.name} (${i.qty} kpl)`).join('<br>')}
+          </div>`:''}
+          <button class="btn" style="margin-top:16px" onclick="camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],unmatchedItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null})">Uusi erä</button>
         </div>`;return;
     }
 
@@ -337,6 +365,13 @@ function render(){
         </div>
         <div class="progress-bar"><div class="progress-fill ${allDone?'done':''}" style="width:${pct}%"></div></div>
       </div>
+
+      ${S.unmatchedItems.length>0?`
+      <div class="card" style="border-left:4px solid #f59e0b;background:#fffbeb">
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">⚠ UUSI-hyllyyn (${S.unmatchedItems.length} tuotetta)</div>
+        <div style="font-size:12px;color:#92400e;margin-bottom:8px">Näillä tuotteilla ei ole varastopaikkaa — laita UUSI-hyllyyn</div>
+        ${S.unmatchedItems.map(i=>`<div style="font-size:12px;color:#78350f;padding:3px 0">${i.name} <span class="mono">(VNR ${i.vnr})</span> — ${i.qty} kpl</div>`).join('')}
+      </div>`:''}
 
       <div class="card" style="border-left:4px solid ${cpColor}">
         <div class="flex justify-between items-center mb-8">
