@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Hyllytysappi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;-webkit-tap-highlight-color:transparent}
+.app{max-width:480px;margin:0 auto;padding:16px 12px;min-height:100dvh}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:16px;margin-bottom:12px}
+h1{font-size:20px;font-weight:700;margin-bottom:4px}
+h2{font-size:16px;font-weight:700;margin-bottom:8px}
+.sub{font-size:12px;color:#64748b;margin-bottom:16px}
+.btn{width:100%;padding:14px 0;border-radius:10px;border:none;background:#1e293b;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
+.btn:active:not(:disabled){opacity:.8}
+.btn-sm{padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.btn-outline{background:#e2e8f0;color:#1e293b}
+.scan-input{width:100%;padding:14px 12px;border-radius:10px;border:2px solid #e2e8f0;font-size:18px;font-family:monospace;font-weight:600;text-align:center;outline:none}
+.scan-input:focus{border-color:#3b82f6}
+.label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.mono{font-family:'JetBrains Mono','SF Mono','Courier New',monospace;font-size:12px}
+.error{color:#dc2626;font-size:13px;text-align:center;margin-top:6px}
+.flex{display:flex}.gap-8{gap:8px}.gap-6{gap:6px}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-1{flex:1}
+.mb-6{margin-bottom:6px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.text-center{text-align:center}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace}
+.badge-L{background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc}
+.badge-F{background:#fce7f3;color:#be185d;border:1.5px solid #f9a8d4}
+.badge-A{background:#ecfdf5;color:#047857;border:1.5px solid #6ee7b7}
+.badge-B{background:#fef3c7;color:#92400e;border:1.5px solid #fcd34d}
+.badge-U{background:#f3e8ff;color:#7c3aed;border:1.5px solid #c4b5fd}
+
+.cart-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.cart-1{background:#ef4444}.cart-2{background:#f59e0b}.cart-3{background:#10b981}.cart-4{background:#3b82f6}.cart-5{background:#8b5cf6}
+
+.progress-bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:#1e293b;transition:width .3s}
+.progress-fill.done{background:#16a34a}
+
+.route-item{padding:8px 10px;border-radius:8px;margin-bottom:4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:1px solid #f1f5f9}
+.route-item.current{background:#eff6ff;border:2px solid #3b82f6}
+.route-item.completed{opacity:.5}
+.route-item-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.route-item-loc{font-size:11px;color:#64748b;font-family:monospace}
+
+.qty-display{display:flex;align-items:center;justify-content:center;gap:4px;padding:14px;border-radius:10px;font-family:monospace}
+.qty-count{font-size:36px;font-weight:800}
+.qty-sep{font-size:22px;color:#94a3b8}
+.qty-total{font-size:36px;font-weight:800;color:#64748b}
+
+.scanned-box{padding:8px 12px;border-radius:8px;margin-bottom:6px;background:#f8fafc;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+.location-big{font-size:20px;font-weight:700;font-family:monospace;color:#1e293b}
+
+.or-divider{display:flex;align-items:center;gap:12px;margin:12px 0;color:#94a3b8;font-size:12px}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:#e2e8f0}
+
+.tab-bar{display:flex;gap:4px;margin-bottom:8px}
+.tab{flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
+.tab.active{background:#1e293b;color:#fff}
+.tab:not(.active){background:#e2e8f0;color:#475569}
+
+.camera-wrap{position:relative;width:100%;border-radius:10px;overflow:hidden;margin-bottom:8px;background:#000;aspect-ratio:4/3}
+.camera-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.camera-guide{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:25%;border:2px solid rgba(255,255,255,.7);border-radius:8px;pointer-events:none}
+.camera-flash{position:absolute;inset:0;background:rgba(76,175,80,.3);pointer-events:none;opacity:0;transition:opacity .15s}
+.camera-flash.show{opacity:1}
+
+.scan-result{padding:10px;border-radius:8px;margin-top:8px;font-size:13px;text-align:center;font-weight:600}
+.scan-ok{background:#f0fdf4;color:#16a34a;border:1px solid #86efac}
+.scan-fail{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
+
+details summary{cursor:pointer;font-size:14px;font-weight:600;margin-bottom:8px}
+details[open] summary{margin-bottom:12px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ═══════════ ROUTE CONFIG ═══════════ */
+const PR=[
+  {id:"L1",asc:!0},{id:"FA",asc:!0},{id:"L2",asc:!1},{id:"L3",asc:!0},
+  {id:"L4",asc:!1},{id:"L5",asc:!0},{id:"A2",asc:!1},{id:"A3",asc:!0},
+  {id:"A4",asc:!1},{id:"A5",asc:!0},{id:"A6_even",asc:!1},{id:"A6odd_A1even",asc:!0},
+  {id:"A1odd_A7",asc:!1},{id:"B1",asc:!0},{id:"B2",asc:!1},{id:"B3",asc:!0},
+  {id:"B4",asc:!1},{id:"UU",asc:!0},
+];
+const PO=PR.map(p=>p.id),PD=Object.fromEntries(PR.map(p=>[p.id,p.asc]));
+const PL={L1:"L1",FA:"FA",L2:"L2",L3:"L3",L4:"L4",L5:"L5",A2:"A2",A3:"A3",A4:"A4",A5:"A5",A6_even:"A6 par.",A6odd_A1even:"A6/A1",A1odd_A7:"A1/A7",B1:"B1",B2:"B2",B3:"B3",B4:"B4",UU:"UU"};
+
+const CZ=[
+  {pos:1,aisles:["L1","FA","L2","L3"],color:"#ef4444"},
+  {pos:2,aisles:["L4","L5","A2","A3"],color:"#f59e0b"},
+  {pos:3,aisles:["A4","A5","A6_even","A6odd_A1even"],color:"#10b981"},
+  {pos:4,aisles:["A1odd_A7","B1","B2"],color:"#3b82f6"},
+  {pos:5,aisles:["B3","B4","UU"],color:"#8b5cf6"},
+];
+function cartPos(pa){for(const z of CZ)if(z.aisles.includes(pa))return z.pos;return 5}
+
+/* ═══════════ LOCATION ═══════════ */
+function pLoc(l){if(!l||["uusi","null","vanha","0",""].includes(l.toLowerCase()))return null;const p=l.split("-");return p.length===4?{aisle:p[0],shelf:p[1],level:p[2],pos:p[3],raw:l}:null}
+function sOdd(s){const n=parseInt(s,10);return isNaN(n)?null:n%2!==0}
+function gPA(p){const{aisle:a,shelf:s}=p,o=sOdd(s);if(a==="A6")return o?"A6odd_A1even":"A6_even";if(a==="A1")return o===!1?"A6odd_A1even":"A1odd_A7";if(a==="A7")return"A1odd_A7";return a}
+function pI(pa){const i=PO.indexOf(pa);return i===-1?999:i}
+function sSort(items){return[...items].sort((a,b)=>{if(!a.parsedLoc&&!b.parsedLoc)return 0;if(!a.parsedLoc)return 1;if(!b.parsedLoc)return-1;const pa=pI(a.physAisle),pb=pI(b.physAisle);if(pa!==pb)return pa-pb;const asc=PD[a.physAisle]!==!1;const sc=a.parsedLoc.shelf.localeCompare(b.parsedLoc.shelf,undefined,{numeric:!0});if(sc)return asc?sc:-sc;const lc=a.parsedLoc.level.localeCompare(b.parsedLoc.level);if(lc)return asc?lc:-lc;const pc=a.parsedLoc.pos.localeCompare(b.parsedLoc.pos,undefined,{numeric:!0});return asc?pc:-pc})}
+
+/* ═══════════ FILE PARSERS ═══════════ */
+function rF(f,e='utf-8'){return new Promise((r,j)=>{const x=new FileReader();x.onload=v=>r(v.target.result);x.onerror=j;x.readAsText(f,e)})}
+function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};d.querySelectorAll("InvoiceRow").forEach(r=>{const id=r.querySelector("ArticleGroupIdentifier")?.textContent||"?",v=r.querySelector("ArticleIdentifier")?.textContent||"",n=r.querySelector("ArticleName")?.textContent||"",q=parseInt(r.querySelector("DeliveredQuantity")?.textContent||"0",10);if(!b[id])b[id]=[];const e=b[id].find(i=>i.vnr===v);if(e)e.qty+=q;else b[id].push({vnr:v,name:n,qty:q})});return b}
+function pCSV(t){const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};r.data.forEach(r=>{const s=(r.sku||"").trim();if(!s)return;m[s]={name:(r.name||"").trim(),ean:(r.ean||"").trim(),location:(r.storage_location||"").trim()}});return m}
+
+/* ═══════════ CAMERA SCANNER ═══════════ */
+let camStream=null,camRunning=!1,camDetector=null,camLast="",camLastT=0,camCallback=null;
+
+async function camStart(cb){
+  camStop();
+  camCallback=cb;
+  const v=document.getElementById('cam-video');
+  if(!v)return;
+  if(!('BarcodeDetector'in window)){setState({error:'BarcodeDetector API ei tuettu tässä selaimessa'});return}
+  try{
+    camDetector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','itf','upc_a','upc_e']});
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}});
+    v.srcObject=camStream;await v.play();camRunning=!0;camScan()
+  }catch(e){
+    if(e.name==='NotAllowedError')setState({error:'Kamera estetty — tarkista selaimen asetukset'});
+    else setState({error:'Kamera-virhe: '+e.message});
+  }
+}
+function camScan(){
+  if(!camRunning)return;
+  const v=document.getElementById('cam-video');
+  if(!v){camRunning=!1;return}
+  camDetector.detect(v).then(codes=>{
+    if(codes.length>0){
+      const c=codes[0].rawValue,now=Date.now();
+      if(c!==camLast||now-camLastT>2000){
+        camLast=c;camLastT=now;
+        if(navigator.vibrate)navigator.vibrate(100);
+        // Flash effect
+        const fl=document.getElementById('cam-flash');
+        if(fl){fl.classList.add('show');setTimeout(()=>fl.classList.remove('show'),200)}
+        if(camCallback)camCallback(c);
+      }
+    }
+  }).catch(()=>{});
+  if(camRunning)requestAnimationFrame(camScan);
+}
+function camStop(){camRunning=!1;if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}camLast="";camLastT=0}
+
+/* ═══════════ STATE ═══════════ */
+let S={
+  phase:'setup', xmlBoxes:null, masterData:null,
+  scannedBoxes:[], routeItems:[], shelved:{},
+  currentIdx:0, error:null, scanMode:'manual',
+  lastScanResult:null, // {type:'ok'|'fail', text:string}
+};
+
+function setState(u){Object.assign(S,u);render()}
+
+/* ═══════════ HELPERS ═══════════ */
+function bCls(a){const k=a?.[0]||'U';return'badge badge-'+({'L':'L','F':'F','A':'A','B':'B','U':'U'}[k]||'U')}
+function cBadge(p){return`<span class="cart-badge cart-${p}">${p}</span>`}
+function tShelved(){return S.routeItems.reduce((s,i)=>s+Math.min(S.shelved[i.vnr]||0,i.qty),0)}
+function tQty(){return S.routeItems.reduce((s,i)=>s+i.qty,0)}
+
+/* ═══════════ ACTIONS ═══════════ */
+async function loadFiles(){
+  const xi=document.getElementById('xml-input'),mi=document.getElementById('master-input');
+  if(!xi.files.length||!mi.files.length)return;
+  setState({error:null});
+  try{
+    const mt=await rF(mi.files[0],'utf-8'),master=pCSV(mt),allB={};
+    for(const f of xi.files){
+      const t=await rF(f,'iso-8859-15'),boxes=pXML(t);
+      for(const[sscc,items]of Object.entries(boxes)){
+        if(!allB[sscc])allB[sscc]=[];
+        items.forEach(item=>{const e=allB[sscc].find(i=>i.vnr===item.vnr);if(e)e.qty+=item.qty;else allB[sscc].push({...item})});
+      }
+    }
+    setState({xmlBoxes:allB,masterData:master,phase:'scan'});
+  }catch(e){setState({error:'Virhe: '+e.message})}
+}
+
+function addBox(code){
+  if(!code)return;setState({error:null,lastScanResult:null});
+  let sscc=S.xmlBoxes[code]?code:Object.keys(S.xmlBoxes).find(k=>k.endsWith(code)||code.endsWith(k));
+  if(!sscc){setState({error:`SSCC "${code.length>8?'...'+code.slice(-8):code}" ei löydy`,lastScanResult:{type:'fail',text:'Ei löydy'}});return}
+  if(S.scannedBoxes.some(b=>b.sscc===sscc)){setState({error:'Laatikko jo skannattu',lastScanResult:{type:'fail',text:'Jo skannattu'}});return}
+  S.scannedBoxes.push({sscc,items:S.xmlBoxes[sscc]});
+  setState({scannedBoxes:S.scannedBoxes,lastScanResult:{type:'ok',text:'Laatikko lisätty! ('+S.xmlBoxes[sscc].length+' tuotetta)'}});
+}
+
+function buildRoute(){
+  camStop();
+  const all=[];
+  S.scannedBoxes.forEach(box=>{box.items.forEach(item=>{
+    const m=S.masterData[item.vnr]||{},loc=m.location||null,pl=pLoc(loc),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+    const ex=all.find(i=>i.vnr===item.vnr);
+    if(ex)ex.qty+=item.qty;
+    else all.push({vnr:item.vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:loc,parsedLoc:pl,physAisle:pa,cartPos:cp});
+  })});
+  const matched=all.filter(i=>i.parsedLoc),unmatched=all.filter(i=>!i.parsedLoc);
+  setState({routeItems:[...sSort(matched),...unmatched],shelved:{},currentIdx:0,phase:'shelve',scanMode:'manual',lastScanResult:null});
+}
+
+function confirmEan(code){
+  if(!code)return;setState({error:null,lastScanResult:null});
+  const cur=S.routeItems[S.currentIdx];
+  const match=(item,c)=>{if(!item.ean||item.ean==='null')return!1;return item.ean===c||c.endsWith(item.ean)||item.ean.endsWith(c)};
+
+  if(cur&&match(cur,code)){
+    const p=S.shelved[cur.vnr]||0;S.shelved[cur.vnr]=p+1;
+    if(p+1>=cur.qty){const nx=S.routeItems.findIndex((it,idx)=>idx>S.currentIdx&&(S.shelved[it.vnr]||0)<it.qty);if(nx!==-1)S.currentIdx=nx}
+    setState({shelved:S.shelved,currentIdx:S.currentIdx,lastScanResult:{type:'ok',text:'✓ Kuitattu '+(p+1)+'/'+cur.qty}});return;
+  }
+  const oi=S.routeItems.findIndex(it=>match(it,code));
+  if(oi!==-1){
+    const o=S.routeItems[oi],p=S.shelved[o.vnr]||0;
+    if(p<o.qty){S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+o.name+' '+(p+1)+'/'+o.qty}});return}
+    setState({error:`${o.name} — jo valmis (${p}/${o.qty})`,lastScanResult:{type:'fail',text:'Jo hyllytetty'}});return;
+  }
+  setState({error:`EAN "${code}" ei vastaa mitään tuotetta`,lastScanResult:{type:'fail',text:'EAN ei tunnistettu'}});
+}
+
+function switchScanMode(mode,callback){
+  camStop();S.scanMode=mode;S.lastScanResult=null;
+  render();
+  if(mode==='camera')setTimeout(()=>camStart(callback),100);
+  else setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},100);
+}
+
+/* ═══════════ RENDER ═══════════ */
+function render(){
+  const app=document.getElementById('app');
+
+  /* ── SETUP ── */
+  if(S.phase==='setup'){
+    camStop();
+    app.innerHTML=`
+      <div class="card">
+        <h1>Hyllytysappi</h1>
+        <p class="sub">Lataa toimitusilmoitukset ja tuoterekisteri</p>
+        <div class="mb-12">
+          <label class="label">Toimitusilmoitukset (XML) — voit valita useita</label>
+          <input type="file" id="xml-input" accept=".xml,.XML" multiple style="font-size:14px;width:100%">
+        </div>
+        <div class="mb-16">
+          <label class="label">Tuoterekisteri (CSV)</label>
+          <input type="file" id="master-input" accept=".csv,.CSV" style="font-size:14px;width:100%">
+        </div>
+        <button class="btn" onclick="loadFiles()">Lataa tiedot</button>
+        ${S.error?`<div class="error">${S.error}</div>`:''}
+      </div>`;
+    return;
+  }
+
+  /* ── SCAN BOXES ── */
+  if(S.phase==='scan'){
+    const ti=S.scannedBoxes.reduce((s,b)=>s+b.items.length,0);
+    const tp=S.scannedBoxes.reduce((s,b)=>s+b.items.reduce((ss,i)=>ss+i.qty,0),0);
+    const bc=Object.keys(S.xmlBoxes).length;
+
+    app.innerHTML=`
+      <div class="card">
+        <h1>Skannaa laatikko</h1>
+        <p class="sub">Lue SSCC-viivakoodi (${bc} laatikkoa ladattu)</p>
+
+        <div class="tab-bar">
+          <button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
+          <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',addBox)">📷 Kamera</button>
+        </div>
+
+        <div class="${S.scanMode==='camera'?'':'hidden'}">
+          <div class="camera-wrap">
+            <video id="cam-video" playsinline muted></video>
+            <div class="camera-guide"></div>
+            <div id="cam-flash" class="camera-flash"></div>
+          </div>
+        </div>
+
+        <div class="${S.scanMode==='manual'?'':'hidden'}">
+          <input type="text" class="scan-input" inputmode="numeric" placeholder="SSCC-koodi"
+            onkeydown="if(event.key==='Enter'){addBox(this.value);this.value='';}">
+          <button class="btn" style="margin-top:8px" onclick="const i=document.querySelector('.scan-input');addBox(i.value);i.value='';i.focus();">Lisää laatikko</button>
+        </div>
+
+        ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
+        ${S.error?`<div class="error">${S.error}</div>`:''}
+      </div>
+
+      ${S.scannedBoxes.length>0?`
+      <div class="card">
+        <h2>Skannatut (${S.scannedBoxes.length})</h2>
+        <div style="font-size:13px;color:#475569;margin-bottom:12px">${ti} tuotetta, ${tp} kpl</div>
+        ${S.scannedBoxes.map((b,i)=>`
+          <div class="scanned-box">
+            <div><span style="font-size:12px;font-weight:600">Laatikko ${i+1}</span>
+            <span class="mono" style="margin-left:8px;color:#64748b">...${b.sscc.slice(-6)}</span></div>
+            <div style="font-size:12px;color:#475569">${b.items.length} tuot. / ${b.items.reduce((s,i)=>s+i.qty,0)} kpl</div>
+          </div>`).join('')}
+        <button class="btn" style="margin-top:8px" onclick="buildRoute()">Muodosta hyllytysjärjestys →</button>
+      </div>`:''}`;
+
+    if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);
+    return;
+  }
+
+  /* ── SHELVE ── */
+  if(S.phase==='shelve'){
+    const ts=tShelved(),tq=tQty(),pct=tq>0?Math.round(ts/tq*100):0,allDone=ts>=tq&&tq>0;
+    const cur=S.routeItems[S.currentIdx],cc=cur?(S.shelved[cur.vnr]||0):0,cd=cur?cc>=cur.qty:!1;
+
+    if(allDone){
+      camStop();
+      app.innerHTML=`
+        <div class="card text-center" style="padding:32px">
+          <div style="font-size:48px;margin-bottom:8px">✓</div>
+          <h2 style="color:#16a34a">Kaikki hyllytetty!</h2>
+          <p style="font-size:13px;color:#64748b">${tq} kpl / ${S.routeItems.length} tuotetta</p>
+          <button class="btn" style="margin-top:16px" onclick="camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null})">Uusi erä</button>
+        </div>`;return;
+    }
+
+    const cpColor=CZ.find(z=>z.pos===cur.cartPos)?.color||'#64748b';
+
+    app.innerHTML=`
+      <div class="mb-12">
+        <div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px">
+          <span>${ts}/${tq} hyllytetty</span><span>${pct}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill ${allDone?'done':''}" style="width:${pct}%"></div></div>
+      </div>
+
+      <div class="card" style="border-left:4px solid ${cpColor}">
+        <div class="flex justify-between items-center mb-8">
+          <div class="flex items-center gap-8">${cBadge(cur.cartPos)}<span style="font-size:12px;color:#64748b">Paikka ${cur.cartPos}</span></div>
+          <span style="font-size:12px;color:#94a3b8">${S.currentIdx+1}/${S.routeItems.length}</span>
+        </div>
+        ${cur.parsedLoc?`
+          <div class="flex items-center gap-8 mb-6">
+            <span class="${bCls(cur.parsedLoc.aisle)}">${cur.parsedLoc.aisle}</span>
+            <span class="location-big">${cur.location}</span>
+          </div>`:`<div class="mono" style="font-size:14px;color:#dc2626;margin-bottom:6px">Ei varastopaikkaa</div>`}
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">${cur.name}</div>
+        <div class="mono" style="color:#64748b;margin-bottom:10px">VNR ${cur.vnr}${cur.ean&&cur.ean!=='null'?' | EAN '+cur.ean:''}</div>
+        <div class="qty-display" style="background:${cd?'#f0fdf4':'#f8fafc'};border:2px solid ${cd?'#86efac':'#e2e8f0'}">
+          <span class="qty-count" style="color:${cd?'#16a34a':'#1e293b'}">${cc}</span>
+          <span class="qty-sep">/</span>
+          <span class="qty-total">${cur.qty}</span>
+          ${cd?'<span style="font-size:24px;margin-left:8px">✓</span>':''}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="label mb-6">Skannaa tuotteen EAN</div>
+        <div class="tab-bar">
+          <button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
+          <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',confirmEan)">📷 Kamera</button>
+        </div>
+
+        <div class="${S.scanMode==='camera'?'':'hidden'}">
+          <div class="camera-wrap">
+            <video id="cam-video" playsinline muted></video>
+            <div class="camera-guide"></div>
+            <div id="cam-flash" class="camera-flash"></div>
+          </div>
+        </div>
+
+        <div class="${S.scanMode==='manual'?'':'hidden'}">
+          <input type="text" class="scan-input" style="font-size:16px" inputmode="numeric" placeholder="EAN-koodi"
+            onkeydown="if(event.key==='Enter'){confirmEan(this.value);this.value='';}">
+          <button class="btn" style="margin-top:6px" onclick="const i=document.querySelector('.scan-input');confirmEan(i.value);i.value='';i.focus();">Kuittaa</button>
+        </div>
+
+        ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
+        ${S.error?`<div class="error">${S.error}</div>`:''}
+      </div>
+
+      <div class="flex gap-8 mb-12">
+        <button class="btn-sm btn-outline flex-1" ${S.currentIdx===0?'disabled':''} onclick="setState({currentIdx:Math.max(0,S.currentIdx-1)})">← Edellinen</button>
+        <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="setState({currentIdx:Math.min(S.routeItems.length-1,S.currentIdx+1)})">Seuraava →</button>
+      </div>
+
+      <details class="card">
+        <summary>Koko reitti (${S.routeItems.length} tuotetta)</summary>
+        <div style="max-height:400px;overflow-y:auto">
+          ${S.routeItems.map((item,idx)=>{
+            const done=(S.shelved[item.vnr]||0)>=item.qty,isCur=idx===S.currentIdx;
+            return`<div class="route-item ${isCur?'current':''} ${done&&!isCur?'completed':''}" onclick="setState({currentIdx:${idx}})">
+              <div class="flex items-center gap-6" style="flex:1;min-width:0">
+                ${cBadge(item.cartPos)}
+                <div style="min-width:0"><div class="route-item-name">${item.name}</div><div class="route-item-loc">${item.location||'—'}</div></div>
+              </div>
+              <div style="font-size:12px;font-weight:700;white-space:nowrap;margin-left:8px;color:${done?'#16a34a':'#1e293b'}">${S.shelved[item.vnr]||0}/${item.qty}${done?' ✓':''}</div>
+            </div>`}).join('')}
+        </div>
+      </details>
+
+      <details class="card">
+        <summary>Kärryn paikat</summary>
+        ${CZ.map(z=>{
+          const items=S.routeItems.filter(i=>i.cartPos===z.pos);
+          if(!items.length)return'';
+          return`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid ${z.color};background:#fafbfc">
+            <div style="font-size:12px;font-weight:700;color:${z.color};margin-bottom:4px">Paikka ${z.pos} — ${items.length} tuotetta</div>
+            ${items.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${i.name} (${i.qty} kpl) → ${i.location||'?'}</div>`).join('')}
+          </div>`}).join('')}
+      </details>`;
+
+    if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
