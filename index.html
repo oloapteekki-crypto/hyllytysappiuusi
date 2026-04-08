@@ -104,7 +104,13 @@ const CZ=[
 function cartPos(pa){for(const z of CZ)if(z.aisles.includes(pa))return z.pos;return 5}
 
 /* ═══════════ LOCATION ═══════════ */
-function pLoc(l){if(!l||["uusi","null","vanha","0",""].includes(l.toLowerCase()))return null;const p=l.split("-");return p.length===4?{aisle:p[0],shelf:p[1],level:p[2],pos:p[3],raw:l}:null}
+function pLoc(l){
+  if(!l||typeof l!=='string')return null;
+  const lt=l.trim().toLowerCase();
+  if(!lt||["uusi","null","vanha","0","uusi "].includes(lt))return null;
+  const p=l.trim().split("-");
+  return p.length===4?{aisle:p[0],shelf:p[1],level:p[2],pos:p[3],raw:l.trim()}:null;
+}
 function sOdd(s){const n=parseInt(s,10);return isNaN(n)?null:n%2!==0}
 function gPA(p){const{aisle:a,shelf:s}=p,o=sOdd(s);if(a==="A6")return o?"A6odd_A1even":"A6_even";if(a==="A1")return o===!1?"A6odd_A1even":"A1odd_A7";if(a==="A7")return"A1odd_A7";return a}
 function pI(pa){const i=PO.indexOf(pa);return i===-1?999:i}
@@ -113,7 +119,13 @@ function sSort(items){return[...items].sort((a,b)=>{if(!a.parsedLoc&&!b.parsedLo
 /* ═══════════ FILE PARSERS ═══════════ */
 function rF(f,e='utf-8'){return new Promise((r,j)=>{const x=new FileReader();x.onload=v=>r(v.target.result);x.onerror=j;x.readAsText(f,e)})}
 function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};d.querySelectorAll("InvoiceRow").forEach(r=>{const id=r.querySelector("ArticleGroupIdentifier")?.textContent||"?",v=r.querySelector("ArticleIdentifier")?.textContent||"",n=r.querySelector("ArticleName")?.textContent||"",q=parseInt(r.querySelector("DeliveredQuantity")?.textContent||"0",10);if(!b[id])b[id]=[];const e=b[id].find(i=>i.vnr===v);if(e)e.qty+=q;else b[id].push({vnr:v,name:n,qty:q})});return b}
-function pCSV(t){const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};r.data.forEach(r=>{const s=(r.sku||"").trim();if(!s)return;m[s]={name:(r.name||"").trim(),ean:(r.ean||"").trim(),location:(r.storage_location||"").trim()}});return m}
+function pCSV(t){
+  const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};
+  r.data.forEach(r=>{
+    const s=String(r.sku||'').trim();if(!s)return;
+    m[s]={name:String(r.name||'').trim(),ean:String(r.ean||'').trim(),location:String(r.storage_location||'').trim()};
+  });return m;
+}
 
 /* ═══════════ CAMERA SCANNER ═══════════ */
 let camStream=null,camRunning=!1,camDetector=null,camLast="",camLastT=0,camCallback=null;
@@ -159,12 +171,13 @@ let S={
   phase:'setup', xmlBoxes:null, masterData:null,
   scannedBoxes:[], routeItems:[], unmatchedItems:[], shelved:{},
   currentIdx:0, error:null, scanMode:'manual',
-  lastScanResult:null, // {type:'ok'|'fail', text:string}
+  lastScanResult:null, loadInfo:null,
 };
 
 function setState(u){Object.assign(S,u);render()}
 
 /* ═══════════ HELPERS ═══════════ */
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function bCls(a){const k=a?.[0]||'U';return'badge badge-'+({'L':'L','F':'F','A':'A','B':'B','U':'U'}[k]||'U')}
 function cBadge(p){return`<span class="cart-badge cart-${p}">${p}</span>`}
 function tShelved(){return S.routeItems.reduce((s,i)=>s+Math.min(S.shelved[i.vnr]||0,i.qty),0)}
@@ -184,7 +197,23 @@ async function loadFiles(){
         items.forEach(item=>{const e=allB[sscc].find(i=>i.vnr===item.vnr);if(e)e.qty+=item.qty;else allB[sscc].push({...item})});
       }
     }
-    setState({xmlBoxes:allB,masterData:master,phase:'scan'});
+    // Validate and show summary
+    let totalProducts=0, withLoc=0, withoutLoc=0, details=[];
+    for(const[sscc,items]of Object.entries(allB)){
+      items.forEach(item=>{
+        totalProducts++;
+        const m=master[item.vnr];
+        const locStr=(m?.location||'').trim();
+        const pl=pLoc(locStr);
+        if(pl) withLoc++; else withoutLoc++;
+        details.push({vnr:item.vnr,name:item.name,locStr,hasLoc:!!pl});
+      });
+    }
+    console.log(`Ladattu: ${Object.keys(allB).length} laatikkoa, ${totalProducts} tuotetta, ${withLoc} varastopaikalla, ${withoutLoc} ilman`);
+    console.table(details);
+    setState({xmlBoxes:allB,masterData:master,phase:'scan',
+      loadInfo:`${Object.keys(allB).length} laatikkoa, ${totalProducts} tuotetta — ${withLoc} varastopaikalla, ${withoutLoc} ilman paikkaa`
+    });
   }catch(e){setState({error:'Virhe: '+e.message})}
 }
 
@@ -197,15 +226,36 @@ function addBox(code){
   setState({scannedBoxes:S.scannedBoxes,lastScanResult:{type:'ok',text:'Laatikko lisätty! ('+S.xmlBoxes[sscc].length+' tuotetta)'}});
 }
 
+function enrichItems(boxes){
+  const all=[];
+  boxes.forEach(box=>{
+    (box.items||[]).forEach(item=>{
+      try{
+        const vnr=String(item.vnr||'');
+        const m=S.masterData[vnr]||{};
+        const locStr=(m.location||'').trim();
+        const pl=pLoc(locStr);
+        const pa=pl?gPA(pl):null;
+        const cp=pa?cartPos(pa):0;
+        const ex=all.find(i=>i.vnr===vnr);
+        if(ex){ex.qty+=item.qty}
+        else{all.push({vnr:vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp})}
+      }catch(e){console.error('enrichItems error for VNR',item.vnr,e)}
+    });
+  });
+  return all;
+}
+
+function getCartPreview(){
+  const allItems=enrichItems(S.scannedBoxes);
+  const withLoc=allItems.filter(i=>i.parsedLoc);
+  const noLoc=allItems.filter(i=>!i.parsedLoc);
+  return{withLoc,noLoc};
+}
+
 function buildRoute(){
   camStop();
-  const all=[];
-  S.scannedBoxes.forEach(box=>{box.items.forEach(item=>{
-    const m=S.masterData[item.vnr]||{},loc=m.location||null,pl=pLoc(loc),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
-    const ex=all.find(i=>i.vnr===item.vnr);
-    if(ex)ex.qty+=item.qty;
-    else all.push({vnr:item.vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:loc,parsedLoc:pl,physAisle:pa,cartPos:cp});
-  })});
+  const all=enrichItems(S.scannedBoxes);
   const matched=all.filter(i=>i.parsedLoc),unmatched=all.filter(i=>!i.parsedLoc);
   setState({routeItems:sSort(matched),unmatchedItems:unmatched,shelved:{},currentIdx:0,phase:'shelve',scanMode:'manual',lastScanResult:null});
 }
@@ -223,7 +273,7 @@ function confirmEan(code){
   if(oi!==-1){
     const o=S.routeItems[oi],p=S.shelved[o.vnr]||0;
     if(p<o.qty){S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+o.name+' '+(p+1)+'/'+o.qty}});return}
-    setState({error:`${o.name} — jo valmis (${p}/${o.qty})`,lastScanResult:{type:'fail',text:'Jo hyllytetty'}});return;
+    setState({error:`${esc(o.name)} — jo valmis (${p}/${o.qty})`,lastScanResult:{type:'fail',text:'Jo hyllytetty'}});return;
   }
   setState({error:`EAN "${code}" ei vastaa mitään tuotetta`,lastScanResult:{type:'fail',text:'EAN ei tunnistettu'}});
 }
@@ -270,6 +320,7 @@ function render(){
       <div class="card">
         <h1>Skannaa laatikko</h1>
         <p class="sub">Lue SSCC-viivakoodi (${bc} laatikkoa ladattu)</p>
+        ${S.loadInfo?`<div style="padding:8px 12px;border-radius:8px;background:#f0fdf4;border:1px solid #86efac;font-size:12px;color:#047857;margin-bottom:12px">✓ ${S.loadInfo}</div>`:''}
 
         <div class="tab-bar">
           <button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
@@ -310,25 +361,24 @@ function render(){
       <div class="card">
         <h2>Kärryn paikkajaottelu</h2>
         ${(()=>{
-          const allItems=[];
-          S.scannedBoxes.forEach(box=>{box.items.forEach(item=>{
-            const m=S.masterData[item.vnr]||{},loc=m.location||null,pl=pLoc(loc),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
-            const ex=allItems.find(i=>i.vnr===item.vnr);
-            if(ex)ex.qty+=item.qty;
-            else allItems.push({vnr:item.vnr,name:item.name||m.name||'?',qty:item.qty,location:loc,parsedLoc:pl,cartPos:cp});
-          })});
-          const noLoc=allItems.filter(i=>!i.parsedLoc);
-          return CZ.map(z=>{
-            const zItems=allItems.filter(i=>i.cartPos===z.pos&&i.parsedLoc);
-            if(!zItems.length)return'';
-            return`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid ${z.color};background:#fafbfc">
-              <div style="font-size:12px;font-weight:700;color:${z.color};margin-bottom:4px">Paikka ${z.pos} — ${zItems.length} tuotetta</div>
-              ${zItems.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${i.name} (${i.qty} kpl) → ${i.location}</div>`).join('')}
-            </div>`}).join('')
-            +(noLoc.length?`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid #94a3b8;background:#f8fafc">
-              <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:4px">UUSI-hylly — ${noLoc.length} tuotetta</div>
-              ${noLoc.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${i.name} (${i.qty} kpl)</div>`).join('')}
-            </div>`:'');
+          const cp=getCartPreview();
+          let html='';
+          CZ.forEach(z=>{
+            const zItems=cp.withLoc.filter(i=>i.cartPos===z.pos);
+            if(zItems.length){
+              html+=`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid ${z.color};background:#fafbfc">
+                <div style="font-size:12px;font-weight:700;color:${z.color};margin-bottom:4px">Paikka ${z.pos} — ${zItems.length} tuotetta</div>
+                ${zItems.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${esc(i.name)} (${i.qty} kpl) → ${i.location}</div>`).join('')}
+              </div>`;
+            }
+          });
+          if(cp.noLoc.length){
+            html+=`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid #94a3b8;background:#f8fafc">
+              <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:4px">UUSI-hylly — ${cp.noLoc.length} tuotetta</div>
+              ${cp.noLoc.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${esc(i.name)} (${i.qty} kpl)</div>`).join('')}
+            </div>`;
+          }
+          return html;
         })()}
       </div>`:''}`;
 
@@ -350,7 +400,7 @@ function render(){
           ${tq>0?`<p style="font-size:13px;color:#64748b">${tq} kpl / ${S.routeItems.length} tuotetta</p>`:''}
           ${S.unmatchedItems.length>0?`<div style="margin-top:12px;padding:10px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;font-size:13px;color:#92400e">
             ⚠ ${S.unmatchedItems.length} tuotetta UUSI-hyllyyn:<br>
-            ${S.unmatchedItems.map(i=>`${i.name} (${i.qty} kpl)`).join('<br>')}
+            ${S.unmatchedItems.map(i=>`${esc(i.name)} (${i.qty} kpl)`).join('<br>')}
           </div>`:''}
           <button class="btn" style="margin-top:16px" onclick="camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],unmatchedItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null})">Uusi erä</button>
         </div>`;return;
@@ -370,7 +420,7 @@ function render(){
       <div class="card" style="border-left:4px solid #f59e0b;background:#fffbeb">
         <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">⚠ UUSI-hyllyyn (${S.unmatchedItems.length} tuotetta)</div>
         <div style="font-size:12px;color:#92400e;margin-bottom:8px">Näillä tuotteilla ei ole varastopaikkaa — laita UUSI-hyllyyn</div>
-        ${S.unmatchedItems.map(i=>`<div style="font-size:12px;color:#78350f;padding:3px 0">${i.name} <span class="mono">(VNR ${i.vnr})</span> — ${i.qty} kpl</div>`).join('')}
+        ${S.unmatchedItems.map(i=>`<div style="font-size:12px;color:#78350f;padding:3px 0">${esc(i.name)} <span class="mono">(VNR ${i.vnr})</span> — ${i.qty} kpl</div>`).join('')}
       </div>`:''}
 
       <div class="card" style="border-left:4px solid ${cpColor}">
@@ -383,7 +433,7 @@ function render(){
             <span class="${bCls(cur.parsedLoc.aisle)}">${cur.parsedLoc.aisle}</span>
             <span class="location-big">${cur.location}</span>
           </div>`:`<div class="mono" style="font-size:14px;color:#dc2626;margin-bottom:6px">Ei varastopaikkaa</div>`}
-        <div style="font-size:15px;font-weight:600;margin-bottom:4px">${cur.name}</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">${esc(cur.name)}</div>
         <div class="mono" style="color:#64748b;margin-bottom:10px">VNR ${cur.vnr}${cur.ean&&cur.ean!=='null'?' | EAN '+cur.ean:''}</div>
         <div class="qty-display" style="background:${cd?'#f0fdf4':'#f8fafc'};border:2px solid ${cd?'#86efac':'#e2e8f0'}">
           <span class="qty-count" style="color:${cd?'#16a34a':'#1e293b'}">${cc}</span>
@@ -431,7 +481,7 @@ function render(){
             return`<div class="route-item ${isCur?'current':''} ${done&&!isCur?'completed':''}" onclick="setState({currentIdx:${idx}})">
               <div class="flex items-center gap-6" style="flex:1;min-width:0">
                 ${cBadge(item.cartPos)}
-                <div style="min-width:0"><div class="route-item-name">${item.name}</div><div class="route-item-loc">${item.location||'—'}</div></div>
+                <div style="min-width:0"><div class="route-item-name">${esc(item.name)}</div><div class="route-item-loc">${item.location||'—'}</div></div>
               </div>
               <div style="font-size:12px;font-weight:700;white-space:nowrap;margin-left:8px;color:${done?'#16a34a':'#1e293b'}">${S.shelved[item.vnr]||0}/${item.qty}${done?' ✓':''}</div>
             </div>`}).join('')}
@@ -445,7 +495,7 @@ function render(){
           if(!items.length)return'';
           return`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid ${z.color};background:#fafbfc">
             <div style="font-size:12px;font-weight:700;color:${z.color};margin-bottom:4px">Paikka ${z.pos} — ${items.length} tuotetta</div>
-            ${items.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${i.name} (${i.qty} kpl) → ${i.location||'?'}</div>`).join('')}
+            ${items.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${esc(i.name)} (${i.qty} kpl) → ${i.location||'?'}</div>`).join('')}
           </div>`}).join('')}
       </details>`;
 
