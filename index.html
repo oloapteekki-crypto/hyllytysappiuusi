@@ -27,61 +27,59 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 .error{color:#dc2626;font-size:13px;text-align:center;margin-top:6px}
 .flex{display:flex}.gap-8{gap:8px}.gap-6{gap:6px}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-1{flex:1}
 .mb-6{margin-bottom:6px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.text-center{text-align:center}
-
 .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace}
 .badge-L{background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc}
 .badge-F{background:#fce7f3;color:#be185d;border:1.5px solid #f9a8d4}
 .badge-A{background:#ecfdf5;color:#047857;border:1.5px solid #6ee7b7}
 .badge-B{background:#fef3c7;color:#92400e;border:1.5px solid #fcd34d}
 .badge-U{background:#f3e8ff;color:#7c3aed;border:1.5px solid #c4b5fd}
-
+.badge-R{background:#fee2e2;color:#b91c1c;border:1.5px solid #fca5a5}
+.badge-J{background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc}
 .cart-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
 .cart-1{background:#ef4444}.cart-2{background:#f59e0b}.cart-3{background:#10b981}.cart-4{background:#3b82f6}.cart-5{background:#8b5cf6}
-
 .progress-bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden}
 .progress-fill{height:100%;border-radius:4px;background:#1e293b;transition:width .3s}
 .progress-fill.done{background:#16a34a}
-
 .route-item{padding:8px 10px;border-radius:8px;margin-bottom:4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:1px solid #f1f5f9}
 .route-item.current{background:#eff6ff;border:2px solid #3b82f6}
 .route-item.completed{opacity:.5}
 .route-item-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .route-item-loc{font-size:11px;color:#64748b;font-family:monospace}
-
 .qty-display{display:flex;align-items:center;justify-content:center;gap:4px;padding:14px;border-radius:10px;font-family:monospace}
-.qty-count{font-size:36px;font-weight:800}
-.qty-sep{font-size:22px;color:#94a3b8}
-.qty-total{font-size:36px;font-weight:800;color:#64748b}
-
+.qty-count{font-size:36px;font-weight:800}.qty-sep{font-size:22px;color:#94a3b8}.qty-total{font-size:36px;font-weight:800;color:#64748b}
 .scanned-box{padding:8px 12px;border-radius:8px;margin-bottom:6px;background:#f8fafc;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
 .location-big{font-size:20px;font-weight:700;font-family:monospace;color:#1e293b}
-
 .or-divider{display:flex;align-items:center;gap:12px;margin:12px 0;color:#94a3b8;font-size:12px}
 .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:#e2e8f0}
-
 .tab-bar{display:flex;gap:4px;margin-bottom:8px}
 .tab{flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
-.tab.active{background:#1e293b;color:#fff}
-.tab:not(.active){background:#e2e8f0;color:#475569}
-
+.tab.active{background:#1e293b;color:#fff}.tab:not(.active){background:#e2e8f0;color:#475569}
 .camera-wrap{position:relative;width:100%;border-radius:10px;overflow:hidden;margin-bottom:8px;background:#000;aspect-ratio:4/3}
 .camera-wrap video{width:100%;height:100%;object-fit:cover;display:block}
 .camera-guide{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:25%;border:2px solid rgba(255,255,255,.7);border-radius:8px;pointer-events:none}
 .camera-flash{position:absolute;inset:0;background:rgba(76,175,80,.3);pointer-events:none;opacity:0;transition:opacity .15s}
 .camera-flash.show{opacity:1}
-
 .scan-result{padding:10px;border-radius:8px;margin-top:8px;font-size:13px;text-align:center;font-weight:600}
 .scan-ok{background:#f0fdf4;color:#16a34a;border:1px solid #86efac}
 .scan-fail{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
-
 details summary{cursor:pointer;font-size:14px;font-weight:600;margin-bottom:8px}
 details[open] summary{margin-bottom:12px}
 .hidden{display:none!important}
+.qty-adj{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+.qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1e293b;transition:all .1s}
+.qty-btn:active{background:#f1f5f9;transform:scale(.95)}
+.qty-btn.minus{color:#dc2626;border-color:#fca5a5}
+.qty-btn.plus{color:#16a34a;border-color:#86efac}
+.qty-manual{width:60px;text-align:center;font-size:18px;font-weight:700;font-family:monospace;border:2px solid #e2e8f0;border-radius:8px;padding:8px 4px;outline:none}
+.qty-manual:focus{border-color:#3b82f6}
+.report-row{padding:8px 10px;border-radius:8px;margin-bottom:4px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.report-ok{background:#f0fdf4;border:1px solid #dcfce7}
+.report-warn{background:#fffbeb;border:1px solid #fde68a}
+.report-err{background:#fef2f2;border:1px solid #fecaca}
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
-
 <script>
 /* ═══════════ ROUTE CONFIG ═══════════ */
 const PR=[
@@ -89,133 +87,164 @@ const PR=[
   {id:"L4",asc:!1},{id:"L5",asc:!0},{id:"A2",asc:!1},{id:"A3",asc:!0},
   {id:"A4",asc:!1},{id:"A5",asc:!0},{id:"A6_even",asc:!1},{id:"A6odd_A1even",asc:!0},
   {id:"A1odd_A7",asc:!1},{id:"B1",asc:!0},{id:"B2",asc:!1},{id:"B3",asc:!0},
-  {id:"B4",asc:!1},{id:"UU",asc:!0},
+  {id:"B4",asc:!1},{id:"UU",asc:!0},{id:"RX",asc:!0},{id:"JK",asc:!0},
 ];
 const PO=PR.map(p=>p.id),PD=Object.fromEntries(PR.map(p=>[p.id,p.asc]));
-const PL={L1:"L1",FA:"FA",L2:"L2",L3:"L3",L4:"L4",L5:"L5",A2:"A2",A3:"A3",A4:"A4",A5:"A5",A6_even:"A6 par.",A6odd_A1even:"A6/A1",A1odd_A7:"A1/A7",B1:"B1",B2:"B2",B3:"B3",B4:"B4",UU:"UU"};
-
+const PL={L1:"L1",FA:"FA",L2:"L2",L3:"L3",L4:"L4",L5:"L5",A2:"A2",A3:"A3",A4:"A4",A5:"A5",A6_even:"A6 par.",A6odd_A1even:"A6/A1",A1odd_A7:"A1/A7",B1:"B1",B2:"B2",B3:"B3",B4:"B4",UU:"UU",RX:"Reseptilääke",JK:"Jääkaappi"};
 const CZ=[
   {pos:1,aisles:["L1","FA","L2","L3"],color:"#ef4444"},
   {pos:2,aisles:["L4","L5","A2","A3"],color:"#f59e0b"},
   {pos:3,aisles:["A4","A5","A6_even","A6odd_A1even"],color:"#10b981"},
   {pos:4,aisles:["A1odd_A7","B1","B2"],color:"#3b82f6"},
-  {pos:5,aisles:["B3","B4","UU"],color:"#8b5cf6"},
+  {pos:5,aisles:["B3","B4","UU","RX","JK"],color:"#8b5cf6"},
 ];
 function cartPos(pa){for(const z of CZ)if(z.aisles.includes(pa))return z.pos;return 5}
 
 /* ═══════════ LOCATION ═══════════ */
 function pLoc(l){
   if(!l||typeof l!=='string')return null;
-  const lt=l.trim().toLowerCase();
+  const t=l.trim(),lt=t.toLowerCase();
   if(!lt||["uusi","null","vanha","0","uusi "].includes(lt))return null;
-  const p=l.trim().split("-");
-  return p.length===4?{aisle:p[0],shelf:p[1],level:p[2],pos:p[3],raw:l.trim()}:null;
+  const p=t.split("-");
+  if(p.length===4){
+    // UU-04 tai korkeampi → ei enää olemassa, ohjataan UUSI-hyllyyn
+    if(p[0].toUpperCase()==='UU'&&parseInt(p[1],10)>=4)return null;
+    return{aisle:p[0],shelf:p[1],level:p[2],pos:p[3],raw:t,type:'shelf'};
+  }
+  if(/^[A-Za-z]\d{1,2}$/.test(t))return{aisle:'RX',shelf:t,level:'0',pos:'0',raw:t,type:'rx'};
+  if(p.length===3)return{aisle:p[0],shelf:p[1],level:p[2],pos:'0',raw:t,type:'shelf3'};
+  if(/^JK\d+$/i.test(t))return{aisle:'JK',shelf:t,level:'0',pos:'0',raw:t,type:'cold'};
+  return null;
 }
 function sOdd(s){const n=parseInt(s,10);return isNaN(n)?null:n%2!==0}
-function gPA(p){const{aisle:a,shelf:s}=p,o=sOdd(s);if(a==="A6")return o?"A6odd_A1even":"A6_even";if(a==="A1")return o===!1?"A6odd_A1even":"A1odd_A7";if(a==="A7")return"A1odd_A7";return a}
+function gPA(p){
+  if(p.type==='rx')return'RX';if(p.type==='cold')return'JK';
+  const{aisle:a,shelf:s}=p,o=sOdd(s);
+  if(a==="A6")return o?"A6odd_A1even":"A6_even";
+  if(a==="A1")return o===!1?"A6odd_A1even":"A1odd_A7";
+  if(a==="A7")return"A1odd_A7";return a;
+}
 function pI(pa){const i=PO.indexOf(pa);return i===-1?999:i}
 function sSort(items){return[...items].sort((a,b)=>{if(!a.parsedLoc&&!b.parsedLoc)return 0;if(!a.parsedLoc)return 1;if(!b.parsedLoc)return-1;const pa=pI(a.physAisle),pb=pI(b.physAisle);if(pa!==pb)return pa-pb;const asc=PD[a.physAisle]!==!1;const sc=a.parsedLoc.shelf.localeCompare(b.parsedLoc.shelf,undefined,{numeric:!0});if(sc)return asc?sc:-sc;const lc=a.parsedLoc.level.localeCompare(b.parsedLoc.level);if(lc)return asc?lc:-lc;const pc=a.parsedLoc.pos.localeCompare(b.parsedLoc.pos,undefined,{numeric:!0});return asc?pc:-pc})}
 
 /* ═══════════ FILE PARSERS ═══════════ */
 function rF(f,e='utf-8'){return new Promise((r,j)=>{const x=new FileReader();x.onload=v=>r(v.target.result);x.onerror=j;x.readAsText(f,e)})}
-function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};d.querySelectorAll("InvoiceRow").forEach(r=>{const id=r.querySelector("ArticleGroupIdentifier")?.textContent||"?",v=r.querySelector("ArticleIdentifier")?.textContent||"",n=r.querySelector("ArticleName")?.textContent||"",q=parseInt(r.querySelector("DeliveredQuantity")?.textContent||"0",10);if(!b[id])b[id]=[];const e=b[id].find(i=>i.vnr===v);if(e)e.qty+=q;else b[id].push({vnr:v,name:n,qty:q})});return b}
+function pXML(t){
+  const d=new DOMParser().parseFromString(t,"text/xml"),b={};
+  const invoice=(d.querySelector("InvoiceNumber")||{}).textContent||Math.random().toString(36).slice(2,8);
+  d.querySelectorAll("InvoiceRow").forEach(r=>{
+    let boxId=null;
+    const agi=r.querySelector("ArticleGroupIdentifier"),pkn=r.querySelector("PackageNumber"),bln=r.querySelector("BoxlistNumber");
+    if(agi&&agi.textContent&&agi.textContent!=='?')boxId=agi.textContent;
+    else if(pkn&&pkn.textContent)boxId=pkn.textContent;
+    else if(bln&&bln.textContent)boxId=bln.textContent;
+    else boxId='inv_'+invoice;
+    const aid=r.querySelector("ArticleIdentifier")?.textContent||"";
+    const vnrId=r.querySelector("VnrIdentifier")?.textContent||"";
+    const n=r.querySelector("ArticleName")?.textContent||"";
+    const qRaw=r.querySelector("DeliveredQuantity")?.textContent||"0";
+    const q=parseInt(qRaw.replace(',','.'),10)||Math.round(parseFloat(qRaw.replace(',','.'))||0);
+    if(!aid&&!vnrId)return;
+    const vnr=aid;
+    if(!b[boxId])b[boxId]=[];
+    const e=b[boxId].find(i=>i.vnr===vnr);
+    if(e)e.qty+=q;else b[boxId].push({vnr,altVnr:vnrId,name:n,qty:q});
+  });return b;
+}
 function pCSV(t){
+  if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
   const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};
-  r.data.forEach(r=>{
-    const s=String(r.sku||'').trim();if(!s)return;
-    m[s]={name:String(r.name||'').trim(),ean:String(r.ean||'').trim(),location:String(r.storage_location||'').trim()};
+  const cols=r.meta?.fields||[];
+  const skuCol=cols.find(c=>c.replace(/^\uFEFF/,'').toLowerCase()==='sku')||'sku';
+  const nameCol=cols.find(c=>c.toLowerCase()==='name')||'name';
+  const eanCol=cols.find(c=>c.toLowerCase()==='ean')||'ean';
+  const locCol=cols.find(c=>c.toLowerCase().includes('storage_location')||c.toLowerCase().includes('location'))||'storage_location';
+  r.data.forEach(row=>{const s=String(row[skuCol]||'').trim();if(!s)return;
+    m[s]={name:String(row[nameCol]||'').trim(),ean:String(row[eanCol]||'').trim(),location:String(row[locCol]||'').trim()};
   });return m;
 }
 
-/* ═══════════ CAMERA SCANNER ═══════════ */
+/* ═══════════ CAMERA ═══════════ */
 let camStream=null,camRunning=!1,camDetector=null,camLast="",camLastT=0,camCallback=null;
-
 async function camStart(cb){
-  camStop();
-  camCallback=cb;
-  const v=document.getElementById('cam-video');
-  if(!v)return;
-  if(!('BarcodeDetector'in window)){setState({error:'BarcodeDetector API ei tuettu tässä selaimessa'});return}
-  try{
-    camDetector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','itf','upc_a','upc_e']});
+  camStop();camCallback=cb;const v=document.getElementById('cam-video');if(!v)return;
+  if(!('BarcodeDetector'in window)){setState({error:'BarcodeDetector API ei tuettu'});return}
+  try{camDetector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','itf','upc_a','upc_e']});
     camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}});
     v.srcObject=camStream;await v.play();camRunning=!0;camScan()
-  }catch(e){
-    if(e.name==='NotAllowedError')setState({error:'Kamera estetty — tarkista selaimen asetukset'});
-    else setState({error:'Kamera-virhe: '+e.message});
-  }
+  }catch(e){setState({error:e.name==='NotAllowedError'?'Kamera estetty — tarkista asetukset':'Kamera-virhe: '+e.message})}
 }
-function camScan(){
-  if(!camRunning)return;
-  const v=document.getElementById('cam-video');
-  if(!v){camRunning=!1;return}
-  camDetector.detect(v).then(codes=>{
-    if(codes.length>0){
-      const c=codes[0].rawValue,now=Date.now();
-      if(c!==camLast||now-camLastT>2000){
-        camLast=c;camLastT=now;
-        if(navigator.vibrate)navigator.vibrate(100);
-        // Flash effect
-        const fl=document.getElementById('cam-flash');
-        if(fl){fl.classList.add('show');setTimeout(()=>fl.classList.remove('show'),200)}
-        if(camCallback)camCallback(c);
-      }
-    }
-  }).catch(()=>{});
-  if(camRunning)requestAnimationFrame(camScan);
-}
+function camScan(){if(!camRunning)return;const v=document.getElementById('cam-video');if(!v){camRunning=!1;return}
+  camDetector.detect(v).then(codes=>{if(codes.length>0){const c=codes[0].rawValue,now=Date.now();
+    if(c!==camLast||now-camLastT>2000){camLast=c;camLastT=now;if(navigator.vibrate)navigator.vibrate(100);
+      const fl=document.getElementById('cam-flash');if(fl){fl.classList.add('show');setTimeout(()=>fl.classList.remove('show'),200)}
+      if(camCallback)camCallback(c)}}}).catch(()=>{});if(camRunning)requestAnimationFrame(camScan)}
 function camStop(){camRunning=!1;if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}camLast="";camLastT=0}
 
 /* ═══════════ STATE ═══════════ */
 let S={
-  phase:'setup', xmlBoxes:null, masterData:null,
-  scannedBoxes:[], routeItems:[], unmatchedItems:[], shelved:{},
-  currentIdx:0, error:null, scanMode:'manual',
-  lastScanResult:null, loadInfo:null,
-  confirmedLoc:null,
-  activeBox:null, // currently viewed box {sscc, items, enriched}
+  phase:'setup',xmlBoxes:null,masterData:null,
+  scannedBoxes:[],routeItems:[],unmatchedItems:[],shelved:{},
+  currentIdx:0,error:null,scanMode:'manual',
+  lastScanResult:null,loadInfo:null,confirmedLoc:null,activeBox:null,
 };
+
+// Prevent page refresh
+window.addEventListener('beforeunload',function(e){
+  if(S.phase!=='setup'){e.preventDefault();e.returnValue='Hyllytyserä on kesken. Haluatko varmasti poistua?'}
+});
 
 function setState(u){Object.assign(S,u);render()}
 
 /* ═══════════ HELPERS ═══════════ */
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function bCls(a){const k=a?.[0]||'U';return'badge badge-'+({'L':'L','F':'F','A':'A','B':'B','U':'U'}[k]||'U')}
+function bCls(a){const k=a?.[0]||'U';return'badge badge-'+({'L':'L','F':'F','A':'A','B':'B','U':'U','R':'R','J':'J'}[k]||'U')}
 function cBadge(p){return`<span class="cart-badge cart-${p}">${p}</span>`}
 function tShelved(){return S.routeItems.reduce((s,i)=>s+Math.min(S.shelved[i.vnr]||0,i.qty),0)}
 function tQty(){return S.routeItems.reduce((s,i)=>s+i.qty,0)}
 
+function lookupMaster(vnr,altVnr){
+  return S.masterData[vnr]||S.masterData[vnr.replace(/^0+/,'')]||(altVnr?(S.masterData[altVnr]||S.masterData[altVnr.replace(/^0+/,'')]):null)||{};
+}
+
+function enrichItems(boxes){
+  const all=[];
+  boxes.forEach(box=>{(box.items||[]).forEach(item=>{try{
+    const vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+    const m=lookupMaster(vnr,alt),locStr=(m.location||'').trim();
+    const pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+    const ex=all.find(i=>i.vnr===vnr);
+    if(ex)ex.qty+=item.qty;
+    else all.push({vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
+  }catch(e){console.error('enrichItems error',item.vnr,e)}})});return all;
+}
+function getCartPreview(){const a=enrichItems(S.scannedBoxes);return{withLoc:a.filter(i=>i.parsedLoc),noLoc:a.filter(i=>!i.parsedLoc)}}
+
+function showBoxDetail(sscc){
+  const box=S.scannedBoxes.find(b=>b.sscc===sscc);if(!box)return;
+  const enriched=[];
+  box.items.forEach(item=>{const vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+    const m=lookupMaster(vnr,alt),locStr=(m.location||'').trim();
+    const pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+    enriched.push({vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
+  });camStop();setState({activeBox:{sscc,items:box.items,enriched},scanMode:'manual',lastScanResult:null,error:null});
+}
+
 /* ═══════════ ACTIONS ═══════════ */
 async function loadFiles(){
   const xi=document.getElementById('xml-input'),mi=document.getElementById('master-input');
-  if(!xi.files.length||!mi.files.length)return;
-  setState({error:null});
+  if(!xi.files.length||!mi.files.length)return;setState({error:null});
   try{
     const mt=await rF(mi.files[0],'utf-8'),master=pCSV(mt),allB={};
-    for(const f of xi.files){
-      const t=await rF(f,'iso-8859-15'),boxes=pXML(t);
-      for(const[sscc,items]of Object.entries(boxes)){
-        if(!allB[sscc])allB[sscc]=[];
-        items.forEach(item=>{const e=allB[sscc].find(i=>i.vnr===item.vnr);if(e)e.qty+=item.qty;else allB[sscc].push({...item})});
-      }
-    }
-    // Validate and show summary
-    let totalProducts=0, withLoc=0, withoutLoc=0, details=[];
-    for(const[sscc,items]of Object.entries(allB)){
-      items.forEach(item=>{
-        totalProducts++;
-        const m=master[item.vnr]||master[String(item.vnr).replace(/^0+/,'')];
-        const locStr=(m?.location||'').trim();
-        const pl=pLoc(locStr);
-        if(pl) withLoc++; else withoutLoc++;
-        details.push({vnr:item.vnr,name:item.name,locStr,hasLoc:!!pl});
-      });
-    }
-    console.log(`Ladattu: ${Object.keys(allB).length} laatikkoa, ${totalProducts} tuotetta, ${withLoc} varastopaikalla, ${withoutLoc} ilman`);
-    console.table(details);
-    setState({xmlBoxes:allB,masterData:master,phase:'scan',
-      loadInfo:`${Object.keys(allB).length} laatikkoa, ${totalProducts} tuotetta — ${withLoc} varastopaikalla, ${withoutLoc} ilman paikkaa`
-    });
+    for(const f of xi.files){let t;try{t=await rF(f,'iso-8859-15')}catch(e){t=await rF(f,'utf-8')}
+      const boxes=pXML(t);for(const[sscc,items]of Object.entries(boxes)){if(!allB[sscc])allB[sscc]=[];
+        items.forEach(item=>{const e=allB[sscc].find(i=>i.vnr===item.vnr);if(e)e.qty+=item.qty;else allB[sscc].push({...item})})}}
+    let tp=0,wl=0,wo=0;
+    for(const[,items]of Object.entries(allB)){items.forEach(item=>{tp++;
+      const vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+      const m=master[vnr]||master[vnr.replace(/^0+/,'')]||(alt?master[alt]||master[alt.replace(/^0+/,'')]:null);
+      if(pLoc((m?.location||'').trim()))wl++;else wo++})}
+    setState({xmlBoxes:allB,masterData:master,phase:'scan',loadInfo:`${Object.keys(allB).length} laatikkoa, ${tp} tuotetta — ${wl} paikalla, ${wo} ilman`});
   }catch(e){setState({error:'Virhe: '+e.message})}
 }
 
@@ -224,457 +253,279 @@ function addBox(code){
   let sscc=S.xmlBoxes[code]?code:Object.keys(S.xmlBoxes).find(k=>k.endsWith(code)||code.endsWith(k));
   if(!sscc){setState({error:`SSCC "${code.length>8?'...'+code.slice(-8):code}" ei löydy`,lastScanResult:{type:'fail',text:'Ei löydy'}});return}
   if(S.scannedBoxes.some(b=>b.sscc===sscc)){setState({error:'Laatikko jo skannattu',lastScanResult:{type:'fail',text:'Jo skannattu'}});return}
-  const boxItems=S.xmlBoxes[sscc];
-  S.scannedBoxes.push({sscc,items:boxItems});
-  // Enrich this box's items for detail view
+  const boxItems=S.xmlBoxes[sscc];S.scannedBoxes.push({sscc,items:boxItems});
   const enriched=[];
-  boxItems.forEach(item=>{
-    const vnr=String(item.vnr||'');
-    const m=lookupMaster(vnr);
-    const locStr=(m.location||'').trim();
-    const pl=pLoc(locStr);
-    const pa=pl?gPA(pl):null;
-    const cp=pa?cartPos(pa):0;
-    enriched.push({vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
-  });
-  camStop();
-  setState({scannedBoxes:S.scannedBoxes,activeBox:{sscc,items:boxItems,enriched},scanMode:'manual',lastScanResult:null});
-}
-
-function lookupMaster(vnr){
-  return S.masterData[vnr] || S.masterData[vnr.replace(/^0+/,'')] || {};
-}
-
-function enrichItems(boxes){
-  const all=[];
-  boxes.forEach(box=>{
-    (box.items||[]).forEach(item=>{
-      try{
-        const vnr=String(item.vnr||'');
-        const m=lookupMaster(vnr);
-        const locStr=(m.location||'').trim();
-        const pl=pLoc(locStr);
-        const pa=pl?gPA(pl):null;
-        const cp=pa?cartPos(pa):0;
-        const ex=all.find(i=>i.vnr===vnr);
-        if(ex){ex.qty+=item.qty}
-        else{all.push({vnr:vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp})}
-      }catch(e){console.error('enrichItems error for VNR',item.vnr,e)}
-    });
-  });
-  return all;
-}
-
-function getCartPreview(){
-  const allItems=enrichItems(S.scannedBoxes);
-  const withLoc=allItems.filter(i=>i.parsedLoc);
-  const noLoc=allItems.filter(i=>!i.parsedLoc);
-  return{withLoc,noLoc};
-}
-
-function showBoxDetail(sscc){
-  const box=S.scannedBoxes.find(b=>b.sscc===sscc);
-  if(!box)return;
-  const enriched=[];
-  box.items.forEach(item=>{
-    const vnr=String(item.vnr||'');
-    const m=lookupMaster(vnr);
-    const locStr=(m.location||'').trim();
-    const pl=pLoc(locStr);
-    const pa=pl?gPA(pl):null;
-    const cp=pa?cartPos(pa):0;
-    enriched.push({vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
-  });
-  camStop();
-  setState({activeBox:{sscc,items:box.items,enriched},scanMode:'manual',lastScanResult:null,error:null});
+  boxItems.forEach(item=>{const vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+    const m=lookupMaster(vnr,alt),locStr=(m.location||'').trim();
+    const pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+    enriched.push({vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp})});
+  camStop();setState({scannedBoxes:S.scannedBoxes,activeBox:{sscc,items:boxItems,enriched},scanMode:'manual',lastScanResult:null});
 }
 
 function buildRoute(){
-  camStop();
-  const all=enrichItems(S.scannedBoxes);
+  camStop();const all=enrichItems(S.scannedBoxes);
   const matched=all.filter(i=>i.parsedLoc),unmatched=all.filter(i=>!i.parsedLoc);
   setState({routeItems:sSort(matched),unmatchedItems:unmatched,shelved:{},currentIdx:0,phase:'shelve',scanMode:'manual',lastScanResult:null,confirmedLoc:null});
 }
 
 function confirmLocation(code){
   if(!code)return;setState({error:null,lastScanResult:null});
-  const cur=S.routeItems[S.currentIdx];
-  if(!cur||!cur.location)return;
-
-  // Normalize: trim, uppercase
-  const scanned=code.trim().toUpperCase();
-  const expected=cur.location.trim().toUpperCase();
-
-  if(scanned===expected){
-    setState({confirmedLoc:expected,lastScanResult:{type:'ok',text:'✓ Oikea paikka: '+cur.location},scanMode:'manual'});
-  }else{
-    // Check if scanned matches any other item's location on route
-    const otherIdx=S.routeItems.findIndex(it=>it.location&&it.location.trim().toUpperCase()===scanned);
-    if(otherIdx!==-1){
-      setState({confirmedLoc:scanned,currentIdx:otherIdx,lastScanResult:{type:'ok',text:'✓ Paikka: '+S.routeItems[otherIdx].location},scanMode:'manual'});
-    }else{
-      setState({error:`Paikka "${code}" ei ole reitillä`,lastScanResult:{type:'fail',text:'Väärä paikka'}});
-    }
-  }
+  const cur=S.routeItems[S.currentIdx];if(!cur||!cur.location)return;
+  const scanned=code.trim().toUpperCase(),expected=cur.location.trim().toUpperCase();
+  if(scanned===expected){setState({confirmedLoc:expected,lastScanResult:{type:'ok',text:'✓ Oikea paikka: '+cur.location},scanMode:'manual'});return}
+  const oi=S.routeItems.findIndex(it=>it.location&&it.location.trim().toUpperCase()===scanned);
+  if(oi!==-1){setState({confirmedLoc:scanned,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ Paikka: '+S.routeItems[oi].location},scanMode:'manual'});return}
+  setState({error:`Paikka "${code}" ei ole reitillä`,lastScanResult:{type:'fail',text:'Väärä paikka'}});
 }
 
 function confirmEan(code){
   if(!code)return;setState({error:null,lastScanResult:null});
+  if(!S.confirmedLoc){setState({error:'Skannaa ensin varastopaikka',lastScanResult:{type:'fail',text:'Skannaa paikka ensin'}});return}
   const cur=S.routeItems[S.currentIdx];
-
-  // Check location is confirmed
-  if(!S.confirmedLoc){
-    setState({error:'Skannaa ensin varastopaikka',lastScanResult:{type:'fail',text:'Skannaa paikka ensin'}});return;
-  }
-
   const match=(item,c)=>{if(!item.ean||item.ean==='null')return!1;return item.ean===c||c.endsWith(item.ean)||item.ean.endsWith(c)};
-
-  if(cur&&match(cur,code)){
-    const p=S.shelved[cur.vnr]||0;S.shelved[cur.vnr]=p+1;
-    setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ Kuitattu '+(p+1)+'/'+cur.qty}});return;
-  }
-  // Check if EAN matches another item at the SAME confirmed location
-  const sameLocIdx=S.routeItems.findIndex(it=>it.location&&it.location.trim().toUpperCase()===S.confirmedLoc&&match(it,code));
-  if(sameLocIdx!==-1){
-    const o=S.routeItems[sameLocIdx],p=S.shelved[o.vnr]||0;
-    if(p<o.qty){S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:sameLocIdx,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty}});return}
-    setState({error:`${esc(o.name)} — jo valmis (${p}/${o.qty})`,lastScanResult:{type:'fail',text:'Jo hyllytetty'}});return;
-  }
-  // Check any item on route
+  if(cur&&match(cur,code)){const p=S.shelved[cur.vnr]||0;S.shelved[cur.vnr]=p+1;
+    setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ Kuitattu '+(p+1)+'/'+cur.qty}});return}
+  const sli=S.routeItems.findIndex(it=>it.location&&it.location.trim().toUpperCase()===S.confirmedLoc&&match(it,code));
+  if(sli!==-1){const o=S.routeItems[sli],p=S.shelved[o.vnr]||0;
+    if(p<o.qty){S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:sli,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty}});return}
+    setState({error:esc(o.name)+' — jo valmis',lastScanResult:{type:'fail',text:'Jo hyllytetty'}});return}
   const oi=S.routeItems.findIndex(it=>match(it,code));
-  if(oi!==-1){
-    const o=S.routeItems[oi],p=S.shelved[o.vnr]||0;
-    if(p<o.qty){
-      // Different location — warn but allow
-      setState({error:`⚠ Tuote on paikassa ${o.location||'?'}, ei tässä paikassa. Skannaa oikea paikka ensin.`,lastScanResult:{type:'fail',text:'Väärä paikka'}});return;
-    }
-    setState({error:`${esc(o.name)} — jo valmis (${p}/${o.qty})`,lastScanResult:{type:'fail',text:'Jo hyllytetty'}});return;
-  }
-  setState({error:`EAN "${code}" ei vastaa mitään tuotetta`,lastScanResult:{type:'fail',text:'EAN ei tunnistettu'}});
+  if(oi!==-1){setState({error:'⚠ Tuote on paikassa '+(S.routeItems[oi].location||'?')+'. Skannaa oikea paikka.',lastScanResult:{type:'fail',text:'Väärä paikka'}});return}
+  setState({error:'EAN "'+code+'" ei vastaa mitään tuotetta',lastScanResult:{type:'fail',text:'EAN ei tunnistettu'}});
+}
+
+// Manual qty adjustment
+function adjustQty(vnr,delta){
+  const cur=(S.shelved[vnr]||0)+delta;
+  S.shelved[vnr]=Math.max(0,cur);
+  setState({shelved:S.shelved,lastScanResult:null});
+}
+function setQtyManual(vnr){
+  const inp=document.getElementById('qty-manual-'+vnr);
+  if(!inp)return;const v=parseInt(inp.value,10);
+  if(!isNaN(v)&&v>=0){S.shelved[vnr]=v;setState({shelved:S.shelved,lastScanResult:null})}
 }
 
 function switchScanMode(mode,callback){
-  camStop();S.scanMode=mode;S.lastScanResult=null;
-  render();
+  camStop();S.scanMode=mode;S.lastScanResult=null;render();
   if(mode==='camera')setTimeout(()=>camStart(callback),100);
   else setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},100);
 }
-
 function navTo(idx){
   if(idx<0||idx>=S.routeItems.length)return;
   const cur=S.routeItems[S.currentIdx],next=S.routeItems[idx];
-  const curLoc=cur?.location?.trim().toUpperCase()||'';
-  const nextLoc=next?.location?.trim().toUpperCase()||'';
-  // Keep confirmedLoc if same location, reset if different
-  const keepLoc=curLoc===nextLoc&&S.confirmedLoc===curLoc;
-  camStop();
-  setState({currentIdx:idx,confirmedLoc:keepLoc?S.confirmedLoc:null,lastScanResult:null,error:null,scanMode:'manual'});
+  const cl=cur?.location?.trim().toUpperCase()||'',nl=next?.location?.trim().toUpperCase()||'';
+  camStop();setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null,scanMode:'manual'});
 }
+
+function finishShelving(){setState({phase:'report'})}
 
 /* ═══════════ RENDER ═══════════ */
 function render(){
   const app=document.getElementById('app');
 
   /* ── SETUP ── */
-  if(S.phase==='setup'){
-    camStop();
-    app.innerHTML=`
-      <div class="card">
-        <h1>Hyllytysappi</h1>
-        <p class="sub">Lataa toimitusilmoitukset ja tuoterekisteri</p>
-        <div class="mb-12">
-          <label class="label">Toimitusilmoitukset (XML) — voit valita useita</label>
-          <input type="file" id="xml-input" accept=".xml,.XML" multiple style="font-size:14px;width:100%">
-        </div>
-        <div class="mb-16">
-          <label class="label">Tuoterekisteri (CSV)</label>
-          <input type="file" id="master-input" accept=".csv,.CSV" style="font-size:14px;width:100%">
-        </div>
-        <button class="btn" onclick="loadFiles()">Lataa tiedot</button>
-        ${S.error?`<div class="error">${S.error}</div>`:''}
-      </div>`;
-    return;
-  }
+  if(S.phase==='setup'){camStop();app.innerHTML=`
+    <div class="card"><h1>Hyllytysappi</h1><p class="sub">Lataa toimitusilmoitukset ja tuoterekisteri</p>
+      <div class="mb-12"><label class="label">Toimitusilmoitukset (XML) — voit valita useita</label>
+        <input type="file" id="xml-input" accept=".xml,.XML" multiple style="font-size:14px;width:100%"></div>
+      <div class="mb-16"><label class="label">Tuoterekisteri (CSV)</label>
+        <input type="file" id="master-input" accept=".csv,.CSV" style="font-size:14px;width:100%"></div>
+      <button class="btn" onclick="loadFiles()">Lataa tiedot</button>
+      ${S.error?`<div class="error">${S.error}</div>`:''}</div>`;return}
 
-  /* ── SCAN BOXES ── */
+  /* ── SCAN: BOX DETAIL ── */
+  if(S.phase==='scan'&&S.activeBox){
+    const ab=S.activeBox,wl=ab.enriched.filter(i=>i.parsedLoc),nl=ab.enriched.filter(i=>!i.parsedLoc);
+    const byLoc={};wl.forEach(i=>{const k=i.location;if(!byLoc[k])byLoc[k]={location:k,parsedLoc:i.parsedLoc,physAisle:i.physAisle,cartPos:i.cartPos,items:[]};byLoc[k].items.push(i)});
+    const sl=Object.values(byLoc).sort((a,b)=>{const pa=pI(a.physAisle),pb=pI(b.physAisle);return pa!==pb?pa-pb:a.location.localeCompare(b.location,undefined,{numeric:!0})});
+    app.innerHTML=`<div class="card">
+      <div class="flex justify-between items-center mb-8"><div><h1 style="margin-bottom:2px">Laatikon sisältö</h1>
+        <div class="mono" style="color:#64748b">SSCC ...${ab.sscc.slice(-6)}</div></div>
+        <div style="text-align:right"><div style="font-size:20px;font-weight:700">${ab.enriched.length}</div><div style="font-size:11px;color:#64748b">tuotetta</div></div></div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">Hyllylevyt reitin mukaan:</div>
+      ${sl.map(loc=>`<div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid ${CZ.find(z=>z.pos===loc.cartPos)?.color||'#94a3b8'};background:#fafbfc">
+        <div class="flex items-center gap-8 mb-6">${cBadge(loc.cartPos)}<span class="${bCls(loc.parsedLoc.aisle)}">${loc.parsedLoc.aisle}</span>
+          <span style="font-size:15px;font-weight:700;font-family:monospace">${loc.location}</span></div>
+        ${loc.items.map(i=>`<div style="padding:4px 0 4px 34px;font-size:13px;display:flex;justify-content:space-between">
+          <span>${esc(i.name)}</span><span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span></div>`).join('')}</div>`).join('')}
+      ${nl.length?`<div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid #94a3b8;background:#fffbeb">
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">UUSI-hyllyyn</div>
+        ${nl.map(i=>`<div style="padding:4px 0 4px 8px;font-size:13px;color:#78350f;display:flex;justify-content:space-between">
+          <span>${esc(i.name)} <span class="mono">(VNR ${i.vnr})</span></span><span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span></div>`).join('')}</div>`:''}</div>
+    <div class="flex gap-8"><button class="btn-sm btn-outline flex-1" onclick="setState({activeBox:null})">← Skannaa lisää</button>
+      <button class="btn flex-1" style="padding:10px 0" onclick="buildRoute()">Aloita hyllytys →</button></div>`;return}
+
+  /* ── SCAN: INPUT ── */
   if(S.phase==='scan'){
-
-    // ── BOX DETAIL VIEW ──
-    if(S.activeBox){
-      const ab=S.activeBox;
-      const withLoc=ab.enriched.filter(i=>i.parsedLoc);
-      const noLoc=ab.enriched.filter(i=>!i.parsedLoc);
-      // Group by location for shelf-level view
-      const byLoc={};
-      withLoc.forEach(i=>{
-        const key=i.location;
-        if(!byLoc[key])byLoc[key]={location:key,parsedLoc:i.parsedLoc,physAisle:i.physAisle,cartPos:i.cartPos,items:[]};
-        byLoc[key].items.push(i);
-      });
-      // Sort locations by route
-      const sortedLocs=Object.values(byLoc).sort((a,b)=>{
-        const pa=pI(a.physAisle),pb=pI(b.physAisle);
-        if(pa!==pb)return pa-pb;
-        return a.location.localeCompare(b.location,undefined,{numeric:true});
-      });
-
-      app.innerHTML=`
-        <div class="card">
-          <div class="flex justify-between items-center mb-8">
-            <div>
-              <h1 style="margin-bottom:2px">Laatikon sisältö</h1>
-              <div class="mono" style="color:#64748b">SSCC ...${ab.sscc.slice(-6)}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-size:20px;font-weight:700">${ab.enriched.length}</div>
-              <div style="font-size:11px;color:#64748b">tuotetta</div>
-            </div>
-          </div>
-
-          <div style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:10px">Hyllylevyt reitin mukaan:</div>
-
-          ${sortedLocs.map(loc=>`
-            <div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid ${CZ.find(z=>z.pos===loc.cartPos)?.color||'#94a3b8'};background:#fafbfc">
-              <div class="flex items-center gap-8 mb-6">
-                ${cBadge(loc.cartPos)}
-                <span class="${bCls(loc.parsedLoc.aisle)}">${loc.parsedLoc.aisle}</span>
-                <span style="font-size:15px;font-weight:700;font-family:monospace;color:#1e293b">${loc.location}</span>
-              </div>
-              ${loc.items.map(i=>`
-                <div style="padding:4px 0 4px 34px;font-size:13px;color:#334155;display:flex;justify-content:space-between">
-                  <span>${esc(i.name)}</span>
-                  <span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span>
-                </div>
-              `).join('')}
-            </div>
-          `).join('')}
-
-          ${noLoc.length>0?`
-            <div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid #94a3b8;background:#fffbeb">
-              <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">UUSI-hyllyyn</div>
-              ${noLoc.map(i=>`
-                <div style="padding:4px 0 4px 8px;font-size:13px;color:#78350f;display:flex;justify-content:space-between">
-                  <span>${esc(i.name)} <span class="mono">(VNR ${i.vnr})</span></span>
-                  <span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span>
-                </div>
-              `).join('')}
-            </div>
-          `:''}
-        </div>
-
-        <div class="flex gap-8">
-          <button class="btn-sm btn-outline flex-1" onclick="setState({activeBox:null})">← Skannaa lisää</button>
-          <button class="btn flex-1" style="padding:10px 0" onclick="buildRoute()">Aloita hyllytys →</button>
-        </div>`;
-      return;
-    }
-
-    // ── SCAN INPUT VIEW ──
-    const ti=S.scannedBoxes.reduce((s,b)=>s+b.items.length,0);
-    const tp=S.scannedBoxes.reduce((s,b)=>s+b.items.reduce((ss,i)=>ss+i.qty,0),0);
+    const ti=S.scannedBoxes.reduce((s,b)=>s+b.items.length,0),tp=S.scannedBoxes.reduce((s,b)=>s+b.items.reduce((ss,i)=>ss+i.qty,0),0);
     const bc=Object.keys(S.xmlBoxes).length;
-
-    app.innerHTML=`
-      <div class="card">
-        <h1>Skannaa laatikko</h1>
-        <p class="sub">Lue SSCC-viivakoodi (${bc} laatikkoa ladattu)</p>
-        ${S.loadInfo?`<div style="padding:8px 12px;border-radius:8px;background:#f0fdf4;border:1px solid #86efac;font-size:12px;color:#047857;margin-bottom:12px">✓ ${S.loadInfo}</div>`:''}
-
-        <div class="tab-bar">
-          <button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
-          <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',addBox)">📷 Kamera</button>
-        </div>
-
-        <div class="${S.scanMode==='camera'?'':'hidden'}">
-          <div class="camera-wrap">
-            <video id="cam-video" playsinline muted></video>
-            <div class="camera-guide"></div>
-            <div id="cam-flash" class="camera-flash"></div>
-          </div>
-        </div>
-
-        <div class="${S.scanMode==='manual'?'':'hidden'}">
-          <input type="text" class="scan-input" inputmode="numeric" placeholder="SSCC-koodi"
-            onkeydown="if(event.key==='Enter'){addBox(this.value);this.value='';}">
-          <button class="btn" style="margin-top:8px" onclick="const i=document.querySelector('.scan-input');addBox(i.value);i.value='';i.focus();">Lisää laatikko</button>
-        </div>
-
-        ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
-        ${S.error?`<div class="error">${S.error}</div>`:''}
-      </div>
-
-      ${S.scannedBoxes.length>0?`
-      <div class="card">
-        <h2>Skannatut (${S.scannedBoxes.length})</h2>
-        <div style="font-size:13px;color:#475569;margin-bottom:12px">${ti} tuotetta, ${tp} kpl</div>
-        ${S.scannedBoxes.map((b,i)=>`
-          <div class="scanned-box" onclick="showBoxDetail('${b.sscc}')" style="cursor:pointer">
-            <div><span style="font-size:12px;font-weight:600">Laatikko ${i+1}</span>
-            <span class="mono" style="margin-left:8px;color:#64748b">...${b.sscc.slice(-6)}</span></div>
-            <div style="font-size:12px;color:#475569">${b.items.length} tuot. / ${b.items.reduce((s,i)=>s+i.qty,0)} kpl →</div>
-          </div>`).join('')}
-        <button class="btn" style="margin-top:8px" onclick="buildRoute()">Muodosta hyllytysjärjestys →</button>
-      </div>`:''}`;
-
-    if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);
-    return;
-  }
+    app.innerHTML=`<div class="card"><h1>Skannaa laatikko</h1>
+      <p class="sub">Lue SSCC-viivakoodi (${bc} laatikkoa ladattu)</p>
+      ${S.loadInfo?`<div style="padding:8px 12px;border-radius:8px;background:#f0fdf4;border:1px solid #86efac;font-size:12px;color:#047857;margin-bottom:12px">✓ ${S.loadInfo}</div>`:''}
+      <div class="tab-bar"><button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
+        <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',addBox)">📷 Kamera</button></div>
+      <div class="${S.scanMode==='camera'?'':'hidden'}"><div class="camera-wrap"><video id="cam-video" playsinline muted></video><div class="camera-guide"></div><div id="cam-flash" class="camera-flash"></div></div></div>
+      <div class="${S.scanMode==='manual'?'':'hidden'}"><input type="text" class="scan-input" inputmode="numeric" placeholder="SSCC-koodi"
+        onkeydown="if(event.key==='Enter'){addBox(this.value);this.value='';}">
+        <button class="btn" style="margin-top:8px" onclick="const i=document.querySelector('.scan-input');addBox(i.value);i.value='';i.focus();">Lisää laatikko</button></div>
+      ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
+      ${S.error?`<div class="error">${S.error}</div>`:''}</div>
+    ${S.scannedBoxes.length?`<div class="card"><h2>Skannatut (${S.scannedBoxes.length})</h2>
+      <div style="font-size:13px;color:#475569;margin-bottom:12px">${ti} tuotetta, ${tp} kpl</div>
+      ${S.scannedBoxes.map((b,i)=>`<div class="scanned-box" onclick="showBoxDetail('${b.sscc}')" style="cursor:pointer">
+        <div><span style="font-size:12px;font-weight:600">Laatikko ${i+1}</span><span class="mono" style="margin-left:8px;color:#64748b">...${b.sscc.slice(-6)}</span></div>
+        <div style="font-size:12px;color:#475569">${b.items.length} tuot. / ${b.items.reduce((s,i)=>s+i.qty,0)} kpl →</div></div>`).join('')}
+      <button class="btn" style="margin-top:8px" onclick="buildRoute()">Muodosta hyllytysjärjestys →</button></div>`:''}`;
+    if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);return}
 
   /* ── SHELVE ── */
   if(S.phase==='shelve'){
-    const ts=tShelved(),tq=tQty(),pct=tq>0?Math.round(ts/tq*100):0,allDone=ts>=tq&&tq>0;
+    const ts=tShelved(),tq=tQty(),pct=tq>0?Math.round(ts/tq*100):0;
     const cur=S.routeItems[S.currentIdx],cc=cur?(S.shelved[cur.vnr]||0):0,cd=cur?cc>=cur.qty:!1;
 
-    if(allDone||!cur){
-      camStop();
-      app.innerHTML=`
-        <div class="card text-center" style="padding:32px">
-          <div style="font-size:48px;margin-bottom:8px">${tq>0?'✓':'📦'}</div>
-          <h2 style="color:${tq>0?'#16a34a':'#1e293b'}">${tq>0?'Kaikki hyllytetty!':'Ei hyllytettäviä tuotteita'}</h2>
-          ${tq>0?`<p style="font-size:13px;color:#64748b">${tq} kpl / ${S.routeItems.length} tuotetta</p>`:''}
-          ${S.unmatchedItems.length>0?`<div style="margin-top:12px;padding:10px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;font-size:13px;color:#92400e">
-            ⚠ ${S.unmatchedItems.length} tuotetta UUSI-hyllyyn:<br>
-            ${S.unmatchedItems.map(i=>`${esc(i.name)} (${i.qty} kpl)`).join('<br>')}
-          </div>`:''}
-          <button class="btn" style="margin-top:16px" onclick="camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],unmatchedItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null,confirmedLoc:null})">Uusi erä</button>
-        </div>`;return;
-    }
+    if(!cur){finishShelving();return}
 
     const cpColor=CZ.find(z=>z.pos===cur.cartPos)?.color||'#64748b';
+    const locMatch=S.confirmedLoc&&cur.location&&cur.location.trim().toUpperCase()===S.confirmedLoc;
 
     app.innerHTML=`
       <div class="mb-12">
-        <div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px">
-          <span>${ts}/${tq} hyllytetty</span><span>${pct}%</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill ${allDone?'done':''}" style="width:${pct}%"></div></div>
+        <div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px"><span>${ts}/${tq} hyllytetty</span><span>${pct}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       </div>
 
-      ${S.unmatchedItems.length>0?`
-      <div class="card" style="border-left:4px solid #f59e0b;background:#fffbeb">
-        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">⚠ UUSI-hyllyyn (${S.unmatchedItems.length} tuotetta)</div>
-        <div style="font-size:12px;color:#92400e;margin-bottom:8px">Näillä tuotteilla ei ole varastopaikkaa — laita UUSI-hyllyyn</div>
-        ${S.unmatchedItems.map(i=>`<div style="font-size:12px;color:#78350f;padding:3px 0">${esc(i.name)} <span class="mono">(VNR ${i.vnr})</span> — ${i.qty} kpl</div>`).join('')}
-      </div>`:''}
+      ${S.unmatchedItems.length?`<div class="card" style="border-left:4px solid #f59e0b;background:#fffbeb">
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">⚠ UUSI-hyllyyn (${S.unmatchedItems.length})</div>
+        ${S.unmatchedItems.map(i=>`<div style="font-size:12px;color:#78350f;padding:2px 0">${esc(i.name)} — ${i.qty} kpl</div>`).join('')}</div>`:''}
 
       <div class="card" style="border-left:4px solid ${cpColor}">
         <div class="flex justify-between items-center mb-8">
           <div class="flex items-center gap-8">${cBadge(cur.cartPos)}<span style="font-size:12px;color:#64748b">Paikka ${cur.cartPos}</span></div>
-          <span style="font-size:12px;color:#94a3b8">${S.currentIdx+1}/${S.routeItems.length}</span>
-        </div>
-        ${cur.parsedLoc?`
-          <div class="flex items-center gap-8 mb-6">
-            <span class="${bCls(cur.parsedLoc.aisle)}">${cur.parsedLoc.aisle}</span>
-            <span class="location-big">${cur.location}</span>
-          </div>`:`<div class="mono" style="font-size:14px;color:#dc2626;margin-bottom:6px">Ei varastopaikkaa</div>`}
+          <span style="font-size:12px;color:#94a3b8">${S.currentIdx+1}/${S.routeItems.length}</span></div>
+        ${cur.parsedLoc?`<div class="flex items-center gap-8 mb-6"><span class="${bCls(cur.parsedLoc.aisle)}">${cur.parsedLoc.aisle}</span>
+          <span class="location-big">${cur.location}</span></div>`:''}
         <div style="font-size:15px;font-weight:600;margin-bottom:4px">${esc(cur.name)}</div>
         <div class="mono" style="color:#64748b;margin-bottom:10px">VNR ${cur.vnr}${cur.ean&&cur.ean!=='null'?' | EAN '+cur.ean:''}</div>
         <div class="qty-display" style="background:${cd?'#f0fdf4':'#f8fafc'};border:2px solid ${cd?'#86efac':'#e2e8f0'}">
           <span class="qty-count" style="color:${cd?'#16a34a':'#1e293b'}">${cc}</span>
-          <span class="qty-sep">/</span>
-          <span class="qty-total">${cur.qty}</span>
-          ${cd?'<span style="font-size:24px;margin-left:8px">✓</span>':''}
+          <span class="qty-sep">/</span><span class="qty-total">${cur.qty}</span>
+          ${cd?'<span style="font-size:24px;margin-left:8px">✓</span>':''}</div>
+        <div class="qty-adj">
+          <button class="qty-btn minus" onclick="adjustQty('${cur.vnr}',-1)">−</button>
+          <input type="number" id="qty-manual-${cur.vnr}" class="qty-manual" value="${cc}" min="0"
+            onchange="setQtyManual('${cur.vnr}')" onkeydown="if(event.key==='Enter')setQtyManual('${cur.vnr}')">
+          <button class="qty-btn plus" onclick="adjustQty('${cur.vnr}',1)">+</button>
         </div>
       </div>
 
       <div class="card">
-        ${(()=>{
-          const locMatch = S.confirmedLoc && cur.location && cur.location.trim().toUpperCase() === S.confirmedLoc;
-          if(!locMatch){
-            // STEP 1: Scan location
-            return `
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">1</div>
-                <div class="label" style="margin:0">Skannaa varastopaikka</div>
-              </div>
-              <div style="padding:10px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;font-size:13px;color:#92400e;margin-bottom:10px;text-align:center">
-                Varmista oikea hyllypaikka: <strong>${cur.location}</strong>
-              </div>
-              <div class="tab-bar">
-                <button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
-                <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',confirmLocation)">📷 Kamera</button>
-              </div>
-              <div class="${S.scanMode==='camera'?'':'hidden'}">
-                <div class="camera-wrap">
-                  <video id="cam-video" playsinline muted></video>
-                  <div class="camera-guide"></div>
-                  <div id="cam-flash" class="camera-flash"></div>
-                </div>
-              </div>
-              <div class="${S.scanMode==='manual'?'':'hidden'}">
-                <input type="text" class="scan-input" style="font-size:16px" placeholder="Varastopaikka"
-                  onkeydown="if(event.key==='Enter'){confirmLocation(this.value);this.value='';}">
-                <button class="btn" style="margin-top:6px" onclick="const i=document.querySelector('.scan-input');confirmLocation(i.value);i.value='';i.focus();">Vahvista paikka</button>
-              </div>`;
-          } else {
-            // STEP 2: Scan EAN
-            return `
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <div style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">✓</div>
-                <div style="font-size:12px;color:#16a34a;font-weight:600">Paikka ${cur.location} vahvistettu</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                <div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">2</div>
-                <div class="label" style="margin:0">Skannaa tuotteen EAN</div>
-              </div>
-              <div class="tab-bar">
-                <button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
-                <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',confirmEan)">📷 Kamera</button>
-              </div>
-              <div class="${S.scanMode==='camera'?'':'hidden'}">
-                <div class="camera-wrap">
-                  <video id="cam-video" playsinline muted></video>
-                  <div class="camera-guide"></div>
-                  <div id="cam-flash" class="camera-flash"></div>
-                </div>
-              </div>
-              <div class="${S.scanMode==='manual'?'':'hidden'}">
-                <input type="text" class="scan-input" style="font-size:16px" inputmode="numeric" placeholder="EAN-koodi"
-                  onkeydown="if(event.key==='Enter'){confirmEan(this.value);this.value='';}">
-                <button class="btn" style="margin-top:6px" onclick="const i=document.querySelector('.scan-input');confirmEan(i.value);i.value='';i.focus();">Kuittaa</button>
-              </div>`;
-          }
-        })()}
-
+        ${!locMatch?`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">1</div>
+            <div class="label" style="margin:0">Skannaa varastopaikka</div></div>
+          <div style="padding:10px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;font-size:13px;color:#92400e;margin-bottom:10px;text-align:center">
+            Varmista: <strong>${cur.location}</strong></div>
+          <div class="tab-bar"><button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
+            <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',confirmLocation)">📷 Kamera</button></div>
+          <div class="${S.scanMode==='camera'?'':'hidden'}"><div class="camera-wrap"><video id="cam-video" playsinline muted></video><div class="camera-guide"></div><div id="cam-flash" class="camera-flash"></div></div></div>
+          <div class="${S.scanMode==='manual'?'':'hidden'}"><input type="text" class="scan-input" style="font-size:16px" placeholder="Varastopaikka"
+            onkeydown="if(event.key==='Enter'){confirmLocation(this.value);this.value='';}">
+            <button class="btn" style="margin-top:6px" onclick="const i=document.querySelector('.scan-input');confirmLocation(i.value);i.value='';i.focus();">Vahvista paikka</button></div>`
+        :`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <div style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">✓</div>
+            <div style="font-size:12px;color:#16a34a;font-weight:600">Paikka ${cur.location} vahvistettu</div></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">2</div>
+            <div class="label" style="margin:0">Skannaa tuotteen EAN</div></div>
+          <div class="tab-bar"><button class="tab ${S.scanMode==='manual'?'active':''}" onclick="switchScanMode('manual')">Syötä koodi</button>
+            <button class="tab ${S.scanMode==='camera'?'active':''}" onclick="switchScanMode('camera',confirmEan)">📷 Kamera</button></div>
+          <div class="${S.scanMode==='camera'?'':'hidden'}"><div class="camera-wrap"><video id="cam-video" playsinline muted></video><div class="camera-guide"></div><div id="cam-flash" class="camera-flash"></div></div></div>
+          <div class="${S.scanMode==='manual'?'':'hidden'}"><input type="text" class="scan-input" style="font-size:16px" inputmode="numeric" placeholder="EAN-koodi"
+            onkeydown="if(event.key==='Enter'){confirmEan(this.value);this.value='';}">
+            <button class="btn" style="margin-top:6px" onclick="const i=document.querySelector('.scan-input');confirmEan(i.value);i.value='';i.focus();">Kuittaa</button></div>`}
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
-        ${S.error?`<div class="error">${S.error}</div>`:''}
-      </div>
+        ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
       <div class="flex gap-8 mb-12">
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx===0?'disabled':''} onclick="navTo(S.currentIdx-1)">← Edellinen</button>
-        <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="navTo(S.currentIdx+1)">Seuraava →</button>
+        <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="navTo(S.currentIdx+1)">Seuraava →</button></div>
+
+      <button class="btn" style="background:#16a34a;margin-bottom:12px" onclick="finishShelving()">Lopeta hyllytys → Raportti</button>
+
+      <details class="card"><summary>Koko reitti (${S.routeItems.length})</summary>
+        <div style="max-height:400px;overflow-y:auto">
+          ${S.routeItems.map((item,idx)=>{const done=(S.shelved[item.vnr]||0)>=item.qty,isCur=idx===S.currentIdx;
+            return`<div class="route-item ${isCur?'current':''} ${done&&!isCur?'completed':''}" onclick="navTo(${idx})">
+              <div class="flex items-center gap-6" style="flex:1;min-width:0">${cBadge(item.cartPos)}
+                <div style="min-width:0"><div class="route-item-name">${esc(item.name)}</div><div class="route-item-loc">${item.location||'—'}</div></div></div>
+              <div style="font-size:12px;font-weight:700;white-space:nowrap;margin-left:8px;color:${done?'#16a34a':'#1e293b'}">${S.shelved[item.vnr]||0}/${item.qty}${done?' ✓':''}</div></div>`}).join('')}
+        </div></details>`;
+    if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);return}
+
+  /* ── REPORT ── */
+  if(S.phase==='report'){
+    camStop();
+    const ok=[],under=[],over=[],notShelved=[];
+    S.routeItems.forEach(item=>{
+      const s=S.shelved[item.vnr]||0;
+      if(s===item.qty)ok.push({...item,shelvedQty:s});
+      else if(s>item.qty)over.push({...item,shelvedQty:s});
+      else if(s>0)under.push({...item,shelvedQty:s});
+      else notShelved.push({...item,shelvedQty:0});
+    });
+    const ts=tShelved(),tq=tQty();
+    const hasDeviations=under.length||over.length||notShelved.length||S.unmatchedItems.length;
+
+    app.innerHTML=`
+      <div class="card">
+        <h1>Hyllytysraportti</h1>
+        <p class="sub">${new Date().toLocaleDateString('fi-FI')} ${new Date().toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'})}</p>
+        <div class="flex gap-8" style="margin-bottom:16px">
+          <div style="flex:1;padding:10px;border-radius:8px;background:#f0fdf4;text-align:center">
+            <div style="font-size:22px;font-weight:700;color:#16a34a">${ts}</div><div style="font-size:11px;color:#047857">Hyllytetty</div></div>
+          <div style="flex:1;padding:10px;border-radius:8px;background:#f8fafc;text-align:center">
+            <div style="font-size:22px;font-weight:700">${tq}</div><div style="font-size:11px;color:#64748b">Odotettu</div></div>
+          <div style="flex:1;padding:10px;border-radius:8px;background:${ts===tq?'#f0fdf4':'#fef2f2'};text-align:center">
+            <div style="font-size:22px;font-weight:700;color:${ts===tq?'#16a34a':'#dc2626'}">${ts-tq}</div><div style="font-size:11px;color:#64748b">Erotus</div></div>
+        </div>
       </div>
 
-      <details class="card">
-        <summary>Koko reitti (${S.routeItems.length} tuotetta)</summary>
-        <div style="max-height:400px;overflow-y:auto">
-          ${S.routeItems.map((item,idx)=>{
-            const done=(S.shelved[item.vnr]||0)>=item.qty,isCur=idx===S.currentIdx;
-            return`<div class="route-item ${isCur?'current':''} ${done&&!isCur?'completed':''}" onclick="navTo(${idx})">
-              <div class="flex items-center gap-6" style="flex:1;min-width:0">
-                ${cBadge(item.cartPos)}
-                <div style="min-width:0"><div class="route-item-name">${esc(item.name)}</div><div class="route-item-loc">${item.location||'—'}</div></div>
-              </div>
-              <div style="font-size:12px;font-weight:700;white-space:nowrap;margin-left:8px;color:${done?'#16a34a':'#1e293b'}">${S.shelved[item.vnr]||0}/${item.qty}${done?' ✓':''}</div>
-            </div>`}).join('')}
-        </div>
-      </details>
+      ${hasDeviations?`<div class="card">
+        <h2 style="color:#dc2626">Poikkeamat</h2>
 
-      <details class="card">
-        <summary>Kärryn paikat</summary>
-        ${CZ.map(z=>{
-          const items=S.routeItems.filter(i=>i.cartPos===z.pos);
-          if(!items.length)return'';
-          return`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid ${z.color};background:#fafbfc">
-            <div style="font-size:12px;font-weight:700;color:${z.color};margin-bottom:4px">Paikka ${z.pos} — ${items.length} tuotetta</div>
-            ${items.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${esc(i.name)} (${i.qty} kpl) → ${i.location||'?'}</div>`).join('')}
-          </div>`}).join('')}
-      </details>`;
+        ${under.length?`<div style="font-size:13px;font-weight:600;color:#92400e;margin:12px 0 6px">Vajaita (${under.length})</div>
+          ${under.map(i=>`<div class="report-row report-warn">
+            <div style="min-width:0"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div class="mono" style="color:#64748b">${i.location||'—'}</div></div>
+            <div style="white-space:nowrap;font-weight:700;color:#92400e">${i.shelvedQty}/${i.qty} <span style="font-size:11px;color:#b45309">(−${i.qty-i.shelvedQty})</span></div></div>`).join('')}`:''}
 
-    if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);
+        ${notShelved.length?`<div style="font-size:13px;font-weight:600;color:#dc2626;margin:12px 0 6px">Ei hyllytetty (${notShelved.length})</div>
+          ${notShelved.map(i=>`<div class="report-row report-err">
+            <div style="min-width:0"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div class="mono" style="color:#64748b">${i.location||'—'}</div></div>
+            <div style="white-space:nowrap;font-weight:700;color:#dc2626">0/${i.qty}</div></div>`).join('')}`:''}
+
+        ${over.length?`<div style="font-size:13px;font-weight:600;color:#7c3aed;margin:12px 0 6px">Ylimäärä (${over.length})</div>
+          ${over.map(i=>`<div class="report-row" style="background:#f5f3ff;border:1px solid #ddd6fe">
+            <div style="min-width:0"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div class="mono" style="color:#64748b">${i.location||'—'}</div></div>
+            <div style="white-space:nowrap;font-weight:700;color:#7c3aed">${i.shelvedQty}/${i.qty} <span style="font-size:11px">(+${i.shelvedQty-i.qty})</span></div></div>`).join('')}`:''}
+
+        ${S.unmatchedItems.length?`<div style="font-size:13px;font-weight:600;color:#92400e;margin:12px 0 6px">UUSI-hyllyyn (${S.unmatchedItems.length})</div>
+          ${S.unmatchedItems.map(i=>`<div class="report-row report-warn">
+            <div style="font-weight:600;font-size:12px">${esc(i.name)}</div>
+            <div style="white-space:nowrap;font-weight:700">${i.qty} kpl</div></div>`).join('')}`:''}
+      </div>`:`<div class="card" style="text-align:center;padding:24px">
+        <div style="font-size:36px;margin-bottom:8px">✓</div>
+        <h2 style="color:#16a34a">Ei poikkeamia</h2></div>`}
+
+      ${ok.length?`<details class="card"><summary style="color:#16a34a">Hyllytetty OK (${ok.length})</summary>
+        ${ok.map(i=>`<div class="report-row report-ok">
+          <div style="min-width:0"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div class="mono" style="color:#64748b">${i.location||'—'}</div></div>
+          <div style="white-space:nowrap;font-weight:700;color:#16a34a">${i.qty} kpl ✓</div></div>`).join('')}</details>`:''}
+
+      <button class="btn" style="margin-top:8px" onclick="camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],unmatchedItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null,confirmedLoc:null,activeBox:null})">Uusi erä</button>`;
   }
 }
-
 render();
 </script>
 </body>
