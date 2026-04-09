@@ -172,7 +172,8 @@ let S={
   scannedBoxes:[], routeItems:[], unmatchedItems:[], shelved:{},
   currentIdx:0, error:null, scanMode:'manual',
   lastScanResult:null, loadInfo:null,
-  confirmedLoc:null, // confirmed location string
+  confirmedLoc:null,
+  activeBox:null, // currently viewed box {sscc, items, enriched}
 };
 
 function setState(u){Object.assign(S,u);render()}
@@ -223,8 +224,21 @@ function addBox(code){
   let sscc=S.xmlBoxes[code]?code:Object.keys(S.xmlBoxes).find(k=>k.endsWith(code)||code.endsWith(k));
   if(!sscc){setState({error:`SSCC "${code.length>8?'...'+code.slice(-8):code}" ei löydy`,lastScanResult:{type:'fail',text:'Ei löydy'}});return}
   if(S.scannedBoxes.some(b=>b.sscc===sscc)){setState({error:'Laatikko jo skannattu',lastScanResult:{type:'fail',text:'Jo skannattu'}});return}
-  S.scannedBoxes.push({sscc,items:S.xmlBoxes[sscc]});
-  setState({scannedBoxes:S.scannedBoxes,lastScanResult:{type:'ok',text:'Laatikko lisätty! ('+S.xmlBoxes[sscc].length+' tuotetta)'}});
+  const boxItems=S.xmlBoxes[sscc];
+  S.scannedBoxes.push({sscc,items:boxItems});
+  // Enrich this box's items for detail view
+  const enriched=[];
+  boxItems.forEach(item=>{
+    const vnr=String(item.vnr||'');
+    const m=lookupMaster(vnr);
+    const locStr=(m.location||'').trim();
+    const pl=pLoc(locStr);
+    const pa=pl?gPA(pl):null;
+    const cp=pa?cartPos(pa):0;
+    enriched.push({vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
+  });
+  camStop();
+  setState({scannedBoxes:S.scannedBoxes,activeBox:{sscc,items:boxItems,enriched},scanMode:'manual',lastScanResult:null});
 }
 
 function lookupMaster(vnr){
@@ -256,6 +270,23 @@ function getCartPreview(){
   const withLoc=allItems.filter(i=>i.parsedLoc);
   const noLoc=allItems.filter(i=>!i.parsedLoc);
   return{withLoc,noLoc};
+}
+
+function showBoxDetail(sscc){
+  const box=S.scannedBoxes.find(b=>b.sscc===sscc);
+  if(!box)return;
+  const enriched=[];
+  box.items.forEach(item=>{
+    const vnr=String(item.vnr||'');
+    const m=lookupMaster(vnr);
+    const locStr=(m.location||'').trim();
+    const pl=pLoc(locStr);
+    const pa=pl?gPA(pl):null;
+    const cp=pa?cartPos(pa):0;
+    enriched.push({vnr,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
+  });
+  camStop();
+  setState({activeBox:{sscc,items:box.items,enriched},scanMode:'manual',lastScanResult:null,error:null});
 }
 
 function buildRoute(){
@@ -367,6 +398,78 @@ function render(){
 
   /* ── SCAN BOXES ── */
   if(S.phase==='scan'){
+
+    // ── BOX DETAIL VIEW ──
+    if(S.activeBox){
+      const ab=S.activeBox;
+      const withLoc=ab.enriched.filter(i=>i.parsedLoc);
+      const noLoc=ab.enriched.filter(i=>!i.parsedLoc);
+      // Group by location for shelf-level view
+      const byLoc={};
+      withLoc.forEach(i=>{
+        const key=i.location;
+        if(!byLoc[key])byLoc[key]={location:key,parsedLoc:i.parsedLoc,physAisle:i.physAisle,cartPos:i.cartPos,items:[]};
+        byLoc[key].items.push(i);
+      });
+      // Sort locations by route
+      const sortedLocs=Object.values(byLoc).sort((a,b)=>{
+        const pa=pI(a.physAisle),pb=pI(b.physAisle);
+        if(pa!==pb)return pa-pb;
+        return a.location.localeCompare(b.location,undefined,{numeric:true});
+      });
+
+      app.innerHTML=`
+        <div class="card">
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <h1 style="margin-bottom:2px">Laatikon sisältö</h1>
+              <div class="mono" style="color:#64748b">SSCC ...${ab.sscc.slice(-6)}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:20px;font-weight:700">${ab.enriched.length}</div>
+              <div style="font-size:11px;color:#64748b">tuotetta</div>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:10px">Hyllylevyt reitin mukaan:</div>
+
+          ${sortedLocs.map(loc=>`
+            <div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid ${CZ.find(z=>z.pos===loc.cartPos)?.color||'#94a3b8'};background:#fafbfc">
+              <div class="flex items-center gap-8 mb-6">
+                ${cBadge(loc.cartPos)}
+                <span class="${bCls(loc.parsedLoc.aisle)}">${loc.parsedLoc.aisle}</span>
+                <span style="font-size:15px;font-weight:700;font-family:monospace;color:#1e293b">${loc.location}</span>
+              </div>
+              ${loc.items.map(i=>`
+                <div style="padding:4px 0 4px 34px;font-size:13px;color:#334155;display:flex;justify-content:space-between">
+                  <span>${esc(i.name)}</span>
+                  <span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span>
+                </div>
+              `).join('')}
+            </div>
+          `).join('')}
+
+          ${noLoc.length>0?`
+            <div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid #94a3b8;background:#fffbeb">
+              <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">UUSI-hyllyyn</div>
+              ${noLoc.map(i=>`
+                <div style="padding:4px 0 4px 8px;font-size:13px;color:#78350f;display:flex;justify-content:space-between">
+                  <span>${esc(i.name)} <span class="mono">(VNR ${i.vnr})</span></span>
+                  <span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span>
+                </div>
+              `).join('')}
+            </div>
+          `:''}
+        </div>
+
+        <div class="flex gap-8">
+          <button class="btn-sm btn-outline flex-1" onclick="setState({activeBox:null})">← Skannaa lisää</button>
+          <button class="btn flex-1" style="padding:10px 0" onclick="buildRoute()">Aloita hyllytys →</button>
+        </div>`;
+      return;
+    }
+
+    // ── SCAN INPUT VIEW ──
     const ti=S.scannedBoxes.reduce((s,b)=>s+b.items.length,0);
     const tp=S.scannedBoxes.reduce((s,b)=>s+b.items.reduce((ss,i)=>ss+i.qty,0),0);
     const bc=Object.keys(S.xmlBoxes).length;
@@ -405,36 +508,12 @@ function render(){
         <h2>Skannatut (${S.scannedBoxes.length})</h2>
         <div style="font-size:13px;color:#475569;margin-bottom:12px">${ti} tuotetta, ${tp} kpl</div>
         ${S.scannedBoxes.map((b,i)=>`
-          <div class="scanned-box">
+          <div class="scanned-box" onclick="showBoxDetail('${b.sscc}')" style="cursor:pointer">
             <div><span style="font-size:12px;font-weight:600">Laatikko ${i+1}</span>
             <span class="mono" style="margin-left:8px;color:#64748b">...${b.sscc.slice(-6)}</span></div>
-            <div style="font-size:12px;color:#475569">${b.items.length} tuot. / ${b.items.reduce((s,i)=>s+i.qty,0)} kpl</div>
+            <div style="font-size:12px;color:#475569">${b.items.length} tuot. / ${b.items.reduce((s,i)=>s+i.qty,0)} kpl →</div>
           </div>`).join('')}
         <button class="btn" style="margin-top:8px" onclick="buildRoute()">Muodosta hyllytysjärjestys →</button>
-      </div>
-
-      <div class="card">
-        <h2>Kärryn paikkajaottelu</h2>
-        ${(()=>{
-          const cp=getCartPreview();
-          let html='';
-          CZ.forEach(z=>{
-            const zItems=cp.withLoc.filter(i=>i.cartPos===z.pos);
-            if(zItems.length){
-              html+=`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid ${z.color};background:#fafbfc">
-                <div style="font-size:12px;font-weight:700;color:${z.color};margin-bottom:4px">Paikka ${z.pos} — ${zItems.length} tuotetta</div>
-                ${zItems.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${esc(i.name)} (${i.qty} kpl) → ${i.location}</div>`).join('')}
-              </div>`;
-            }
-          });
-          if(cp.noLoc.length){
-            html+=`<div style="padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid #94a3b8;background:#f8fafc">
-              <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:4px">UUSI-hylly — ${cp.noLoc.length} tuotetta</div>
-              ${cp.noLoc.map(i=>`<div style="font-size:11px;color:#475569;padding:2px 0">${esc(i.name)} (${i.qty} kpl)</div>`).join('')}
-            </div>`;
-          }
-          return html;
-        })()}
       </div>`:''}`;
 
     if(S.scanMode==='manual')setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},50);
