@@ -157,7 +157,28 @@ function pXML(t){
     if(!b[boxId])b[boxId]=[];
     const e=b[boxId].find(i=>i.vnr===vnr);
     if(e)e.qty+=q;else b[boxId].push({vnr,altVnr:vnrId,name:n,qty:q});
-  });return b;
+  });
+  // Add alternative keys for box lookup (OriginalInvoiceNumber, PicklistNumber, InvoiceNumber)
+  // So scanning any of these codes will find the box
+  const altKeys={};
+  d.querySelectorAll("InvoiceRow").forEach(r=>{
+    let boxId=null;
+    const agi=r.querySelector("ArticleGroupIdentifier"),pkn=r.querySelector("PackageNumber"),bln=r.querySelector("BoxlistNumber");
+    if(agi&&agi.textContent&&agi.textContent!=='?')boxId=agi.textContent;
+    else if(pkn&&pkn.textContent)boxId=pkn.textContent;
+    else if(bln&&bln.textContent)boxId=bln.textContent;
+    else boxId='inv_'+invoice;
+    // Map alternative codes to this boxId
+    const orig=r.querySelector("OriginalInvoiceNumber")?.textContent;
+    const pick=r.querySelector("PicklistNumber")?.textContent;
+    if(orig)altKeys[orig]=boxId;
+    if(pick)altKeys[pick]=boxId;
+  });
+  // Also map invoice number itself
+  altKeys[invoice]='inv_'+invoice;
+  altKeys['inv_'+invoice]='inv_'+invoice;
+  b._altKeys=altKeys;
+  return b;
 }
 function pCSV(t){
   if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
@@ -191,10 +212,10 @@ function camStop(){camRunning=!1;if(camStream){camStream.getTracks().forEach(t=>
 
 /* ═══════════ STATE ═══════════ */
 let S={
-  phase:'setup',xmlBoxes:null,masterData:null,
+  phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,
   scannedBoxes:[],routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},
   currentIdx:0,error:null,scanMode:'camera',
-  lastScanResult:null,loadInfo:null,confirmedLoc:null,activeBox:null,
+  lastScanResult:null,loadInfo:null,confirmedLoc:null,activeBox:null,pendingSSCC:null,
 };
 
 // ── Session storage: survive page refresh ──
@@ -206,8 +227,8 @@ function saveState(){
       phase:S.phase,scannedBoxes:S.scannedBoxes,routeItems:S.routeItems,
       unmatchedItems:S.unmatchedItems,rxItems:S.rxItems,shelved:S.shelved,
       currentIdx:S.currentIdx,loadInfo:S.loadInfo,confirmedLoc:S.confirmedLoc,
-      // Save xmlBoxes only if in scan phase (needed for box scanning)
       xmlBoxes:S.phase==='scan'?S.xmlBoxes:null,
+      boxAltKeys:S.phase==='scan'?S.boxAltKeys:null,
       masterData:S.phase==='scan'?S.masterData:null,
     };
     sessionStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));
@@ -220,7 +241,6 @@ function loadSavedState(){
     const saved=JSON.parse(raw);
     // Only restore if we were past setup
     if(!saved.phase||saved.phase==='setup')return false;
-    // If in scan phase, we need xmlBoxes and masterData
     if(saved.phase==='scan'&&(!saved.xmlBoxes||!saved.masterData))return false;
     // Restore
     Object.assign(S,saved);
@@ -312,23 +332,56 @@ async function loadFiles(){
   const xi=document.getElementById('xml-input'),mi=document.getElementById('master-input');
   if(!xi.files.length||!mi.files.length)return;setState({error:null});
   try{
-    const mt=await rF(mi.files[0],'utf-8'),master=pCSV(mt),allB={};
+    const mt=await rF(mi.files[0],'utf-8'),master=pCSV(mt),allB={},allAltKeys={};
     for(const f of xi.files){let t;try{t=await rF(f,'iso-8859-15')}catch(e){t=await rF(f,'utf-8')}
-      const boxes=pXML(t);for(const[sscc,items]of Object.entries(boxes)){if(!allB[sscc])allB[sscc]=[];
+      const boxes=pXML(t);
+      // Collect alt keys
+      if(boxes._altKeys){Object.assign(allAltKeys,boxes._altKeys);delete boxes._altKeys}
+      for(const[sscc,items]of Object.entries(boxes)){if(!allB[sscc])allB[sscc]=[];
         items.forEach(item=>{const e=allB[sscc].find(i=>i.vnr===item.vnr);if(e)e.qty+=item.qty;else allB[sscc].push({...item})})}}
     let tp=0,wl=0,wo=0;
     for(const[,items]of Object.entries(allB)){items.forEach(item=>{tp++;
       const vnr=String(item.vnr||''),alt=String(item.altVnr||'');
       const m=master[vnr]||master[vnr.replace(/^0+/,'')]||(alt?master[alt]||master[alt.replace(/^0+/,'')]:null);
       if(pLoc((m?.location||'').trim()))wl++;else wo++})}
-    setState({xmlBoxes:allB,masterData:master,phase:'scan',loadInfo:`${Object.keys(allB).length} laatikkoa, ${tp} tuotetta — ${wl} paikalla, ${wo} ilman`});
+    setState({xmlBoxes:allB,boxAltKeys:allAltKeys,masterData:master,phase:'scan',loadInfo:`${Object.keys(allB).length} laatikkoa, ${tp} tuotetta — ${wl} paikalla, ${wo} ilman`});
   }catch(e){setState({error:'Virhe: '+e.message})}
+}
+
+// Direct box add by known SSCC (from picker)
+function addBoxDirect(sscc){
+  if(!sscc||!S.xmlBoxes[sscc])return;
+  if(S.scannedBoxes.some(b=>b.sscc===sscc)){setState({error:'Laatikko jo skannattu',pendingSSCC:null});return}
+  const boxItems=S.xmlBoxes[sscc];S.scannedBoxes.push({sscc,items:boxItems});
+  const enriched=[];
+  boxItems.forEach(item=>{const vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+    const m=lookupMaster(vnr,alt),locStr=(m.location||'').trim();
+    const pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+    enriched.push({vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp})});
+  camStop();setState({scannedBoxes:S.scannedBoxes,activeBox:{sscc,items:boxItems,enriched},scanMode:'camera',lastScanResult:null,pendingSSCC:null});
 }
 
 function addBox(code){
   if(!code)return;setState({error:null,lastScanResult:null});
+  // Try direct match, then endsWith, then altKeys
   let sscc=S.xmlBoxes[code]?code:Object.keys(S.xmlBoxes).find(k=>k.endsWith(code)||code.endsWith(k));
-  if(!sscc){setState({error:`SSCC "${code.length>8?'...'+code.slice(-8):code}" ei löydy`,lastScanResult:{type:'fail',text:'Ei löydy'}});return}
+  if(!sscc&&S.boxAltKeys){
+    const mapped=S.boxAltKeys[code];
+    if(mapped&&S.xmlBoxes[mapped])sscc=mapped;
+  }
+  // Fallback: if 18-20 digit code (SSCC) not found, check unscanned boxes
+  if(!sscc&&code.length>=18&&/^\d+$/.test(code)){
+    const unscanned=Object.keys(S.xmlBoxes).filter(k=>!S.scannedBoxes.some(b=>b.sscc===k));
+    if(unscanned.length===1){
+      // Only one unscanned box left — auto-match
+      sscc=unscanned[0];
+    } else if(unscanned.length>1){
+      // Show picker
+      setState({error:null,pendingSSCC:code,lastScanResult:{type:'fail',text:'SSCC ei löydy XML:stä. Valitse laatikko alta.'}});
+      return;
+    }
+  }
+  if(!sscc){setState({error:`Koodi "${code.length>8?'...'+code.slice(-8):code}" ei löydy`,lastScanResult:{type:'fail',text:'Ei löydy'}});return}
   if(S.scannedBoxes.some(b=>b.sscc===sscc)){setState({error:'Laatikko jo skannattu',lastScanResult:{type:'fail',text:'Jo skannattu'}});return}
   const boxItems=S.xmlBoxes[sscc];S.scannedBoxes.push({sscc,items:boxItems});
   const enriched=[];
@@ -473,7 +526,17 @@ function render(){
         onkeydown="if(event.key==='Enter'){addBox(this.value);this.value='';}">
         <button class="btn" style="margin-top:8px" onclick="const i=document.querySelector('.scan-input');addBox(i.value);i.value='';i.focus();">Lisää laatikko</button></div>
       ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
-      ${S.error?`<div class="error">${S.error}</div>`:''}</div>
+      ${S.error?`<div class="error">${S.error}</div>`:''}
+      ${S.pendingSSCC?(()=>{
+        const unscanned=Object.keys(S.xmlBoxes).filter(k=>!S.scannedBoxes.some(b=>b.sscc===k));
+        return`<div style="margin-top:8px;padding:10px;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe">
+          <div style="font-size:12px;font-weight:600;color:#1e40af;margin-bottom:6px">Valitse oikea laatikko:</div>
+          ${unscanned.map(k=>{const items=S.xmlBoxes[k];
+            return`<div onclick="S.pendingSSCC=null;addBoxDirect('${k}')" style="padding:8px 10px;border-radius:6px;margin-bottom:4px;background:#fff;border:1px solid #e2e8f0;cursor:pointer;font-size:12px">
+              <span class="mono" style="color:#64748b">...${k.slice(-8)}</span> — ${items.length} tuotetta / ${items.reduce((s,i)=>s+i.qty,0)} kpl
+            </div>`}).join('')}
+          <button class="btn-sm btn-outline" style="width:100%;margin-top:4px" onclick="setState({pendingSSCC:null,lastScanResult:null})">Peruuta</button>
+        </div>`})():''}</div>
     ${S.scannedBoxes.length?`<div class="card"><h2>Skannatut (${S.scannedBoxes.length})</h2>
       <div style="font-size:13px;color:#475569;margin-bottom:12px">${ti} tuotetta, ${tp} kpl</div>
       ${S.scannedBoxes.map((b,i)=>`<div class="scanned-box" onclick="showBoxDetail('${b.sscc}')" style="cursor:pointer">
