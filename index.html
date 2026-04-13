@@ -184,17 +184,70 @@ function camStop(){camRunning=!1;if(camStream){camStream.getTracks().forEach(t=>
 /* ═══════════ STATE ═══════════ */
 let S={
   phase:'setup',xmlBoxes:null,masterData:null,
-  scannedBoxes:[],routeItems:[],unmatchedItems:[],shelved:{},
+  scannedBoxes:[],routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},
   currentIdx:0,error:null,scanMode:'manual',
   lastScanResult:null,loadInfo:null,confirmedLoc:null,activeBox:null,
 };
 
+// ── Session storage: survive page refresh ──
+const STORAGE_KEY='hyllytysappi_state';
+function saveState(){
+  try{
+    // Save everything except raw file data (too large) and transient UI state
+    const toSave={
+      phase:S.phase,scannedBoxes:S.scannedBoxes,routeItems:S.routeItems,
+      unmatchedItems:S.unmatchedItems,rxItems:S.rxItems,shelved:S.shelved,
+      currentIdx:S.currentIdx,loadInfo:S.loadInfo,confirmedLoc:S.confirmedLoc,
+      // Save xmlBoxes only if in scan phase (needed for box scanning)
+      xmlBoxes:S.phase==='scan'?S.xmlBoxes:null,
+      masterData:S.phase==='scan'?S.masterData:null,
+    };
+    sessionStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));
+  }catch(e){console.warn('State save failed',e)}
+}
+function loadSavedState(){
+  try{
+    const raw=sessionStorage.getItem(STORAGE_KEY);
+    if(!raw)return false;
+    const saved=JSON.parse(raw);
+    // Only restore if we were past setup
+    if(!saved.phase||saved.phase==='setup')return false;
+    // If in scan phase, we need xmlBoxes and masterData
+    if(saved.phase==='scan'&&(!saved.xmlBoxes||!saved.masterData))return false;
+    // Restore
+    Object.assign(S,saved);
+    S.error=null;S.lastScanResult=null;S.scanMode='manual';S.activeBox=null;
+    return true;
+  }catch(e){return false}
+}
+function clearSavedState(){try{sessionStorage.removeItem(STORAGE_KEY)}catch(e){}}
+
+// ── Undo: track last shelved actions ──
+let undoStack=[];
+function pushUndo(action){undoStack.push(action);if(undoStack.length>50)undoStack.shift()}
+function popUndo(){
+  if(!undoStack.length)return;
+  const action=undoStack.pop();
+  if(action.type==='shelve'){
+    S.shelved[action.vnr]=action.prevQty;
+    setState({shelved:S.shelved,currentIdx:action.idx,lastScanResult:{type:'ok',text:'↩ Peruttu: '+esc(action.name)}});
+  }
+}
+
 // Prevent page refresh
 window.addEventListener('beforeunload',function(e){
-  if(S.phase!=='setup'){e.preventDefault();e.returnValue='Hyllytyserä on kesken. Haluatko varmasti poistua?'}
+  if(S.phase!=='setup'){saveState();e.preventDefault();e.returnValue='Hyllytyserä on kesken.'}
 });
 
-function setState(u){Object.assign(S,u);render()}
+function setState(u){
+  Object.assign(S,u);
+  // Save after meaningful state changes
+  if(S.phase!=='setup')saveState();
+  render();
+}
+
+// Try to restore on load
+const wasRestored=loadSavedState();
 
 /* ═══════════ HELPERS ═══════════ */
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -228,6 +281,11 @@ function showBoxDetail(sscc){
     const pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
     enriched.push({vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
   });camStop();setState({activeBox:{sscc,items:box.items,enriched},scanMode:'manual',lastScanResult:null,error:null});
+}
+
+function removeBox(sscc){
+  S.scannedBoxes=S.scannedBoxes.filter(b=>b.sscc!==sscc);
+  setState({scannedBoxes:S.scannedBoxes,activeBox:null,lastScanResult:{type:'ok',text:'Laatikko poistettu'}});
 }
 
 /* ═══════════ ACTIONS ═══════════ */
@@ -264,8 +322,10 @@ function addBox(code){
 
 function buildRoute(){
   camStop();const all=enrichItems(S.scannedBoxes);
-  const matched=all.filter(i=>i.parsedLoc),unmatched=all.filter(i=>!i.parsedLoc);
-  setState({routeItems:sSort(matched),unmatchedItems:unmatched,shelved:{},currentIdx:0,phase:'shelve',scanMode:'manual',lastScanResult:null,confirmedLoc:null});
+  const matched=all.filter(i=>i.parsedLoc&&i.parsedLoc.type!=='rx');
+  const rx=all.filter(i=>i.parsedLoc&&i.parsedLoc.type==='rx');
+  const unmatched=all.filter(i=>!i.parsedLoc);
+  setState({routeItems:sSort(matched),unmatchedItems:unmatched,rxItems:rx,shelved:{},currentIdx:0,phase:'shelve',scanMode:'manual',lastScanResult:null,confirmedLoc:null});
 }
 
 function confirmLocation(code){
@@ -283,11 +343,11 @@ function confirmEan(code){
   if(!S.confirmedLoc){setState({error:'Skannaa ensin varastopaikka',lastScanResult:{type:'fail',text:'Skannaa paikka ensin'}});return}
   const cur=S.routeItems[S.currentIdx];
   const match=(item,c)=>{if(!item.ean||item.ean==='null')return!1;return item.ean===c||c.endsWith(item.ean)||item.ean.endsWith(c)};
-  if(cur&&match(cur,code)){const p=S.shelved[cur.vnr]||0;S.shelved[cur.vnr]=p+1;
+  if(cur&&match(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prevQty:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;
     setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ Kuitattu '+(p+1)+'/'+cur.qty}});return}
   const sli=S.routeItems.findIndex(it=>it.location&&it.location.trim().toUpperCase()===S.confirmedLoc&&match(it,code));
   if(sli!==-1){const o=S.routeItems[sli],p=S.shelved[o.vnr]||0;
-    if(p<o.qty){S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:sli,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty}});return}
+    if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prevQty:p,idx:sli,name:o.name});S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:sli,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty}});return}
     setState({error:esc(o.name)+' — jo valmis',lastScanResult:{type:'fail',text:'Jo hyllytetty'}});return}
   const oi=S.routeItems.findIndex(it=>match(it,code));
   if(oi!==-1){setState({error:'⚠ Tuote on paikassa '+(S.routeItems[oi].location||'?')+'. Skannaa oikea paikka.',lastScanResult:{type:'fail',text:'Väärä paikka'}});return}
@@ -296,14 +356,16 @@ function confirmEan(code){
 
 // Manual qty adjustment
 function adjustQty(vnr,delta){
-  const cur=(S.shelved[vnr]||0)+delta;
-  S.shelved[vnr]=Math.max(0,cur);
+  const prev=S.shelved[vnr]||0;
+  const cur=Math.max(0,prev+delta);
+  if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===vnr);pushUndo({type:'shelve',vnr,prevQty:prev,idx:S.currentIdx,name:item?.name||vnr})}
+  S.shelved[vnr]=cur;
   setState({shelved:S.shelved,lastScanResult:null});
 }
 function setQtyManual(vnr){
   const inp=document.getElementById('qty-manual-'+vnr);
   if(!inp)return;const v=parseInt(inp.value,10);
-  if(!isNaN(v)&&v>=0){S.shelved[vnr]=v;setState({shelved:S.shelved,lastScanResult:null})}
+  if(!isNaN(v)&&v>=0){const prev=S.shelved[vnr]||0;if(v!==prev){const item=S.routeItems.find(i=>i.vnr===vnr);pushUndo({type:'shelve',vnr,prevQty:prev,idx:S.currentIdx,name:item?.name||vnr})}S.shelved[vnr]=v;setState({shelved:S.shelved,lastScanResult:null})}
 }
 
 function switchScanMode(mode,callback){
@@ -318,7 +380,14 @@ function navTo(idx){
   camStop();setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null,scanMode:'manual'});
 }
 
-function finishShelving(){setState({phase:'report'})}
+function finishShelving(skipConfirm){
+  if(!skipConfirm){
+    const ts=tShelved(),tq=tQty();
+    const msg=ts<tq?`Hyllytys on kesken (${ts}/${tq}). Haluatko silti lopettaa ja siirtyä raporttiin?`:'Haluatko lopettaa hyllytyksen ja siirtyä raporttiin?';
+    if(!confirm(msg))return;
+  }
+  setState({phase:'report'});
+}
 
 /* ═══════════ RENDER ═══════════ */
 function render(){
@@ -336,7 +405,10 @@ function render(){
 
   /* ── SCAN: BOX DETAIL ── */
   if(S.phase==='scan'&&S.activeBox){
-    const ab=S.activeBox,wl=ab.enriched.filter(i=>i.parsedLoc),nl=ab.enriched.filter(i=>!i.parsedLoc);
+    const ab=S.activeBox;
+    const wl=ab.enriched.filter(i=>i.parsedLoc&&i.parsedLoc.type!=='rx');
+    const rx=ab.enriched.filter(i=>i.parsedLoc&&i.parsedLoc.type==='rx');
+    const nl=ab.enriched.filter(i=>!i.parsedLoc);
     const byLoc={};wl.forEach(i=>{const k=i.location;if(!byLoc[k])byLoc[k]={location:k,parsedLoc:i.parsedLoc,physAisle:i.physAisle,cartPos:i.cartPos,items:[]};byLoc[k].items.push(i)});
     const sl=Object.values(byLoc).sort((a,b)=>{const pa=pI(a.physAisle),pb=pI(b.physAisle);return pa!==pb?pa-pb:a.location.localeCompare(b.location,undefined,{numeric:!0})});
     app.innerHTML=`<div class="card">
@@ -347,14 +419,24 @@ function render(){
       ${sl.map(loc=>`<div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid ${CZ.find(z=>z.pos===loc.cartPos)?.color||'#94a3b8'};background:#fafbfc">
         <div class="flex items-center gap-8 mb-6">${cBadge(loc.cartPos)}<span class="${bCls(loc.parsedLoc.aisle)}">${loc.parsedLoc.aisle}</span>
           <span style="font-size:15px;font-weight:700;font-family:monospace">${loc.location}</span></div>
-        ${loc.items.map(i=>`<div style="padding:4px 0 4px 34px;font-size:13px;display:flex;justify-content:space-between">
-          <span>${esc(i.name)}</span><span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span></div>`).join('')}</div>`).join('')}
+        ${loc.items.map(i=>`<div style="padding:4px 0 4px 34px;font-size:13px">
+          <div class="flex justify-between"><span>${esc(i.name)}</span><span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span></div>
+          ${i.ean&&i.ean!=='null'?`<div class="mono" style="color:#94a3b8;padding-left:0">EAN ${i.ean}</div>`:''}</div>`).join('')}</div>`).join('')}
+
+      ${rx.length?`<div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid #b91c1c;background:#fef2f2">
+        <div style="font-size:13px;font-weight:700;color:#b91c1c;margin-bottom:6px">💊 Reseptilääkkeet → lääkekaappiin</div>
+        ${rx.map(i=>`<div style="padding:4px 0 4px 8px;font-size:13px;color:#7f1d1d">
+          <div class="flex justify-between"><span>${esc(i.name)}</span><span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl → <strong>${i.location}</strong></span></div>
+          ${i.ean&&i.ean!=='null'?`<div class="mono" style="color:#c4a3a3">EAN ${i.ean}</div>`:''}</div>`).join('')}</div>`:''}
+
       ${nl.length?`<div style="padding:10px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid #94a3b8;background:#fffbeb">
         <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">UUSI-hyllyyn</div>
-        ${nl.map(i=>`<div style="padding:4px 0 4px 8px;font-size:13px;color:#78350f;display:flex;justify-content:space-between">
-          <span>${esc(i.name)} <span class="mono">(VNR ${i.vnr})</span></span><span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span></div>`).join('')}</div>`:''}</div>
-    <div class="flex gap-8"><button class="btn-sm btn-outline flex-1" onclick="setState({activeBox:null})">← Skannaa lisää</button>
-      <button class="btn flex-1" style="padding:10px 0" onclick="buildRoute()">Aloita hyllytys →</button></div>`;return}
+        ${nl.map(i=>`<div style="padding:4px 0 4px 8px;font-size:13px;color:#78350f">
+          <div class="flex justify-between"><span>${esc(i.name)} <span class="mono">(VNR ${i.vnr})</span></span><span style="font-weight:700;white-space:nowrap;margin-left:8px">${i.qty} kpl</span></div>
+          ${i.ean&&i.ean!=='null'?`<div class="mono" style="color:#b4a78f">EAN ${i.ean}</div>`:''}</div>`).join('')}</div>`:''}</div>
+    <div class="flex gap-8" style="margin-bottom:8px"><button class="btn-sm btn-outline flex-1" onclick="setState({activeBox:null})">← Skannaa lisää</button>
+      <button class="btn flex-1" style="padding:10px 0" onclick="buildRoute()">Aloita hyllytys →</button></div>
+    <button class="btn-sm" style="width:100%;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5" onclick="removeBox('${ab.sscc}')">Poista tämä laatikko</button>`;return}
 
   /* ── SCAN: INPUT ── */
   if(S.phase==='scan'){
@@ -384,7 +466,7 @@ function render(){
     const ts=tShelved(),tq=tQty(),pct=tq>0?Math.round(ts/tq*100):0;
     const cur=S.routeItems[S.currentIdx],cc=cur?(S.shelved[cur.vnr]||0):0,cd=cur?cc>=cur.qty:!1;
 
-    if(!cur){finishShelving();return}
+    if(!cur){finishShelving(true);return}
 
     const cpColor=CZ.find(z=>z.pos===cur.cartPos)?.color||'#64748b';
     const locMatch=S.confirmedLoc&&cur.location&&cur.location.trim().toUpperCase()===S.confirmedLoc;
@@ -398,6 +480,10 @@ function render(){
       ${S.unmatchedItems.length?`<div class="card" style="border-left:4px solid #f59e0b;background:#fffbeb">
         <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">⚠ UUSI-hyllyyn (${S.unmatchedItems.length})</div>
         ${S.unmatchedItems.map(i=>`<div style="font-size:12px;color:#78350f;padding:2px 0">${esc(i.name)} — ${i.qty} kpl</div>`).join('')}</div>`:''}
+
+      ${S.rxItems.length?`<div class="card" style="border-left:4px solid #b91c1c;background:#fef2f2">
+        <div style="font-size:13px;font-weight:700;color:#b91c1c;margin-bottom:6px">💊 Reseptilääkkeet → lääkekaappiin (${S.rxItems.length})</div>
+        ${S.rxItems.map(i=>`<div style="font-size:12px;color:#7f1d1d;padding:2px 0">${esc(i.name)} — ${i.qty} kpl → <strong>${i.location}</strong></div>`).join('')}</div>`:''}
 
       <div class="card" style="border-left:4px solid ${cpColor}">
         <div class="flex justify-between items-center mb-8">
@@ -450,6 +536,7 @@ function render(){
 
       <div class="flex gap-8 mb-12">
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx===0?'disabled':''} onclick="navTo(S.currentIdx-1)">← Edellinen</button>
+        <button class="btn-sm flex-1" style="background:${undoStack.length?'#fef3c7':'#f1f5f9'};color:${undoStack.length?'#92400e':'#cbd5e1'};border:none" ${undoStack.length?'':'disabled'} onclick="popUndo()">↩ Peru</button>
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="navTo(S.currentIdx+1)">Seuraava →</button></div>
 
       <button class="btn" style="background:#16a34a;margin-bottom:12px" onclick="finishShelving()">Lopeta hyllytys → Raportti</button>
@@ -476,7 +563,7 @@ function render(){
       else notShelved.push({...item,shelvedQty:0});
     });
     const ts=tShelved(),tq=tQty();
-    const hasDeviations=under.length||over.length||notShelved.length||S.unmatchedItems.length;
+    const hasDeviations=under.length||over.length||notShelved.length||S.unmatchedItems.length||S.rxItems.length;
 
     app.innerHTML=`
       <div class="card">
@@ -514,6 +601,11 @@ function render(){
           ${S.unmatchedItems.map(i=>`<div class="report-row report-warn">
             <div style="font-weight:600;font-size:12px">${esc(i.name)}</div>
             <div style="white-space:nowrap;font-weight:700">${i.qty} kpl</div></div>`).join('')}`:''}
+
+        ${S.rxItems.length?`<div style="font-size:13px;font-weight:600;color:#b91c1c;margin:12px 0 6px">Reseptilääkkeet → lääkekaappi (${S.rxItems.length})</div>
+          ${S.rxItems.map(i=>`<div class="report-row report-err">
+            <div style="min-width:0"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div class="mono" style="color:#64748b">${i.location}</div></div>
+            <div style="white-space:nowrap;font-weight:700">${i.qty} kpl</div></div>`).join('')}`:''}
       </div>`:`<div class="card" style="text-align:center;padding:24px">
         <div style="font-size:36px;margin-bottom:8px">✓</div>
         <h2 style="color:#16a34a">Ei poikkeamia</h2></div>`}
@@ -523,10 +615,20 @@ function render(){
           <div style="min-width:0"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div class="mono" style="color:#64748b">${i.location||'—'}</div></div>
           <div style="white-space:nowrap;font-weight:700;color:#16a34a">${i.qty} kpl ✓</div></div>`).join('')}</details>`:''}
 
-      <button class="btn" style="margin-top:8px" onclick="camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],unmatchedItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null,confirmedLoc:null,activeBox:null})">Uusi erä</button>`;
+      <button class="btn" style="margin-top:8px" onclick="clearSavedState();undoStack=[];camStop();setState({phase:'scan',scannedBoxes:[],routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,scanMode:'manual',lastScanResult:null,confirmedLoc:null,activeBox:null})">Uusi erä</button>`;
   }
 }
-render();
+// Show restore banner or normal render
+if(wasRestored){
+  render();
+  // Show brief notification
+  const nb=document.createElement('div');
+  nb.style.cssText='position:fixed;top:0;left:0;right:0;padding:10px;background:#eff6ff;border-bottom:2px solid #3b82f6;text-align:center;font-size:13px;font-weight:600;color:#1e40af;z-index:999';
+  nb.innerHTML='✓ Edellinen hyllytyserä palautettu <button onclick="this.parentElement.remove()" style="margin-left:12px;background:#3b82f6;color:#fff;border:none;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">OK</button> <button onclick="clearSavedState();location.reload()" style="margin-left:4px;background:#e2e8f0;color:#475569;border:none;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Aloita alusta</button>';
+  document.body.prepend(nb);
+} else {
+  render();
+}
 </script>
 </body>
 </html>
