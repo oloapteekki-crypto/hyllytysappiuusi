@@ -8,12 +8,6 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e293b">
 <title>Hyllytysappi</title>
-<link rel="manifest" id="manifest-link">
-<script>
-const manifest={name:'Hyllytysappi',short_name:'Hyllytys',start_url:'.',display:'standalone',orientation:'portrait',background_color:'#f8fafc',theme_color:'#1e293b',icons:[{src:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>📦</text></svg>',sizes:'any',type:'image/svg+xml'}]};
-const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
-document.getElementById('manifest-link').href=URL.createObjectURL(blob);
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -73,8 +67,8 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 details summary{cursor:pointer;font-size:14px;font-weight:600;margin-bottom:8px}
 details[open] summary{margin-bottom:12px}
 .hidden{display:none!important}
-#scanner-input{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
-.scanner-status{padding:12px;border-radius:10px;text-align:center;font-size:14px;font-weight:600}
+#scanner-input{position:fixed;top:0;left:0;width:100%;height:1px;opacity:0.01;border:none;padding:0;font-size:16px;z-index:-1}
+.scanner-status{padding:16px;border-radius:10px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;user-select:none;-webkit-user-select:none}
 .qty-adj{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
 .qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1e293b;transition:all .1s}
 .qty-btn:active{background:#f1f5f9;transform:scale(.95)}
@@ -284,16 +278,20 @@ window.addEventListener('beforeunload',function(e){
 function refocusScanner(){
   if(S.scanMode==='scanner'&&S.phase!=='setup'&&S.phase!=='report'){
     const inp=document.getElementById('scanner-input');
-    if(inp&&document.activeElement!==inp)inp.focus();
+    if(inp&&document.activeElement!==inp){
+      // Set readonly first to prevent keyboard, then focus, then remove readonly
+      inp.setAttribute('readonly','readonly');
+      inp.focus();
+      setTimeout(()=>inp.removeAttribute('readonly'),100);
+    }
   }
 }
 document.addEventListener('click',function(e){
-  // Don't refocus if clicking interactive elements
   const tag=e.target.tagName;
-  if(['BUTTON','INPUT','SELECT','TEXTAREA','A','SUMMARY'].includes(tag))return;
+  if(['BUTTON','SELECT','TEXTAREA','A','SUMMARY'].includes(tag))return;
+  // If clicking scanner-status or anywhere non-interactive, refocus
   setTimeout(refocusScanner,200);
 });
-// Periodically check focus (catches edge cases like after confirm dialogs)
 setInterval(refocusScanner,1500);
 
 function setState(u){
@@ -543,11 +541,11 @@ function scanUI(callback,placeholder){
       <button class="tab ${isManual?'active':''}" onclick="switchScanMode('manual')">⌨ Käsin</button>
     </div>
     ${isScanner?`
-      <input type="text" id="scanner-input" autocomplete="off" placeholder="Klikkaa tähän + skannaa"
-        onfocus="this.removeAttribute('readonly')"
+      <input type="text" id="scanner-input" autocomplete="off"
         onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';this.focus();}">
-      <div class="scanner-status" style="background:#eff6ff;color:#1e40af">
-        🔫 Lue viivakoodi — kenttä aktiivinen
+      <div class="scanner-status" style="background:#eff6ff;color:#1e40af;border:2px dashed #93c5fd"
+        onclick="const i=document.getElementById('scanner-input');if(i){i.focus();i.click()}">
+        🔫 Skanneri valmis — lue viivakoodi
       </div>`:''}
     ${isCamera?`
       <div class="camera-wrap"><video id="cam-video" playsinline muted></video><div class="camera-guide"></div><div id="cam-flash" class="camera-flash"></div></div>`:''}
