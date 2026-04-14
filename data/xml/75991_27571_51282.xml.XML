@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice Version="1.3">
+  <SellerPartyDetails>
+    <SellerOrganisationName>Magnum Medical Finland Oy</SellerOrganisationName>
+    <SellerOrganisationTaxCode>Y1918478-6</SellerOrganisationTaxCode>
+    <SellerPostalAddressDetails>
+      <SellerStreetName>Tuupakantie 32</SellerStreetName>
+      <SellerTownName>Vantaa</SellerTownName>
+      <SellerPostCodeIdentifier>01740</SellerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </SellerPostalAddressDetails>
+  </SellerPartyDetails>
+  <SellerCommunicationDetails>
+    <SellerPhoneNumberIdentifier>+358 20 759 8897</SellerPhoneNumberIdentifier>
+  </SellerCommunicationDetails>
+  <SellerInformationDetails>
+    <SellerPhoneNumber>+358 20 759 8897</SellerPhoneNumber>
+    <SellerCommonEmailaddressIdentifier>info@magnummedical.fi</SellerCommonEmailaddressIdentifier>
+  </SellerInformationDetails>
+  <BuyerPartyDetails>
+    <BuyerPartyIdentifier>75991</BuyerPartyIdentifier>
+    <BuyerOrganisationName>Kaivopuiston apteekki</BuyerOrganisationName>
+    <BuyerPostalAddressDetails>
+      <BuyerStreetName>PL2134</BuyerStreetName>
+      <BuyerTownName>Docuscan</BuyerTownName>
+      <BuyerPostCodeIdentifier>02066</BuyerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </BuyerPostalAddressDetails>
+  </BuyerPartyDetails>
+  <DeliveryPartyDetails>
+    <DeliveryPartyIdentifier>75991</DeliveryPartyIdentifier>
+    <DeliveryOrganisationName>OLO-APTEEKKI VERKKOPALVELU</DeliveryOrganisationName>
+    <DeliveryPostalAddressDetails>
+      <DeliveryStreetName>MUUNTOTIE 1</DeliveryStreetName>
+      <DeliveryTownName>VANTAA</DeliveryTownName>
+      <DeliveryPostCodeIdentifier>01510</DeliveryPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </DeliveryPostalAddressDetails>
+  </DeliveryPartyDetails>
+  <InvoiceDetails>
+    <InvoiceNumber>7/64-51282</InvoiceNumber>
+    <InvoiceDate Format="CCYYMMDD">20260413</InvoiceDate>
+    <RouteId></RouteId>
+    <RouteTime Format="CCYYMMDD">20260413</RouteTime>
+    <RouteDescription>PK-seutu(PKS-4)21:50</RouteDescription>
+    <CustomerOrder>27571</CustomerOrder>
+  </InvoiceDetails>
+  <InvoiceRow>
+    <ArticleIdentifier>064818</ArticleIdentifier>
+    <ArticleName>MIRANAX 550MG 50 TABL (064818) Naproxenum</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">4</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">4</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">3.64</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">14.56</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65125</PicklistNumber>
+    <ArticleBatcNumber>N2025008F</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280930</BatcUseByDate>
+    <OriginalInvoiceNumber>27571</OriginalInvoiceNumber>
+  </InvoiceRow>
+</Finvoice>

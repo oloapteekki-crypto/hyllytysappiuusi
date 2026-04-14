@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice Version="1.3">
+  <SellerPartyDetails>
+    <SellerOrganisationName>Magnum Medical Finland Oy</SellerOrganisationName>
+    <SellerOrganisationTaxCode>Y1918478-6</SellerOrganisationTaxCode>
+    <SellerPostalAddressDetails>
+      <SellerStreetName>Tuupakantie 32</SellerStreetName>
+      <SellerTownName>Vantaa</SellerTownName>
+      <SellerPostCodeIdentifier>01740</SellerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </SellerPostalAddressDetails>
+  </SellerPartyDetails>
+  <SellerCommunicationDetails>
+    <SellerPhoneNumberIdentifier>+358 20 759 8897</SellerPhoneNumberIdentifier>
+  </SellerCommunicationDetails>
+  <SellerInformationDetails>
+    <SellerPhoneNumber>+358 20 759 8897</SellerPhoneNumber>
+    <SellerCommonEmailaddressIdentifier>info@magnummedical.fi</SellerCommonEmailaddressIdentifier>
+  </SellerInformationDetails>
+  <BuyerPartyDetails>
+    <BuyerPartyIdentifier>72062</BuyerPartyIdentifier>
+    <BuyerOrganisationName>Olo-apteekki Oy / 100</BuyerOrganisationName>
+    <BuyerPostalAddressDetails>
+      <BuyerStreetName>Muuntotie1</BuyerStreetName>
+      <BuyerTownName>VANTAA</BuyerTownName>
+      <BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </BuyerPostalAddressDetails>
+  </BuyerPartyDetails>
+  <DeliveryPartyDetails>
+    <DeliveryPartyIdentifier>72062</DeliveryPartyIdentifier>
+    <DeliveryOrganisationName>OLO-APTEEKKI VERKKOPALVELU OY</DeliveryOrganisationName>
+    <DeliveryPostalAddressDetails>
+      <DeliveryStreetName>Muuntotie 1</DeliveryStreetName>
+      <DeliveryTownName>VANTAA</DeliveryTownName>
+      <DeliveryPostCodeIdentifier>01510</DeliveryPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </DeliveryPostalAddressDetails>
+  </DeliveryPartyDetails>
+  <InvoiceDetails>
+    <InvoiceNumber>7/64-51324</InvoiceNumber>
+    <InvoiceDate Format="CCYYMMDD">20260413</InvoiceDate>
+    <RouteId></RouteId>
+    <RouteTime Format="CCYYMMDD">20260413</RouteTime>
+    <RouteDescription>PK-seutu(PKS-4)21:50</RouteDescription>
+    <CustomerOrder>27570</CustomerOrder>
+  </InvoiceDetails>
+  <InvoiceRow>
+    <ArticleIdentifier>8224474</ArticleIdentifier>
+    <ArticleName>BABE BALM TO OIL 500ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">2</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">3</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">16.65</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">33.3</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>518911</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280731</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8224474</ArticleIdentifier>
+    <ArticleName>BABE BALM TO OIL 500ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">1</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">3</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">16.65</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">16.65</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>518911</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280731</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8224492</ArticleIdentifier>
+    <ArticleName>BABE ESSENTIALS SOOTHING MICELLAR GEL 90ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">3</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">3</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">3.6</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">10.8</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>V05</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280430</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8254475</ArticleIdentifier>
+    <ArticleName>BABE Lip &amp; Cheek Color Balm SPF 50 Punainen 20 ml</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">11</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">11</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">5.2</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">57.2</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>525311</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280930</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8242233</ArticleIdentifier>
+    <ArticleName>BABE STOP AKN MATTIFYING MOISTURISER 50 ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">4</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">4</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">10.95</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">43.8</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>400811</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20290131</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8248753</ArticleIdentifier>
+    <ArticleName>CumLaude Lab CLX emätinpuikot 10 x 3 g</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">10</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">10</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">7.02</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">70.2</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>1968</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20300531</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8257048</ArticleIdentifier>
+    <ArticleName>GYNEVIA SILVER GEL 25ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">11.9</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">71.4</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>236W</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20270630</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8244853</ArticleIdentifier>
+    <ArticleName>NOGEL MAGNESIUMSUIHKE ZECHSTEIN 100ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">4</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">10</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">3.3</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">13.2</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>251125</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20281231</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8244853</ArticleIdentifier>
+    <ArticleName>NOGEL MAGNESIUMSUIHKE ZECHSTEIN 100ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">10</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">3.3</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">19.8</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>251125</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20281231</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8248269</ArticleIdentifier>
+    <ArticleName>NOGEL SUPERRAUTA ACEROLA-KIRSIKKA 60MG 100 TABL.</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">7.31</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">43.86</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>140825</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280814</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8218384</ArticleIdentifier>
+    <ArticleName>Scholl 24h Deo Kenkäsuihke, 150 ml</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">4</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">4</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">5.15</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">20.6</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>SS250960</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280930</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8218390</ArticleIdentifier>
+    <ArticleName>Scholl Advanced Repair jalkavoide 150 ml</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">4.95</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">29.7</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>014</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20290228</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8243394</ArticleIdentifier>
+    <ArticleName>Scholl Kantapäävoidepuikko halkeileville kantapäille</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">5.02</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">30.12</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>43401</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20261231</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8239506</ArticleIdentifier>
+    <ArticleName>WIDMER Clear &amp; Dry Sun Spray 50 hajusteeton 200ml</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">9</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">9</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">8.69</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">78.21</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>2342003NP</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20260831</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8250378</ArticleIdentifier>
+    <ArticleName>WIDMER NUTRIDERM DAY CREAM ÉCLAT ROSÉ UV 50 50ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">16.45</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">98.7</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>2426071</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280630</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8250370</ArticleIdentifier>
+    <ArticleName>WIDMER PUREDERM CLARIFYING LOTION HAJUSTEETON 200ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">2</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">8.29</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">16.58</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>2502058NP</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20290131</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8250370</ArticleIdentifier>
+    <ArticleName>WIDMER PUREDERM CLARIFYING LOTION HAJUSTEETON 200ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">4</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">8.29</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">33.16</RowVatExcludedAmount>
+    <PicklistNumber>7/900-65124</PicklistNumber>
+    <ArticleBatcNumber>2502058NP</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20290131</BatcUseByDate>
+    <OriginalInvoiceNumber>27570</OriginalInvoiceNumber>
+  </InvoiceRow>
+</Finvoice>
