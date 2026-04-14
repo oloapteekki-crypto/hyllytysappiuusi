@@ -10,7 +10,7 @@
 <title>Hyllytysappi</title>
 <link rel="manifest" id="manifest-link">
 <script>
-const manifest={name:'Hyllytysappi',short_name:'Hyllytys',start_url:'.',display:'fullscreen',orientation:'portrait',background_color:'#f8fafc',theme_color:'#1e293b',icons:[{src:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>📦</text></svg>',sizes:'any',type:'image/svg+xml'}]};
+const manifest={name:'Hyllytysappi',short_name:'Hyllytys',start_url:'.',display:'standalone',orientation:'portrait',background_color:'#f8fafc',theme_color:'#1e293b',icons:[{src:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>📦</text></svg>',sizes:'any',type:'image/svg+xml'}]};
 const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
 document.getElementById('manifest-link').href=URL.createObjectURL(blob);
 </script>
@@ -73,8 +73,8 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 details summary{cursor:pointer;font-size:14px;font-weight:600;margin-bottom:8px}
 details[open] summary{margin-bottom:12px}
 .hidden{display:none!important}
-#scanner-input{width:100%;padding:12px;border-radius:10px;border:2px solid #3b82f6;font-size:16px;font-family:monospace;text-align:center;outline:none;background:#eff6ff;color:#1e40af;font-weight:600;caret-color:transparent}
-.scanner-status{padding:8px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;margin-top:6px}
+#scanner-input{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.scanner-status{padding:12px;border-radius:10px;text-align:center;font-size:14px;font-weight:600}
 .qty-adj{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
 .qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1e293b;transition:all .1s}
 .qty-btn:active{background:#f1f5f9;transform:scale(.95)}
