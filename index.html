@@ -473,7 +473,7 @@ function render(){
       <div class="mb-12"><label class="label">Toimitusilmoitukset (XML) — voit valita useita</label>
         <input type="file" id="xml-input" accept=".xml,.XML" multiple style="font-size:14px;width:100%"></div>
       <div class="mb-16"><label class="label">Tuoterekisteri (CSV)</label>
-        <input type="file" id="master-input" accept=".csv,.CSV" style="font-size:14px;width:100%"></div>
+        <input type="file" id="master-input" accept=".csv,.CSV,.tsv,text/csv,text/plain,application/csv,application/vnd.ms-excel" style="font-size:14px;width:100%"></div>
       <button class="btn" onclick="loadFiles()">Lataa tiedot</button>
       ${S.error?`<div class="error">${S.error}</div>`:''}</div>`;return}
 
