@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e293b">
 <title>Hyllytysappi</title>
+<link rel="manifest" id="manifest-link">
+<script>
+const _m={name:'Hyllytysappi',short_name:'Hyllytys',start_url:'.',display:'minimal-ui',orientation:'portrait',background_color:'#f8fafc',theme_color:'#1e293b',icons:[{src:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>📦</text></svg>',sizes:'any',type:'image/svg+xml'}]};
+document.getElementById('manifest-link').href=URL.createObjectURL(new Blob([JSON.stringify(_m)],{type:'application/json'}));
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -67,7 +69,7 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 details summary{cursor:pointer;font-size:14px;font-weight:600;margin-bottom:8px}
 details[open] summary{margin-bottom:12px}
 .hidden{display:none!important}
-#scanner-input{position:fixed;top:0;left:0;width:100%;height:1px;opacity:0.01;border:none;padding:0;font-size:16px;z-index:-1}
+#scanner-input{width:100%;padding:12px;border-radius:10px;border:2px solid #3b82f6;font-size:16px;font-family:monospace;text-align:center;outline:none;background:#eff6ff;color:#1e40af;font-weight:600}
 .scanner-status{padding:16px;border-radius:10px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;user-select:none;-webkit-user-select:none}
 .qty-adj{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
 .qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1e293b;transition:all .1s}
@@ -257,17 +259,6 @@ function popUndo(){
     setState({shelved:S.shelved,currentIdx:action.idx,lastScanResult:{type:'ok',text:'↩ Peruttu: '+esc(action.name)}});
   }
 }
-
-// Fullscreen on first tap (mobile)
-let fsTriggered=false;
-function goFullscreen(){
-  if(fsTriggered)return;
-  const el=document.documentElement;
-  if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});
-  else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
-  fsTriggered=true;
-}
-document.addEventListener('click',function(){if(!fsTriggered&&S.phase!=='setup')goFullscreen()},{once:false});
 
 // Prevent page refresh
 window.addEventListener('beforeunload',function(e){
@@ -542,11 +533,11 @@ function scanUI(callback,placeholder){
       <button class="tab ${isManual?'active':''}" onclick="switchScanMode('manual')">⌨ Käsin</button>
     </div>
     ${isScanner?`
-      <input type="text" id="scanner-input" autocomplete="off"
+      <input type="text" id="scanner-input" autocomplete="off" inputmode="none" placeholder="Skannaa..."
         onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';refocusScanner();}">
-      <div class="scanner-status" style="background:#eff6ff;color:#1e40af;border:2px dashed #93c5fd"
+      <div class="scanner-status" style="background:#eff6ff;color:#1e40af"
         onclick="refocusScanner()">
-        🔫 Skanneri valmis — lue viivakoodi
+        🔫 Klikkaa tähän jos skanneri ei lue
       </div>`:''}
     ${isCamera?`
       <div class="camera-wrap"><video id="cam-video" playsinline muted></video><div class="camera-guide"></div><div id="cam-flash" class="camera-flash"></div></div>`:''}
