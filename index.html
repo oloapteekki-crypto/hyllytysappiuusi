@@ -73,8 +73,8 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 details summary{cursor:pointer;font-size:14px;font-weight:600;margin-bottom:8px}
 details[open] summary{margin-bottom:12px}
 .hidden{display:none!important}
-#scanner-input{position:fixed;top:-100px;left:0;width:1px;height:1px;opacity:0;border:none;padding:0}
-.scanner-status{padding:12px;border-radius:10px;text-align:center;font-size:14px;font-weight:600}
+#scanner-input{width:100%;padding:12px;border-radius:10px;border:2px solid #3b82f6;font-size:16px;font-family:monospace;text-align:center;outline:none;background:#eff6ff;color:#1e40af;font-weight:600;caret-color:transparent}
+.scanner-status{padding:8px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;margin-top:6px}
 .qty-adj{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
 .qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1e293b;transition:all .1s}
 .qty-btn:active{background:#f1f5f9;transform:scale(.95)}
@@ -543,10 +543,11 @@ function scanUI(callback,placeholder){
       <button class="tab ${isManual?'active':''}" onclick="switchScanMode('manual')">⌨ Käsin</button>
     </div>
     ${isScanner?`
-      <input type="text" id="scanner-input" autocomplete="off" inputmode="none"
+      <input type="text" id="scanner-input" autocomplete="off" inputmode="none" placeholder="Odottaa skannausta..."
+        onfocus="this.setAttribute('data-cb','${cbName}')"
         onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';this.focus();}">
       <div class="scanner-status" style="background:#eff6ff;color:#1e40af">
-        🔫 Skanneri aktiivinen — lue viivakoodi
+        🔫 Lue viivakoodi — kenttä aktiivinen
       </div>`:''}
     ${isCamera?`
       <div class="camera-wrap"><video id="cam-video" playsinline muted></video><div class="camera-guide"></div><div id="cam-flash" class="camera-flash"></div></div>`:''}
@@ -555,6 +556,29 @@ function scanUI(callback,placeholder){
         onkeydown="if(event.key==='Enter'){${cbName}(this.value);this.value='';}">
       <button class="btn" style="margin-top:6px" onclick="const i=document.querySelector('.scan-input');${cbName}(i.value);i.value='';i.focus();">OK</button>`:''}`
 }
+
+// Global keydown fallback: if scanner sends data while no input is focused, capture it
+let _scanBuffer='',_scanTimer=null;
+document.addEventListener('keydown',function(e){
+  // Only in scanner mode and not when typing in a real input
+  if(S.scanMode!=='scanner'||S.phase==='setup'||S.phase==='report')return;
+  const tag=document.activeElement?.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA')return; // Let focused input handle it
+  
+  if(e.key==='Enter'&&_scanBuffer.length>3){
+    e.preventDefault();
+    const code=_scanBuffer;_scanBuffer='';
+    clearTimeout(_scanTimer);
+    // Determine which callback to use
+    if(S.phase==='scan')addBox(code);
+    else if(S.phase==='shelve'&&!S.confirmedLoc)confirmLocation(code);
+    else if(S.phase==='shelve')confirmEan(code);
+  } else if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){
+    _scanBuffer+=e.key;
+    clearTimeout(_scanTimer);
+    _scanTimer=setTimeout(()=>{_scanBuffer=''},300); // Reset after 300ms idle
+  }
+});
 
 /* ═══════════ RENDER ═══════════ */
 function render(){
