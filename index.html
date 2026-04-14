@@ -543,8 +543,8 @@ function scanUI(callback,placeholder){
       <button class="tab ${isManual?'active':''}" onclick="switchScanMode('manual')">⌨ Käsin</button>
     </div>
     ${isScanner?`
-      <input type="text" id="scanner-input" autocomplete="off" inputmode="none" placeholder="Odottaa skannausta..."
-        onfocus="this.setAttribute('data-cb','${cbName}')"
+      <input type="text" id="scanner-input" autocomplete="off" placeholder="Klikkaa tähän + skannaa"
+        onfocus="this.removeAttribute('readonly')"
         onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';this.focus();}">
       <div class="scanner-status" style="background:#eff6ff;color:#1e40af">
         🔫 Lue viivakoodi — kenttä aktiivinen
