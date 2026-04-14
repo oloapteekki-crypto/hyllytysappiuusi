@@ -510,7 +510,8 @@ function switchScanMode(mode,callback){
   if(mode==='camera'&&document.activeElement)document.activeElement.blur();
   render();
   if(mode==='camera')setTimeout(()=>camStart(callback),100);
-  else setTimeout(()=>{const inp=document.getElementById('scanner-input')||document.querySelector('.scan-input');if(inp)inp.focus()},100);
+  else if(mode==='scanner')setTimeout(refocusScanner,100);
+  else setTimeout(()=>{const inp=document.querySelector('.scan-input');if(inp)inp.focus()},100);
 }
 function navTo(idx){
   if(idx<0||idx>=S.routeItems.length)return;
@@ -542,9 +543,9 @@ function scanUI(callback,placeholder){
     </div>
     ${isScanner?`
       <input type="text" id="scanner-input" autocomplete="off"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';this.focus();}">
+        onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';refocusScanner();}">
       <div class="scanner-status" style="background:#eff6ff;color:#1e40af;border:2px dashed #93c5fd"
-        onclick="const i=document.getElementById('scanner-input');if(i){i.focus();i.click()}">
+        onclick="refocusScanner()">
         🔫 Skanneri valmis — lue viivakoodi
       </div>`:''}
     ${isCamera?`
@@ -660,7 +661,7 @@ function render(){
         <div><span style="font-size:12px;font-weight:600">Laatikko ${i+1}</span><span class="mono" style="margin-left:8px;color:#64748b">...${b.sscc.slice(-6)}</span></div>
         <div style="font-size:12px;color:#475569">${b.items.length} tuot. / ${b.items.reduce((s,i)=>s+i.qty,0)} kpl →</div></div>`).join('')}
       <button class="btn" style="margin-top:8px" onclick="buildRoute()">Muodosta hyllytysjärjestys →</button></div>`:''}`;
-    setTimeout(()=>{if(S.scanMode==='camera'){const cb=S.phase==='scan'?addBox:(S.confirmedLoc?confirmEan:confirmLocation);camStart(cb)}else{const inp=document.getElementById('scanner-input')||document.querySelector('.scan-input');if(inp)inp.focus()}},100);return}
+    setTimeout(()=>{if(S.scanMode==='camera'){const cb=S.phase==='scan'?addBox:(S.confirmedLoc?confirmEan:confirmLocation);camStart(cb)}else{refocusScanner()}},100);return}
 
   /* ── SHELVE ── */
   if(S.phase==='shelve'){
@@ -740,7 +741,7 @@ function render(){
                 <div style="min-width:0"><div class="route-item-name">${esc(item.name)}</div><div class="route-item-loc">${item.location||'—'}</div></div></div>
               <div style="font-size:12px;font-weight:700;white-space:nowrap;margin-left:8px;color:${done?'#16a34a':'#1e293b'}">${S.shelved[item.vnr]||0}/${item.qty}${done?' ✓':''}</div></div>`}).join('')}
         </div></details>`;
-    setTimeout(()=>{if(S.scanMode==='camera'){const cb=S.phase==='scan'?addBox:(S.confirmedLoc?confirmEan:confirmLocation);camStart(cb)}else{const inp=document.getElementById('scanner-input')||document.querySelector('.scan-input');if(inp)inp.focus()}},100);return}
+    setTimeout(()=>{if(S.scanMode==='camera'){const cb=S.phase==='scan'?addBox:(S.confirmedLoc?confirmEan:confirmLocation);camStart(cb)}else{refocusScanner()}},100);return}
 
   /* ── REPORT ── */
   if(S.phase==='report'){
