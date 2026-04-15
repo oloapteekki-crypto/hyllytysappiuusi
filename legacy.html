@@ -216,6 +216,63 @@ function enrichItems(boxes){
 }
 
 /* Actions */
+var REPO_RAW='https://raw.githubusercontent.com/oloapteekki-crypto/hyllytysappiuusi/main/';
+var REPO_API='https://api.github.com/repos/oloapteekki-crypto/hyllytysappiuusi/contents/data/xml';
+
+function xhrGet(url,cb){
+  var x=new XMLHttpRequest();
+  x.open('GET',url,true);
+  x.onreadystatechange=function(){if(x.readyState===4){cb(x.status===200?x.responseText:null)}};
+  x.send();
+}
+
+function loadFromGitHub(){
+  setState({error:null,loadInfo:'Haetaan tuoterekisteriä...'});
+  xhrGet(REPO_RAW+'data/tuoterekisteri.csv?_='+Date.now(),function(csvText){
+    if(!csvText){setState({error:'Tuoterekisteriä ei löydy palvelimelta',loadInfo:null});return}
+    var master=pCSV(csvText);
+    if(Object.keys(master).length<10){setState({error:'Tuoterekisteri tyhjä',loadInfo:null});return}
+    setState({loadInfo:'Haetaan XML-listaa...'});
+    xhrGet(REPO_API+'?_='+Date.now(),function(dirJson){
+      if(!dirJson){setState({error:'XML-kansiota ei löydy palvelimelta',loadInfo:null});return}
+      var dirList;
+      try{dirList=JSON.parse(dirJson)}catch(e){setState({error:'XML-listan lukuvirhe',loadInfo:null});return}
+      var xmlFiles=[];
+      for(var i=0;i<dirList.length;i++){
+        var name=dirList[i].name||'';
+        if(name.toLowerCase().indexOf('.xml')!==-1)xmlFiles.push(dirList[i]);
+      }
+      if(!xmlFiles.length){setState({error:'Ei XML-tiedostoja kansiossa data/xml/',loadInfo:null});return}
+      var allB={},allAltKeys={},done=0,total=xmlFiles.length;
+      for(var j=0;j<xmlFiles.length;j++){
+        (function(fileInfo,idx){
+          setState({loadInfo:'Ladataan XML '+(idx+1)+'/'+total+'...'});
+          xhrGet(fileInfo.download_url+'?_='+Date.now(),function(xmlText){
+            if(xmlText){
+              var boxes=pXML(xmlText);
+              if(boxes._altKeys){for(var k in boxes._altKeys)allAltKeys[k]=boxes._altKeys[k];delete boxes._altKeys}
+              for(var sscc in boxes){if(!allB[sscc])allB[sscc]=[];
+                var items=boxes[sscc];for(var n=0;n<items.length;n++){
+                  var ex=allB[sscc].find(function(x){return x.vnr===items[n].vnr});
+                  if(ex)ex.qty+=items[n].qty;else allB[sscc].push({vnr:items[n].vnr,altVnr:items[n].altVnr,name:items[n].name,qty:items[n].qty})
+                }}
+            }
+            done++;
+            if(done===total){
+              var tp=0,wl=0,wo=0;
+              for(var s in allB){var it=allB[s];for(var x=0;x<it.length;x++){tp++;
+                var v=String(it[x].vnr||''),a=String(it[x].altVnr||'');
+                var mm=master[v]||master[v.replace(/^0+/,'')]||(a?master[a]||master[a.replace(/^0+/,'')]:null);
+                if(pLoc((mm&&mm.location||'').trim()))wl++;else wo++}}
+              setState({xmlBoxes:allB,boxAltKeys:allAltKeys,masterData:master,phase:'scan',loadInfo:total+' XML, '+Object.keys(allB).length+' laatikkoa, '+tp+' tuotetta — '+wl+' paikalla, '+wo+' ilman'});
+            }
+          });
+        })(xmlFiles[j],j);
+      }
+    });
+  });
+}
+
 function loadFiles(){
   var xi=document.getElementById('xml-input'),mi=document.getElementById('master-input');
   if(!xi.files.length||!mi.files.length)return;
@@ -343,14 +400,17 @@ function render(){
   var h='';
 
   if(S.phase==='setup'){
-    h='<div class="card"><h1>Hyllytysappi</h1><p class="sub">Lataa tiedostot</p>'+
-      '<div class="mb-12"><label class="label">Toimitusilmoitukset (XML)</label>'+
+    h='<div class="card"><h1>Hyllytysappi</h1><p class="sub">Lataa päivän tiedot</p>'+
+      '<button class="btn" onclick="loadFromGitHub()"'+(S.loadInfo?' disabled':'')+'>'+
+      (S.loadInfo||'Lataa tiedot palvelimelta')+'</button>'+
+      (S.error?'<div class="error" style="margin-top:8px">'+S.error+'</div>':'')+
+      '<div style="display:flex;align-items:center;gap:12px;margin:12px 0;color:#94a3b8;font-size:12px"><div style="flex:1;height:1px;background:#e2e8f0"></div>tai käsin<div style="flex:1;height:1px;background:#e2e8f0"></div></div>'+
+      '<div style="font-size:13px">'+
+      '<div class="mb-8"><label class="label">Toimitusilmoitukset (XML)</label>'+
       '<input type="file" id="xml-input" accept=".xml,.XML" multiple style="font-size:14px;width:100%"></div>'+
-      '<div class="mb-16"><label class="label">Tuoterekisteri (CSV)</label>'+
+      '<div class="mb-8"><label class="label">Tuoterekisteri (CSV)</label>'+
       '<input type="file" id="master-input" style="font-size:14px;width:100%"></div>'+
-      '<button class="btn" onclick="loadFiles()">Lataa tiedot</button>'+
-      (S.error?'<div class="error">'+S.error+'</div>':'')+
-      (S.loadInfo?'<div style="font-size:12px;color:#64748b;margin-top:8px;text-align:center">'+S.loadInfo+'</div>':'')+
+      '<button class="btn btn-outline" style="color:#475569" onclick="loadFiles()">Lataa tiedostoista</button></div>'+
       '</div>';
     app.innerHTML=h;return;
   }
