@@ -69,7 +69,7 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 details summary{cursor:pointer;font-size:14px;font-weight:600;margin-bottom:8px}
 details[open] summary{margin-bottom:12px}
 .hidden{display:none!important}
-#scanner-input{width:100%;padding:12px;border-radius:10px;border:2px solid #3b82f6;font-size:16px;font-family:monospace;text-align:center;outline:none;background:#eff6ff;color:#1e40af;font-weight:600}
+#scanner-input{width:100%;padding:14px 12px;border-radius:10px;border:2px solid #3b82f6;font-size:18px;font-family:monospace;font-weight:600;text-align:center;outline:none;background:#eff6ff;color:#1e40af}
 .scanner-status{padding:16px;border-radius:10px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;user-select:none;-webkit-user-select:none}
 .qty-adj{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
 .qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1e293b;transition:all .1s}
@@ -533,12 +533,8 @@ function scanUI(callback,placeholder){
       <button class="tab ${isManual?'active':''}" onclick="switchScanMode('manual')">⌨ Käsin</button>
     </div>
     ${isScanner?`
-      <input type="text" id="scanner-input" autocomplete="off" inputmode="none" placeholder="Skannaa..."
-        onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';refocusScanner();}">
-      <div class="scanner-status" style="background:#eff6ff;color:#1e40af"
-        onclick="refocusScanner()">
-        🔫 Klikkaa tähän jos skanneri ei lue
-      </div>`:''}
+      <input type="text" id="scanner-input" autocomplete="off" inputmode="numeric" placeholder="Skannaa viivakoodi"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();${cbName}(this.value);this.value='';refocusScanner();}">`:''}
     ${isCamera?`
       <div class="camera-wrap"><video id="cam-video" playsinline muted></video><div class="camera-guide"></div><div id="cam-flash" class="camera-flash"></div></div>`:''}
     ${isManual?`
