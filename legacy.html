@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Hyllytysappi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#1e293b}
+.app{max-width:480px;margin:0 auto;padding:16px 12px;min-height:100%}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:16px;margin-bottom:12px}
+h1{font-size:20px;font-weight:700;margin-bottom:4px}
+h2{font-size:16px;font-weight:700;margin-bottom:8px}
+.sub{font-size:12px;color:#64748b;margin-bottom:16px}
+.btn{width:100%;padding:14px 0;border-radius:10px;border:none;background:#1e293b;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.btn:disabled{background:#e2e8f0;color:#94a3b8}
+.btn-sm{padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.btn-outline{background:#e2e8f0;color:#1e293b}
+.scan-input{width:100%;padding:14px 12px;border-radius:10px;border:2px solid #3b82f6;font-size:18px;font-family:monospace;font-weight:600;text-align:center;outline:none;background:#eff6ff;color:#1e40af}
+.scan-input:focus{border-color:#2563eb}
+.label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;text-transform:uppercase}
+.mono{font-family:monospace;font-size:12px}
+.error{color:#dc2626;font-size:13px;text-align:center;margin-top:6px}
+.flex{display:-webkit-flex;display:flex}.gap-8{gap:8px}.items-center{-webkit-align-items:center;align-items:center}
+.justify-between{-webkit-justify-content:space-between;justify-content:space-between}.flex-1{-webkit-flex:1;flex:1}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace}
+.badge-L{background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc}
+.badge-F{background:#fce7f3;color:#be185d;border:1px solid #f9a8d4}
+.badge-A{background:#ecfdf5;color:#047857;border:1px solid #6ee7b7}
+.badge-B{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.badge-U{background:#f3e8ff;color:#7c3aed;border:1px solid #c4b5fd}
+.badge-R{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+.badge-J{background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc}
+.cart-badge{display:inline-block;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:800;color:#fff;text-align:center;line-height:24px}
+.cart-1{background:#ef4444}.cart-2{background:#f59e0b}.cart-3{background:#10b981}.cart-4{background:#3b82f6}.cart-5{background:#8b5cf6}
+.progress-bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden;margin-bottom:12px}
+.progress-fill{height:100%;border-radius:4px;background:#1e293b}
+.route-item{padding:8px 10px;border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid #f1f5f9}
+.route-item.current{background:#eff6ff;border:2px solid #3b82f6}
+.route-item.done{opacity:0.5}
+.qty-display{padding:14px;border-radius:10px;text-align:center;font-family:monospace}
+.qty-adj{text-align:center;margin-top:8px}
+.qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer}
+.qty-manual{width:60px;text-align:center;font-size:18px;font-weight:700;font-family:monospace;border:2px solid #e2e8f0;border-radius:8px;padding:8px 4px}
+.scanned-box{padding:8px 12px;border-radius:8px;margin-bottom:6px;background:#f8fafc;border:1px solid #e2e8f0}
+.report-row{padding:8px 10px;border-radius:8px;margin-bottom:4px;font-size:13px}
+.report-ok{background:#f0fdf4;border:1px solid #dcfce7}
+.report-warn{background:#fffbeb;border:1px solid #fde68a}
+.report-err{background:#fef2f2;border:1px solid #fecaca}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+/* ═══════════ ES5 COMPATIBLE ═══════════ */
+
+/* Polyfills */
+if(!Array.prototype.find){Array.prototype.find=function(fn){for(var i=0;i<this.length;i++){if(fn(this[i],i))return this[i]}}}
+if(!Array.prototype.findIndex){Array.prototype.findIndex=function(fn){for(var i=0;i<this.length;i++){if(fn(this[i],i))return i}return-1}}
+if(!Array.prototype.includes){Array.prototype.includes=function(v){return this.indexOf(v)!==-1}}
+if(!String.prototype.includes){String.prototype.includes=function(v){return this.indexOf(v)!==-1}}
+if(!String.prototype.startsWith){String.prototype.startsWith=function(v){return this.slice(0,v.length)===v}}
+if(!String.prototype.endsWith){String.prototype.endsWith=function(v){return this.slice(-v.length)===v}}
+
+/* Route config */
+var PR=[
+  {id:"L1",asc:true},{id:"FA",asc:true},{id:"L2",asc:false},{id:"L3",asc:true},
+  {id:"L4",asc:false},{id:"L5",asc:true},{id:"A2",asc:false},{id:"A3",asc:true},
+  {id:"A4",asc:false},{id:"A5",asc:true},{id:"A6_even",asc:false},{id:"A6odd_A1even",asc:true},
+  {id:"A1odd_A7",asc:false},{id:"B1",asc:true},{id:"B2",asc:false},{id:"B3",asc:true},
+  {id:"B4",asc:false},{id:"UU",asc:true},{id:"RX",asc:true},{id:"JK",asc:true}
+];
+var PO=[];var PD={};
+for(var i=0;i<PR.length;i++){PO.push(PR[i].id);PD[PR[i].id]=PR[i].asc}
+
+var CZ=[
+  {pos:1,aisles:["L1","FA","L2","L3"],color:"#ef4444"},
+  {pos:2,aisles:["L4","L5","A2","A3"],color:"#f59e0b"},
+  {pos:3,aisles:["A4","A5","A6_even","A6odd_A1even"],color:"#10b981"},
+  {pos:4,aisles:["A1odd_A7","B1","B2"],color:"#3b82f6"},
+  {pos:5,aisles:["B3","B4","UU","RX","JK"],color:"#8b5cf6"}
+];
+function cartPos(pa){for(var i=0;i<CZ.length;i++){if(CZ[i].aisles.indexOf(pa)!==-1)return CZ[i].pos}return 5}
+
+/* Location */
+function pLoc(l){
+  if(!l||typeof l!=='string')return null;
+  var t=l.trim(),lt=t.toLowerCase();
+  if(!lt||["uusi","null","vanha","0","uusi "].indexOf(lt)!==-1)return null;
+  var p=t.split("-");
+  if(p.length===4){
+    if(p[0].toUpperCase()==='UU'&&parseInt(p[1],10)>=4)return null;
+    return{aisle:p[0],shelf:p[1],level:p[2],pos:p[3],raw:t,type:'shelf'};
+  }
+  if(/^[A-Za-z]\d{1,2}$/.test(t))return{aisle:'RX',shelf:t,level:'0',pos:'0',raw:t,type:'rx'};
+  if(p.length===3)return{aisle:p[0],shelf:p[1],level:p[2],pos:'0',raw:t,type:'shelf3'};
+  if(/^JK\d+$/i.test(t))return{aisle:'JK',shelf:t,level:'0',pos:'0',raw:t,type:'cold'};
+  return null;
+}
+function sOdd(s){var n=parseInt(s,10);return isNaN(n)?null:n%2!==0}
+function gPA(p){
+  if(p.type==='rx')return'RX';if(p.type==='cold')return'JK';
+  var a=p.aisle,s=p.shelf,o=sOdd(s);
+  if(a==="A6")return o?"A6odd_A1even":"A6_even";
+  if(a==="A1")return o===false?"A6odd_A1even":"A1odd_A7";
+  if(a==="A7")return"A1odd_A7";return a;
+}
+function pI(pa){var i=PO.indexOf(pa);return i===-1?999:i}
+function sSort(items){
+  return items.slice().sort(function(a,b){
+    if(!a.parsedLoc&&!b.parsedLoc)return 0;if(!a.parsedLoc)return 1;if(!b.parsedLoc)return-1;
+    var pa=pI(a.physAisle),pb=pI(b.physAisle);if(pa!==pb)return pa-pb;
+    var asc=PD[a.physAisle]!==false;
+    var sc=a.parsedLoc.shelf.localeCompare(b.parsedLoc.shelf,undefined,{numeric:true});if(sc)return asc?sc:-sc;
+    var lc=a.parsedLoc.level.localeCompare(b.parsedLoc.level);if(lc)return asc?lc:-lc;
+    var pc=a.parsedLoc.pos.localeCompare(b.parsedLoc.pos,undefined,{numeric:true});return asc?pc:-pc;
+  });
+}
+
+/* File parsers */
+function rF(file,enc,cb){var r=new FileReader();r.onload=function(e){cb(e.target.result)};r.onerror=function(){cb(null)};r.readAsText(file,enc||'utf-8')}
+
+function pXML(t){
+  var d=new DOMParser().parseFromString(t,"text/xml"),b={};
+  var invEl=d.querySelector("InvoiceNumber");
+  var invoice=invEl?invEl.textContent:Math.random().toString(36).slice(2,8);
+  var rows=d.querySelectorAll("InvoiceRow");
+  var altKeys={};
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var boxId=null;
+    var agiEl=r.querySelector("ArticleGroupIdentifier");
+    var pknEl=r.querySelector("PackageNumber");
+    var blnEl=r.querySelector("BoxlistNumber");
+    if(agiEl&&agiEl.textContent&&agiEl.textContent!=='?')boxId=agiEl.textContent;
+    else if(pknEl&&pknEl.textContent)boxId=pknEl.textContent;
+    else if(blnEl&&blnEl.textContent)boxId=blnEl.textContent;
+    else boxId='inv_'+invoice;
+    var aidEl=r.querySelector("ArticleIdentifier");
+    var vnrEl=r.querySelector("VnrIdentifier");
+    var nmEl=r.querySelector("ArticleName");
+    var qEl=r.querySelector("DeliveredQuantity");
+    var aid=aidEl?aidEl.textContent:"";
+    var vnrId=vnrEl?vnrEl.textContent:"";
+    var nm=nmEl?nmEl.textContent:"";
+    var qRaw=qEl?qEl.textContent:"0";
+    var q=parseInt(qRaw.replace(',','.'),10)||0;
+    if(!aid&&!vnrId)continue;
+    if(!b[boxId])b[boxId]=[];
+    var ex=b[boxId].find(function(x){return x.vnr===aid});
+    if(ex)ex.qty+=q;else b[boxId].push({vnr:aid,altVnr:vnrId,name:nm,qty:q});
+    var origEl=r.querySelector("OriginalInvoiceNumber");
+    var pickEl=r.querySelector("PicklistNumber");
+    if(origEl&&origEl.textContent)altKeys[origEl.textContent]=boxId;
+    if(pickEl&&pickEl.textContent)altKeys[pickEl.textContent]=boxId;
+  }
+  altKeys[invoice]='inv_'+invoice;
+  b._altKeys=altKeys;
+  return b;
+}
+function pCSV(t){
+  if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
+  var r=Papa.parse(t,{header:true,skipEmptyLines:true}),m={};
+  var cols=r.meta&&r.meta.fields?r.meta.fields:[];
+  var skuCol='sku',nameCol='name',eanCol='ean',locCol='storage_location';
+  for(var c=0;c<cols.length;c++){
+    var cl=cols[c].replace(/^\uFEFF/,'').toLowerCase();
+    if(cl==='sku')skuCol=cols[c];
+    if(cl==='name')nameCol=cols[c];
+    if(cl==='ean')eanCol=cols[c];
+    if(cl.indexOf('location')!==-1)locCol=cols[c];
+  }
+  for(var i=0;i<r.data.length;i++){
+    var row=r.data[i];
+    var s=String(row[skuCol]||'').trim();if(!s)continue;
+    m[s]={name:String(row[nameCol]||'').trim(),ean:String(row[eanCol]||'').trim(),location:String(row[locCol]||'').trim()};
+  }
+  return m;
+}
+
+/* State */
+var S={
+  phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,
+  scannedBoxes:[],routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},
+  currentIdx:0,error:null,lastScanResult:null,loadInfo:null,confirmedLoc:null,activeBox:null
+};
+
+function setState(u){for(var k in u)S[k]=u[k];render()}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function bCls(a){var k=a?a[0]:'U';var m={L:'L',F:'F',A:'A',B:'B',U:'U',R:'R',J:'J'};return'badge badge-'+(m[k]||'U')}
+function cBadge(p){return'<span class="cart-badge cart-'+p+'">'+p+'</span>'}
+function tShelved(){var s=0;for(var i=0;i<S.routeItems.length;i++){s+=Math.min(S.shelved[S.routeItems[i].vnr]||0,S.routeItems[i].qty)}return s}
+function tQty(){var s=0;for(var i=0;i<S.routeItems.length;i++){s+=S.routeItems[i].qty}return s}
+
+function lookupMaster(vnr,alt){
+  return S.masterData[vnr]||S.masterData[vnr.replace(/^0+/,'')]||(alt?(S.masterData[alt]||S.masterData[alt.replace(/^0+/,'')]):null)||{};
+}
+
+function enrichItems(boxes){
+  var all=[];
+  for(var b=0;b<boxes.length;b++){
+    var items=boxes[b].items||[];
+    for(var i=0;i<items.length;i++){
+      var item=items[i];
+      var vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+      var m=lookupMaster(vnr,alt),locStr=(m.location||'').trim();
+      var pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+      var ex=all.find(function(x){return x.vnr===vnr});
+      if(ex){ex.qty+=item.qty}
+      else{all.push({vnr:vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp})}
+    }
+  }
+  return all;
+}
+
+/* Actions */
+function loadFiles(){
+  var xi=document.getElementById('xml-input'),mi=document.getElementById('master-input');
+  if(!xi.files.length||!mi.files.length)return;
+  setState({error:null,loadInfo:'Ladataan...'});
+  rF(mi.files[0],'utf-8',function(csvText){
+    if(!csvText){setState({error:'CSV-lukuvirhe'});return}
+    var master=pCSV(csvText);
+    var allB={},allAltKeys={},pending=xi.files.length,done=0;
+    for(var f=0;f<xi.files.length;f++){
+      (function(file){
+        rF(file,'iso-8859-15',function(xmlText){
+          if(!xmlText){rF(file,'utf-8',function(t){processXml(t)});}else{processXml(xmlText)}
+          function processXml(t){
+            if(t){
+              var boxes=pXML(t);
+              if(boxes._altKeys){for(var k in boxes._altKeys)allAltKeys[k]=boxes._altKeys[k];delete boxes._altKeys}
+              for(var sscc in boxes){if(!allB[sscc])allB[sscc]=[];
+                var items=boxes[sscc];for(var j=0;j<items.length;j++){
+                  var ex=allB[sscc].find(function(x){return x.vnr===items[j].vnr});
+                  if(ex)ex.qty+=items[j].qty;else allB[sscc].push({vnr:items[j].vnr,altVnr:items[j].altVnr,name:items[j].name,qty:items[j].qty})
+                }}
+            }
+            done++;
+            if(done===pending){
+              var tp=0,wl=0,wo=0;
+              for(var s in allB){var it=allB[s];for(var x=0;x<it.length;x++){tp++;
+                var v=String(it[x].vnr||''),a=String(it[x].altVnr||'');
+                var mm=master[v]||master[v.replace(/^0+/,'')]||(a?master[a]||master[a.replace(/^0+/,'')]:null);
+                if(pLoc((mm&&mm.location||'').trim()))wl++;else wo++}}
+              setState({xmlBoxes:allB,boxAltKeys:allAltKeys,masterData:master,phase:'scan',
+                loadInfo:Object.keys(allB).length+' laatikkoa, '+tp+' tuotetta — '+wl+' paikalla, '+wo+' ilman'});
+            }
+          }
+        });
+      })(xi.files[f]);
+    }
+  });
+}
+
+function addBox(code){
+  if(!code)return;setState({error:null,lastScanResult:null});
+  var sscc=S.xmlBoxes[code]?code:null;
+  if(!sscc){var keys=Object.keys(S.xmlBoxes);for(var i=0;i<keys.length;i++){if(keys[i].endsWith(code)||code.endsWith(keys[i])){sscc=keys[i];break}}}
+  if(!sscc&&S.boxAltKeys){var mapped=S.boxAltKeys[code];if(mapped&&S.xmlBoxes[mapped])sscc=mapped}
+  if(!sscc&&code.length>=18&&/^\d+$/.test(code)){
+    var unscanned=Object.keys(S.xmlBoxes).filter(function(k){return!S.scannedBoxes.find(function(b){return b.sscc===k})});
+    if(unscanned.length===1)sscc=unscanned[0];
+  }
+  if(!sscc){setState({error:'Koodi ei löydy',lastScanResult:{type:'fail',text:'Ei löydy'}});return}
+  if(S.scannedBoxes.find(function(b){return b.sscc===sscc})){setState({error:'Jo skannattu'});return}
+  var boxItems=S.xmlBoxes[sscc];S.scannedBoxes.push({sscc:sscc,items:boxItems});
+  var enriched=[];
+  for(var j=0;j<boxItems.length;j++){
+    var item=boxItems[j],vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+    var m=lookupMaster(vnr,alt),locStr=(m.location||'').trim();
+    var pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+    enriched.push({vnr:vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
+  }
+  setState({scannedBoxes:S.scannedBoxes,activeBox:{sscc:sscc,items:boxItems,enriched:enriched},lastScanResult:null});
+}
+
+function buildRoute(){
+  var all=enrichItems(S.scannedBoxes);
+  var matched=all.filter(function(i){return i.parsedLoc&&i.parsedLoc.type!=='rx'});
+  var rx=all.filter(function(i){return i.parsedLoc&&i.parsedLoc.type==='rx'});
+  var unmatched=all.filter(function(i){return!i.parsedLoc});
+  setState({routeItems:sSort(matched),unmatchedItems:unmatched,rxItems:rx,shelved:{},currentIdx:0,phase:'shelve',confirmedLoc:null});
+}
+
+function confirmLocation(code){
+  if(!code)return;setState({error:null,lastScanResult:null});
+  var cur=S.routeItems[S.currentIdx];if(!cur||!cur.location)return;
+  var scanned=code.trim().toUpperCase(),expected=cur.location.trim().toUpperCase();
+  if(scanned===expected){setState({confirmedLoc:expected,lastScanResult:{type:'ok',text:'OK: '+cur.location}});return}
+  var oi=-1;for(var i=0;i<S.routeItems.length;i++){if(S.routeItems[i].location&&S.routeItems[i].location.trim().toUpperCase()===scanned){oi=i;break}}
+  if(oi!==-1){setState({confirmedLoc:scanned,currentIdx:oi,lastScanResult:{type:'ok',text:'OK: '+S.routeItems[oi].location}});return}
+  setState({error:'Paikka ei ole reitillä',lastScanResult:{type:'fail',text:'Väärä'}});
+}
+
+function confirmEan(code){
+  if(!code)return;setState({error:null,lastScanResult:null});
+  if(!S.confirmedLoc){setState({error:'Skannaa ensin paikka'});return}
+  var cur=S.routeItems[S.currentIdx];
+  function matchEan(item,c){if(!item.ean||item.ean==='null')return false;return item.ean===c||c.endsWith(item.ean)||item.ean.endsWith(c)}
+  if(cur&&matchEan(cur,code)){var p=S.shelved[cur.vnr]||0;S.shelved[cur.vnr]=p+1;setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'OK '+(p+1)+'/'+cur.qty}});return}
+  for(var i=0;i<S.routeItems.length;i++){
+    var it=S.routeItems[i];
+    if(it.location&&it.location.trim().toUpperCase()===S.confirmedLoc&&matchEan(it,code)){
+      var pp=S.shelved[it.vnr]||0;if(pp<it.qty){S.shelved[it.vnr]=pp+1;setState({shelved:S.shelved,currentIdx:i,lastScanResult:{type:'ok',text:'OK '+esc(it.name)+' '+(pp+1)+'/'+it.qty}});return}
+      setState({error:'Jo valmis'});return;
+    }
+  }
+  setState({error:'EAN ei tunnistettu'});
+}
+
+function adjustQty(vnr,delta){var cur=Math.max(0,(S.shelved[vnr]||0)+delta);S.shelved[vnr]=cur;setState({shelved:S.shelved})}
+function setQtyManual(vnr){var inp=document.getElementById('qty-manual-'+vnr);if(!inp)return;var v=parseInt(inp.value,10);if(!isNaN(v)&&v>=0){S.shelved[vnr]=v;setState({shelved:S.shelved})}}
+
+function navTo(idx){
+  if(idx<0||idx>=S.routeItems.length)return;
+  var cur=S.routeItems[S.currentIdx],next=S.routeItems[idx];
+  var cl=cur&&cur.location?cur.location.trim().toUpperCase():'';
+  var nl=next&&next.location?next.location.trim().toUpperCase():'';
+  setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null});
+}
+
+function finishShelving(skip){
+  if(!skip){var ts=tShelved(),tq=tQty();if(!confirm(ts<tq?'Kesken ('+ts+'/'+tq+'). Lopeta?':'Lopeta hyllytys?'))return}
+  setState({phase:'report'});
+}
+
+function handleScan(cbName){
+  var inp=document.getElementById('scan-field');
+  if(!inp)return;
+  var val=inp.value;inp.value='';inp.focus();
+  if(!val)return;
+  if(cbName==='addBox')addBox(val);
+  else if(cbName==='confirmLocation')confirmLocation(val);
+  else if(cbName==='confirmEan')confirmEan(val);
+}
+
+/* Render */
+function render(){
+  var app=document.getElementById('app');
+  var h='';
+
+  if(S.phase==='setup'){
+    h='<div class="card"><h1>Hyllytysappi</h1><p class="sub">Lataa tiedostot</p>'+
+      '<div class="mb-12"><label class="label">Toimitusilmoitukset (XML)</label>'+
+      '<input type="file" id="xml-input" accept=".xml,.XML" multiple style="font-size:14px;width:100%"></div>'+
+      '<div class="mb-16"><label class="label">Tuoterekisteri (CSV)</label>'+
+      '<input type="file" id="master-input" style="font-size:14px;width:100%"></div>'+
+      '<button class="btn" onclick="loadFiles()">Lataa tiedot</button>'+
+      (S.error?'<div class="error">'+S.error+'</div>':'')+
+      (S.loadInfo?'<div style="font-size:12px;color:#64748b;margin-top:8px;text-align:center">'+S.loadInfo+'</div>':'')+
+      '</div>';
+    app.innerHTML=h;return;
+  }
+
+  if(S.phase==='scan'&&S.activeBox){
+    var ab=S.activeBox;
+    var wl=[],rx=[],nl=[];
+    for(var i=0;i<ab.enriched.length;i++){
+      var it=ab.enriched[i];
+      if(it.parsedLoc&&it.parsedLoc.type==='rx')rx.push(it);
+      else if(it.parsedLoc)wl.push(it);
+      else nl.push(it);
+    }
+    h='<div class="card"><h1>Laatikko ...'+ab.sscc.slice(-6)+'</h1>'+
+      '<p class="sub">'+ab.enriched.length+' tuotetta</p>';
+    for(var j=0;j<wl.length;j++){
+      h+='<div style="padding:6px 0;font-size:13px"><b>'+esc(wl[j].location)+'</b> '+esc(wl[j].name)+' ('+wl[j].qty+' kpl)'+(wl[j].ean&&wl[j].ean!=='null'?'<br><span class="mono" style="color:#94a3b8">EAN '+wl[j].ean+'</span>':'')+'</div>';
+    }
+    if(rx.length){h+='<div style="margin-top:8px;padding:8px;background:#fef2f2;border-radius:8px"><b style="color:#b91c1c">Reseptilääkkeet</b>';
+      for(var k=0;k<rx.length;k++){h+='<div style="font-size:12px;color:#7f1d1d">'+esc(rx[k].name)+' → '+rx[k].location+' ('+rx[k].qty+' kpl)</div>'}h+='</div>'}
+    if(nl.length){h+='<div style="margin-top:8px;padding:8px;background:#fffbeb;border-radius:8px"><b style="color:#92400e">UUSI-hyllyyn</b>';
+      for(var l=0;l<nl.length;l++){h+='<div style="font-size:12px;color:#78350f">'+esc(nl[l].name)+' ('+nl[l].qty+' kpl)</div>'}h+='</div>'}
+    h+='</div><div class="flex gap-8"><button class="btn-sm btn-outline flex-1" onclick="setState({activeBox:null})">← Lisää</button>'+
+      '<button class="btn flex-1" style="padding:10px 0" onclick="buildRoute()">Hyllytys →</button></div>';
+    app.innerHTML=h;return;
+  }
+
+  if(S.phase==='scan'){
+    h='<div class="card"><h1>Skannaa laatikko</h1>'+
+      (S.loadInfo?'<div style="padding:6px;border-radius:8px;background:#f0fdf4;font-size:12px;color:#047857;margin-bottom:12px">'+S.loadInfo+'</div>':'')+
+      '<input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa viivakoodi" onkeydown="if(event.key===\'Enter\'){event.preventDefault();handleScan(\'addBox\')}">'+
+      '<button class="btn" style="margin-top:8px" onclick="handleScan(\'addBox\')">Lisää</button>'+
+      (S.lastScanResult?'<div style="margin-top:6px;padding:8px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;'+(S.lastScanResult.type==='ok'?'background:#f0fdf4;color:#16a34a':'background:#fef2f2;color:#dc2626')+'">'+S.lastScanResult.text+'</div>':'')+
+      (S.error?'<div class="error">'+S.error+'</div>':'')+
+      '</div>';
+    if(S.scannedBoxes.length){
+      h+='<div class="card"><h2>Skannatut ('+S.scannedBoxes.length+')</h2>';
+      for(var i=0;i<S.scannedBoxes.length;i++){
+        var b=S.scannedBoxes[i];
+        var tq=0;for(var j=0;j<b.items.length;j++)tq+=b.items[j].qty;
+        h+='<div class="scanned-box" onclick="showBoxDetail(\''+b.sscc+'\')">'+
+          '<span style="font-size:12px;font-weight:600">Laatikko '+(i+1)+'</span> <span class="mono">...'+b.sscc.slice(-6)+'</span>'+
+          '<span style="float:right;font-size:12px">'+b.items.length+' / '+tq+' kpl</span></div>';
+      }
+      h+='<button class="btn" style="margin-top:8px" onclick="buildRoute()">Hyllytysjärjestys →</button></div>';
+    }
+    app.innerHTML=h;
+    setTimeout(function(){var inp=document.getElementById('scan-field');if(inp)inp.focus()},50);
+    return;
+  }
+
+  if(S.phase==='shelve'){
+    var ts=tShelved(),tq=tQty(),pct=tq>0?Math.round(ts/tq*100):0;
+    var cur=S.routeItems[S.currentIdx],cc=cur?(S.shelved[cur.vnr]||0):0,cd=cur?cc>=cur.qty:false;
+    if(!cur){finishShelving(true);return}
+    var cpColor='#64748b';for(var z=0;z<CZ.length;z++){if(CZ[z].aisles.indexOf(cur.physAisle||'')!==-1){cpColor=CZ[z].color;break}}
+    var locMatch=S.confirmedLoc&&cur.location&&cur.location.trim().toUpperCase()===S.confirmedLoc;
+    var cbName=locMatch?'confirmEan':'confirmLocation';
+    var placeholder=locMatch?'Skannaa EAN':'Skannaa paikka';
+
+    h='<div style="font-size:12px;color:#475569;margin-bottom:4px">'+ts+'/'+tq+' ('+pct+'%)</div>'+
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>';
+
+    if(S.unmatchedItems.length){
+      h+='<div class="card" style="border-left:4px solid #f59e0b;background:#fffbeb"><b style="color:#92400e;font-size:13px">UUSI-hyllyyn ('+S.unmatchedItems.length+')</b>';
+      for(var i=0;i<S.unmatchedItems.length;i++){h+='<div style="font-size:12px;color:#78350f">'+esc(S.unmatchedItems[i].name)+' — '+S.unmatchedItems[i].qty+' kpl</div>'}h+='</div>';
+    }
+    if(S.rxItems.length){
+      h+='<div class="card" style="border-left:4px solid #b91c1c;background:#fef2f2"><b style="color:#b91c1c;font-size:13px">Reseptilääkkeet ('+S.rxItems.length+')</b>';
+      for(var i=0;i<S.rxItems.length;i++){h+='<div style="font-size:12px;color:#7f1d1d">'+esc(S.rxItems[i].name)+' → '+S.rxItems[i].location+' ('+S.rxItems[i].qty+' kpl)</div>'}h+='</div>';
+    }
+
+    h+='<div class="card" style="border-left:4px solid '+cpColor+'">'+
+      '<div class="flex justify-between items-center mb-8"><div>'+cBadge(cur.cartPos)+' <span style="font-size:12px;color:#64748b">Paikka '+cur.cartPos+'</span></div>'+
+      '<span style="font-size:12px;color:#94a3b8">'+(S.currentIdx+1)+'/'+S.routeItems.length+'</span></div>';
+    if(cur.parsedLoc){h+='<div class="mb-8"><span class="'+bCls(cur.parsedLoc.aisle)+'">'+cur.parsedLoc.aisle+'</span> <b style="font-size:20px;font-family:monospace">'+cur.location+'</b></div>'}
+    h+='<div style="font-size:15px;font-weight:600;margin-bottom:4px">'+esc(cur.name)+'</div>'+
+      '<div class="mono" style="color:#64748b;margin-bottom:8px">VNR '+cur.vnr+(cur.ean&&cur.ean!=='null'?' | EAN '+cur.ean:'')+'</div>'+
+      '<div class="qty-display" style="background:'+(cd?'#f0fdf4':'#f8fafc')+';border:2px solid '+(cd?'#86efac':'#e2e8f0')+'">'+
+      '<span style="font-size:36px;font-weight:800;color:'+(cd?'#16a34a':'#1e293b')+'">'+cc+'</span>'+
+      '<span style="font-size:22px;color:#94a3b8"> / </span>'+
+      '<span style="font-size:36px;font-weight:800;color:#64748b">'+cur.qty+'</span>'+
+      (cd?' <span style="font-size:24px">✓</span>':'')+
+      '</div><div class="qty-adj">'+
+      '<button class="qty-btn" style="color:#dc2626;border-color:#fca5a5" onclick="adjustQty(\''+cur.vnr+'\',-1)">−</button> '+
+      '<input type="number" id="qty-manual-'+cur.vnr+'" class="qty-manual" value="'+cc+'" min="0" onchange="setQtyManual(\''+cur.vnr+'\')"> '+
+      '<button class="qty-btn" style="color:#16a34a;border-color:#86efac" onclick="adjustQty(\''+cur.vnr+'\',1)">+</button></div></div>';
+
+    h+='<div class="card">';
+    if(!locMatch){h+='<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:8px">1. Skannaa paikka: <b>'+cur.location+'</b></div>'}
+    else{h+='<div style="font-size:13px;font-weight:600;color:#16a34a;margin-bottom:8px">✓ '+cur.location+' — 2. Skannaa EAN</div>'}
+    h+='<input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="'+placeholder+'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();handleScan(\''+cbName+'\')}">'+
+      '<button class="btn" style="margin-top:6px" onclick="handleScan(\''+cbName+'\')">OK</button>'+
+      (S.lastScanResult?'<div style="margin-top:6px;padding:8px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;'+(S.lastScanResult.type==='ok'?'background:#f0fdf4;color:#16a34a':'background:#fef2f2;color:#dc2626')+'">'+S.lastScanResult.text+'</div>':'')+
+      (S.error?'<div class="error">'+S.error+'</div>':'')+'</div>';
+
+    h+='<div class="flex gap-8 mb-12">'+
+      '<button class="btn-sm btn-outline flex-1" '+(S.currentIdx===0?'disabled':'')+' onclick="navTo(S.currentIdx-1)">←</button>'+
+      '<button class="btn-sm btn-outline flex-1" '+(S.currentIdx>=S.routeItems.length-1?'disabled':'')+' onclick="navTo(S.currentIdx+1)">→</button></div>'+
+      '<button class="btn" style="background:#16a34a;margin-bottom:12px" onclick="finishShelving()">Lopeta → Raportti</button>';
+
+    app.innerHTML=h;
+    setTimeout(function(){var inp=document.getElementById('scan-field');if(inp)inp.focus()},50);
+    return;
+  }
+
+  if(S.phase==='report'){
+    var ok=[],under=[],over=[],notDone=[];
+    for(var i=0;i<S.routeItems.length;i++){
+      var it=S.routeItems[i],sv=S.shelved[it.vnr]||0;
+      if(sv===it.qty)ok.push({n:it.name,l:it.location,s:sv,q:it.qty});
+      else if(sv>it.qty)over.push({n:it.name,l:it.location,s:sv,q:it.qty});
+      else if(sv>0)under.push({n:it.name,l:it.location,s:sv,q:it.qty});
+      else notDone.push({n:it.name,l:it.location,s:0,q:it.qty});
+    }
+    var ts=tShelved(),tq=tQty();
+    h='<div class="card"><h1>Raportti</h1>'+
+      '<div class="flex gap-8 mb-12">'+
+      '<div style="flex:1;padding:10px;border-radius:8px;background:#f0fdf4;text-align:center"><div style="font-size:22px;font-weight:700;color:#16a34a">'+ts+'</div><div style="font-size:11px;color:#047857">Hyllytetty</div></div>'+
+      '<div style="flex:1;padding:10px;border-radius:8px;background:#f8fafc;text-align:center"><div style="font-size:22px;font-weight:700">'+tq+'</div><div style="font-size:11px;color:#64748b">Odotettu</div></div>'+
+      '<div style="flex:1;padding:10px;border-radius:8px;background:'+(ts===tq?'#f0fdf4':'#fef2f2')+';text-align:center"><div style="font-size:22px;font-weight:700;color:'+(ts===tq?'#16a34a':'#dc2626')+'">'+(ts-tq)+'</div><div style="font-size:11px;color:#64748b">Erotus</div></div></div></div>';
+
+    if(under.length){h+='<div class="card"><h2 style="color:#92400e">Vajaita ('+under.length+')</h2>';
+      for(var i=0;i<under.length;i++){h+='<div class="report-row report-warn"><span>'+esc(under[i].n)+'</span><span style="float:right;font-weight:700;color:#92400e">'+under[i].s+'/'+under[i].q+'</span></div>'}h+='</div>'}
+    if(notDone.length){h+='<div class="card"><h2 style="color:#dc2626">Ei hyllytetty ('+notDone.length+')</h2>';
+      for(var i=0;i<notDone.length;i++){h+='<div class="report-row report-err"><span>'+esc(notDone[i].n)+'</span><span style="float:right;font-weight:700;color:#dc2626">0/'+notDone[i].q+'</span></div>'}h+='</div>'}
+    if(over.length){h+='<div class="card"><h2 style="color:#7c3aed">Ylimäärä ('+over.length+')</h2>';
+      for(var i=0;i<over.length;i++){h+='<div class="report-row" style="background:#f5f3ff;border:1px solid #ddd6fe"><span>'+esc(over[i].n)+'</span><span style="float:right;font-weight:700;color:#7c3aed">'+over[i].s+'/'+over[i].q+'</span></div>'}h+='</div>'}
+    if(S.unmatchedItems.length){h+='<div class="card"><h2 style="color:#92400e">UUSI-hyllyyn ('+S.unmatchedItems.length+')</h2>';
+      for(var i=0;i<S.unmatchedItems.length;i++){h+='<div class="report-row report-warn">'+esc(S.unmatchedItems[i].name)+' — '+S.unmatchedItems[i].qty+' kpl</div>'}h+='</div>'}
+    if(S.rxItems.length){h+='<div class="card"><h2 style="color:#b91c1c">Reseptilääkkeet ('+S.rxItems.length+')</h2>';
+      for(var i=0;i<S.rxItems.length;i++){h+='<div class="report-row report-err">'+esc(S.rxItems[i].name)+' → '+S.rxItems[i].location+' ('+S.rxItems[i].qty+' kpl)</div>'}h+='</div>'}
+    if(ok.length){h+='<div class="card"><h2 style="color:#16a34a">OK ('+ok.length+')</h2>';
+      for(var i=0;i<ok.length;i++){h+='<div class="report-row report-ok"><span>'+esc(ok[i].n)+'</span><span style="float:right;font-weight:700;color:#16a34a">'+ok[i].q+' ✓</span></div>'}h+='</div>'}
+
+    h+='<button class="btn" style="margin-top:8px" onclick="setState({phase:\'scan\',scannedBoxes:[],routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,error:null,lastScanResult:null,confirmedLoc:null,activeBox:null})">Uusi erä</button>';
+    app.innerHTML=h;return;
+  }
+}
+
+function showBoxDetail(sscc){
+  var box=S.scannedBoxes.find(function(b){return b.sscc===sscc});if(!box)return;
+  var enriched=[];
+  for(var i=0;i<box.items.length;i++){
+    var item=box.items[i],vnr=String(item.vnr||''),alt=String(item.altVnr||'');
+    var m=lookupMaster(vnr,alt),locStr=(m.location||'').trim();
+    var pl=pLoc(locStr),pa=pl?gPA(pl):null,cp=pa?cartPos(pa):0;
+    enriched.push({vnr:vnr,altVnr:alt,name:item.name||m.name||'?',ean:m.ean||'',qty:item.qty,location:pl?locStr:null,parsedLoc:pl,physAisle:pa,cartPos:cp});
+  }
+  setState({activeBox:{sscc:sscc,items:box.items,enriched:enriched}});
+}
+
+render();
+</script>
+</body>
+</html>
