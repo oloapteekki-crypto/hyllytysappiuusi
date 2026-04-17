@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice version="1.2">
+	<SellerPartyDetails>
+		<SellerPartyIdentifier>Medifon Oy</SellerPartyIdentifier>
+		<SellerOrganisationName>Medifon Oy</SellerOrganisationName>
+		<SellerOrganisationTaxCode>0471598-6</SellerOrganisationTaxCode>
+		<SellerPostalAddressDetails>
+			<SellerStreetName>Kutojantie 5</SellerStreetName>
+			<SellerTownName>Espoo</SellerTownName>
+			<SellerPostCodeIdentifier>02630</SellerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</SellerPostalAddressDetails>
+	</SellerPartyDetails>
+	<BuyerPartyDetails>
+		<BuyerPartyIdentifier>12164</BuyerPartyIdentifier>
+		<BuyerOrganisationName>Olo-apteekki Oy / Verkkokauppa</BuyerOrganisationName>
+		<BuyerPostalAddressDetails>
+			<BuyerStreetName>Muuntotie 1</BuyerStreetName>
+			<BuyerTownName>Vantaa</BuyerTownName>
+			<BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</BuyerPostalAddressDetails>
+	</BuyerPartyDetails>
+	<InvoiceDetails>
+		<InvoiceTypeCode>DEV01</InvoiceTypeCode>
+		<InvoiceTypeText>TOIMITUSILMOITUS</InvoiceTypeText>
+		<OriginCode>Origin</OriginCode>
+		<InvoiceNumber>633411</InvoiceNumber>
+		<InvoiceDate Format="CCYYMMDD">20260416</InvoiceDate>
+	</InvoiceDetails>
+	<InvoiceRow>
+		<ArticleIdentifier>9252383</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056241872</ArticleGroupIdentifier>
+		<ArticleName>Carbalan perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9252383</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">18,00</OrderedQuantity>
+		<EndDate>20271130</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,43</UnitPriceAmount>
+		<RowIdentifier>1</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3048657</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">79,75</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9281720</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056241889</ArticleGroupIdentifier>
+		<ArticleName>Probicare 200 g</ArticleName>
+		<BuyerArticleIdentifier>9281720</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">60,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">60,00</OrderedQuantity>
+		<EndDate>20271130</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,84</UnitPriceAmount>
+		<RowIdentifier>2</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3049028</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">290,16</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9553670</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>LRP Anthelios UVAir Serum tinted light  SPF50+ sävytetty aurinkosuojavoide 50 ml</ArticleName>
+		<BuyerArticleIdentifier>9553670</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">3,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">3,00</OrderedQuantity>
+		<EndDate>20290131</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">13,83</UnitPriceAmount>
+		<RowIdentifier>3</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>54A100</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">41,49</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9294524</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>Vichy CS UV AGE aurinkosuojavoide SPF50+ 40 ml</ArticleName>
+		<BuyerArticleIdentifier>9294524</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">4,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">4,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">15,63</UnitPriceAmount>
+		<RowIdentifier>4</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">62,52</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9505886</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>Avene Sun cream 50+ TriAsorB 50ml</ArticleName>
+		<BuyerArticleIdentifier>9505886</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">18,00</OrderedQuantity>
+		<EndDate>20271130</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,60</UnitPriceAmount>
+		<RowIdentifier>5</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>4A7K1</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">172,80</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9269554</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>Sodermix scar creme 15 g</ArticleName>
+		<BuyerArticleIdentifier>9269554</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">2,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">2,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,41</UnitPriceAmount>
+		<RowIdentifier>6</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">20,82</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9270995</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>(poisto)Rehband QD Metatarsal Pad L</ArticleName>
+		<BuyerArticleIdentifier>9270995</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">1,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">1,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,31</UnitPriceAmount>
+		<RowIdentifier>7</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">9,31</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9288628</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>Boreas jalkavoide 150 ml</ArticleName>
+		<BuyerArticleIdentifier>9288628</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20280531</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,50</UnitPriceAmount>
+		<RowIdentifier>8</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>29085</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">39,00</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9540767</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>SisterYoung AYLA ROSE hiustenselvitysharja 1 kpl</ArticleName>
+		<BuyerArticleIdentifier>9540767</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">1,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">1,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,20</UnitPriceAmount>
+		<RowIdentifier>9</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">6,20</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9533705</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>Uriage Bariederm Cica Insulating repairing hand cream 50ml</ArticleName>
+		<BuyerArticleIdentifier>9533705</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">3,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">3,00</OrderedQuantity>
+		<EndDate>20281130</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,98</UnitPriceAmount>
+		<RowIdentifier>10</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>530811</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">11,94</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9508647</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>Avanti Medical A-med Textile laastari kangas 20 kpl</ArticleName>
+		<BuyerArticleIdentifier>9508647</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">8,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">8,00</OrderedQuantity>
+		<EndDate>20280730</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">0,85</UnitPriceAmount>
+		<RowIdentifier>11</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>20230801AV</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">6,80</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9277023</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779056243760</ArticleGroupIdentifier>
+		<ArticleName>Bodyflex Glucosamin Plus 120 tabl</ArticleName>
+		<BuyerArticleIdentifier>9277023</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">3,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">3,00</OrderedQuantity>
+		<EndDate>20271002</EndDate>
+		<OriginalInvoiceNumber>27632</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">20,44</UnitPriceAmount>
+		<RowIdentifier>12</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25073203</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">61,32</RowAmount>
+	</InvoiceRow>
+</Finvoice>
