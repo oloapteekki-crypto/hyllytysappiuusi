@@ -1,0 +1,1781 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice version="1.2">
+	<SellerPartyDetails>
+		<SellerPartyIdentifier>Medifon Oy</SellerPartyIdentifier>
+		<SellerOrganisationName>Medifon Oy</SellerOrganisationName>
+		<SellerOrganisationTaxCode>0471598-6</SellerOrganisationTaxCode>
+		<SellerPostalAddressDetails>
+			<SellerStreetName>Kutojantie 5</SellerStreetName>
+			<SellerTownName>Espoo</SellerTownName>
+			<SellerPostCodeIdentifier>02630</SellerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</SellerPostalAddressDetails>
+	</SellerPartyDetails>
+	<BuyerPartyDetails>
+		<BuyerPartyIdentifier>12164</BuyerPartyIdentifier>
+		<BuyerOrganisationName>Olo-apteekki Oy / Verkkokauppa</BuyerOrganisationName>
+		<BuyerPostalAddressDetails>
+			<BuyerStreetName>Muuntotie 1</BuyerStreetName>
+			<BuyerTownName>Vantaa</BuyerTownName>
+			<BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</BuyerPostalAddressDetails>
+	</BuyerPartyDetails>
+	<InvoiceDetails>
+		<InvoiceTypeCode>DEV01</InvoiceTypeCode>
+		<InvoiceTypeText>TOIMITUSILMOITUS</InvoiceTypeText>
+		<OriginCode>Origin</OriginCode>
+		<InvoiceNumber>634521</InvoiceNumber>
+		<InvoiceDate Format="CCYYMMDD">20260421</InvoiceDate>
+	</InvoiceDetails>
+	<InvoiceRow>
+		<ArticleIdentifier>9251888</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089710</ArticleGroupIdentifier>
+		<ArticleName>Ceralan Plus perusvoide pumppupullo 500 g</ArticleName>
+		<BuyerArticleIdentifier>9251888</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">18,00</OrderedQuantity>
+		<EndDate>20290228</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">12,30</UnitPriceAmount>
+		<RowIdentifier>1</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3060901</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">221,40</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9251833</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089710</ArticleGroupIdentifier>
+		<ArticleName>Aqualan L perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9251833</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">120,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,88</UnitPriceAmount>
+		<RowIdentifier>2</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3054332</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">93,04</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9251833</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089727</ArticleGroupIdentifier>
+		<ArticleName>Aqualan L perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9251833</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">66,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">120,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,88</UnitPriceAmount>
+		<RowIdentifier>3</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3054332</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">255,86</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9251833</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089734</ArticleGroupIdentifier>
+		<ArticleName>Aqualan L perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9251833</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">30,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">120,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,88</UnitPriceAmount>
+		<RowIdentifier>4</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3054332</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">116,30</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9546883</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089734</ArticleGroupIdentifier>
+		<ArticleName>Oatcare 200g</ArticleName>
+		<BuyerArticleIdentifier>9546883</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">24,00</OrderedQuantity>
+		<EndDate>20280131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,84</UnitPriceAmount>
+		<RowIdentifier>5</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3059803</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">116,06</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9254077</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089734</ArticleGroupIdentifier>
+		<ArticleName>Lipolan perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9254077</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">36,00</OrderedQuantity>
+		<EndDate>20271231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,04</UnitPriceAmount>
+		<RowIdentifier>6</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3053275</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">48,48</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9254077</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089741</ArticleGroupIdentifier>
+		<ArticleName>Lipolan perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9254077</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">36,00</OrderedQuantity>
+		<EndDate>20271231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,04</UnitPriceAmount>
+		<RowIdentifier>7</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3053275</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">96,96</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9252306</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089741</ArticleGroupIdentifier>
+		<ArticleName>Aqualan Duo perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9252306</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">42,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">60,00</OrderedQuantity>
+		<EndDate>20271130</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,88</UnitPriceAmount>
+		<RowIdentifier>8</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3050278</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">162,82</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9252306</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089758</ArticleGroupIdentifier>
+		<ArticleName>Aqualan Duo perusvoide 200 g</ArticleName>
+		<BuyerArticleIdentifier>9252306</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">60,00</OrderedQuantity>
+		<EndDate>20271130</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,88</UnitPriceAmount>
+		<RowIdentifier>9</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3050278</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">69,78</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9252163</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089758</ArticleGroupIdentifier>
+		<ArticleName>Sebamed Liquid Face&amp;Body Wash pesuneste 300 ml</ArticleName>
+		<BuyerArticleIdentifier>9252163</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">24,00</OrderedQuantity>
+		<EndDate>20280730</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,26</UnitPriceAmount>
+		<RowIdentifier>10</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>5A307A54</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">78,25</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9282061</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089758</ArticleGroupIdentifier>
+		<ArticleName>Sebamed Everyday Hellävarainen Shampoo 200 ml</ArticleName>
+		<BuyerArticleIdentifier>9282061</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20280131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,20</UnitPriceAmount>
+		<RowIdentifier>11</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>5A281A06</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">19,19</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9540646</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089758</ArticleGroupIdentifier>
+		<ArticleName>RAUSCH Pajunkuori erikoishoitoshampoo 200 ml</ArticleName>
+		<BuyerArticleIdentifier>9540646</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20300216</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,25</UnitPriceAmount>
+		<RowIdentifier>12</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>020985</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">61,50</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9513036</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089802</ArticleGroupIdentifier>
+		<ArticleName>Movex Glukosamiini Strong 180 tabl</ArticleName>
+		<BuyerArticleIdentifier>9513036</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">30,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">30,00</OrderedQuantity>
+		<EndDate>20281202</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">13,20</UnitPriceAmount>
+		<RowIdentifier>13</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2570320704</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">395,93</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9521583</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089802</ArticleGroupIdentifier>
+		<ArticleName>Femisan Glide liukuvoide 75 ml</ArticleName>
+		<BuyerArticleIdentifier>9521583</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">60,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">60,00</OrderedQuantity>
+		<EndDate>20270430</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">2,77</UnitPriceAmount>
+		<RowIdentifier>14</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>P15523</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">166,14</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9254000</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089802</ArticleGroupIdentifier>
+		<ArticleName>Multivita Ascorbin 500 mg 200 tabl</ArticleName>
+		<BuyerArticleIdentifier>9254000</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">30,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20271109</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,34</UnitPriceAmount>
+		<RowIdentifier>15</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2569680201</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">190,24</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9254000</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089819</ArticleGroupIdentifier>
+		<ArticleName>Multivita Ascorbin 500 mg 200 tabl</ArticleName>
+		<BuyerArticleIdentifier>9254000</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20271109</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,34</UnitPriceAmount>
+		<RowIdentifier>16</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2569680201</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">63,41</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9282006</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089819</ArticleGroupIdentifier>
+		<ArticleName>Sebamed CF Deep Cleans. Foam puhd.vaahto 150 ml</ArticleName>
+		<BuyerArticleIdentifier>9282006</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">36,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">36,00</OrderedQuantity>
+		<EndDate>20280531</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,73</UnitPriceAmount>
+		<RowIdentifier>17</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>5C025C08</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">170,16</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9537126</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089826</ArticleGroupIdentifier>
+		<ArticleName>KarpaLact Liukastingeeli 75 ml</ArticleName>
+		<BuyerArticleIdentifier>9537126</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">48,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">48,00</OrderedQuantity>
+		<EndDate>20290131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,95</UnitPriceAmount>
+		<RowIdentifier>18</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>01/2029/56</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">189,70</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9263988</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089970</ArticleGroupIdentifier>
+		<ArticleName>Gelsectan 60 kaps</ArticleName>
+		<BuyerArticleIdentifier>9263988</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">53,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">144,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">17,50</UnitPriceAmount>
+		<RowIdentifier>19</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>G5N056</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">927,58</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9290476</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089970</ArticleGroupIdentifier>
+		<ArticleName>Otinova korvasuihke 15 ml</ArticleName>
+		<BuyerArticleIdentifier>9290476</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20271031</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,51</UnitPriceAmount>
+		<RowIdentifier>20</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>S24574</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">45,03</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9298363</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089970</ArticleGroupIdentifier>
+		<ArticleName>Posterisan protect puikko 10 kpl</ArticleName>
+		<BuyerArticleIdentifier>9298363</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">40,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20280131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,37</UnitPriceAmount>
+		<RowIdentifier>21</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25000315</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">254,60</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9281071</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089987</ArticleGroupIdentifier>
+		<ArticleName>Humidose nenän kostutusliuos 50 ml</ArticleName>
+		<BuyerArticleIdentifier>9281071</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">50,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">50,00</OrderedQuantity>
+		<EndDate>20281130</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,04</UnitPriceAmount>
+		<RowIdentifier>22</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3049771</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">202,02</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9263988</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208089994</ArticleGroupIdentifier>
+		<ArticleName>Gelsectan 60 kaps</ArticleName>
+		<BuyerArticleIdentifier>9263988</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">80,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">144,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">17,50</UnitPriceAmount>
+		<RowIdentifier>23</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>G5N056</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">1400,12</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9263988</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208090006</ArticleGroupIdentifier>
+		<ArticleName>Gelsectan 60 kaps</ArticleName>
+		<BuyerArticleIdentifier>9263988</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">11,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">144,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">17,50</UnitPriceAmount>
+		<RowIdentifier>24</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>G5N056</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">192,52</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9512211</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091010</ArticleGroupIdentifier>
+		<ArticleName>Sebamed Anti-hairloss shampoo 200 ml</ArticleName>
+		<BuyerArticleIdentifier>9512211</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">18,00</OrderedQuantity>
+		<EndDate>20280331</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,20</UnitPriceAmount>
+		<RowIdentifier>25</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>5A033A13</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">57,56</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9507360</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091010</ArticleGroupIdentifier>
+		<ArticleName>Terveystutka Torni3 dosetti 1 kpl</ArticleName>
+		<BuyerArticleIdentifier>9507360</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,50</UnitPriceAmount>
+		<RowIdentifier>26</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">90,00</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9514070</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091010</ArticleGroupIdentifier>
+		<ArticleName>WAYA Premium 3D-unimaski musta 1 kpl</ArticleName>
+		<BuyerArticleIdentifier>9514070</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">24,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">15,80</UnitPriceAmount>
+		<RowIdentifier>27</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">379,20</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9258752</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091089</ArticleGroupIdentifier>
+		<ArticleName>A-Derma Cytelium Drying Spray 100 ml</ArticleName>
+		<BuyerArticleIdentifier>9258752</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20280930</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,46</UnitPriceAmount>
+		<RowIdentifier>28</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>5S2UM</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">101,52</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9536851</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091089</ArticleGroupIdentifier>
+		<ArticleName>IOMI Footnurse Diabetessukka 37-42 Murretut värit 3 paria</ArticleName>
+		<BuyerArticleIdentifier>9536851</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">8,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">8,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">5,65</UnitPriceAmount>
+		<RowIdentifier>29</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">45,20</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9518415</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091089</ArticleGroupIdentifier>
+		<ArticleName>Avanti Medical insuliiniruisku 1 ml + neula 30G 0,3x12 mm 100 kpl</ArticleName>
+		<BuyerArticleIdentifier>9518415</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">11,00</OrderedQuantity>
+		<EndDate>20290430</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">25,00</UnitPriceAmount>
+		<RowIdentifier>30</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>202405820</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">150,00</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9523519</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091089</ArticleGroupIdentifier>
+		<ArticleName>SIPO Pöydänreunan pehmuste ecru 2m 1 kpl</ArticleName>
+		<BuyerArticleIdentifier>9523519</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,18</UnitPriceAmount>
+		<RowIdentifier>31</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">37,08</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9502894</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091126</ArticleGroupIdentifier>
+		<ArticleName>Avene Tolerance Cleanser 200ml</ArticleName>
+		<BuyerArticleIdentifier>9502894</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">9,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">9,00</OrderedQuantity>
+		<EndDate>20290131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,06</UnitPriceAmount>
+		<RowIdentifier>32</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>6A01N</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">90,52</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9530130</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091126</ArticleGroupIdentifier>
+		<ArticleName>KarpaLact Strong 120 kaps</ArticleName>
+		<BuyerArticleIdentifier>9530130</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">18,00</OrderedQuantity>
+		<EndDate>20270930</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">23,11</UnitPriceAmount>
+		<RowIdentifier>33</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>DL 249</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">416,02</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9524685</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091126</ArticleGroupIdentifier>
+		<ArticleName>Rikas Pellavansiemenöljy 500 ml</ArticleName>
+		<BuyerArticleIdentifier>9524685</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">9,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20270228</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,94</UnitPriceAmount>
+		<RowIdentifier>34</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>EC 62</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">62,43</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9549644</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091126</ArticleGroupIdentifier>
+		<ArticleName>Thermoskin Recovery Ice Sleeve 85697 L 1 kpl</ArticleName>
+		<BuyerArticleIdentifier>9549644</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">12,95</UnitPriceAmount>
+		<RowIdentifier>35</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>18121</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">77,70</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9270005</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>A-Derma Exomega Control Lotion 400 ml</ArticleName>
+		<BuyerArticleIdentifier>9270005</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20281031</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">15,98</UnitPriceAmount>
+		<RowIdentifier>36</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>5S3J9</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">95,88</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9283656</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>Bio-Selen+Sinkki 150 tabl</ArticleName>
+		<BuyerArticleIdentifier>9283656</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20281130</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">13,10</UnitPriceAmount>
+		<RowIdentifier>37</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2650249</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">131,00</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9274196</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>Ducray Keracnyl Foaming gel 400 ml</ArticleName>
+		<BuyerArticleIdentifier>9274196</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20270731</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">13,63</UnitPriceAmount>
+		<RowIdentifier>38</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>4S6TB</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">81,78</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9290806</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>Favora rauhoittava kosteusvoide 50 ml</ArticleName>
+		<BuyerArticleIdentifier>9290806</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20280630</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,56</UnitPriceAmount>
+		<RowIdentifier>39</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>1B72R</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">102,77</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9269279</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>MediGoo Herkkä raskaustesti liuska 2kpl</ArticleName>
+		<BuyerArticleIdentifier>9269279</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">20,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">30,00</OrderedQuantity>
+		<EndDate>20270228</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">1,99</UnitPriceAmount>
+		<RowIdentifier>40</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>F2503044</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">39,80</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9281698</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>Posivil Zink mustaherukka kuumajuomajauhe 20 pss</ArticleName>
+		<BuyerArticleIdentifier>9281698</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20280106</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,50</UnitPriceAmount>
+		<RowIdentifier>41</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>L5319/2</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">42,03</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9219735</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>Sense Me Caring Massage Glide RFSU 150 ml</ArticleName>
+		<BuyerArticleIdentifier>9219735</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">5,80</UnitPriceAmount>
+		<RowIdentifier>42</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">34,80</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9516578</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091188</ArticleGroupIdentifier>
+		<ArticleName>WAYA Comfort 3D-unimaski musta 1 kpl</ArticleName>
+		<BuyerArticleIdentifier>9516578</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">8,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">8,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,45</UnitPriceAmount>
+		<RowIdentifier>43</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">51,60</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9541372</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091416</ArticleGroupIdentifier>
+		<ArticleName>ButiPron 30 kaps</ArticleName>
+		<BuyerArticleIdentifier>9541372</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">50,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">50,00</OrderedQuantity>
+		<EndDate>20280131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,79</UnitPriceAmount>
+		<RowIdentifier>44</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>L150126</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">339,58</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9530119</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091416</ArticleGroupIdentifier>
+		<ArticleName>KarpaLact Strong 60 kaps</ArticleName>
+		<BuyerArticleIdentifier>9530119</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20270930</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">12,46</UnitPriceAmount>
+		<RowIdentifier>45</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>EB 45</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">149,47</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9521462</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091416</ArticleGroupIdentifier>
+		<ArticleName>Kyolic Cardio 30 tabl</ArticleName>
+		<BuyerArticleIdentifier>9521462</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">24,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,87</UnitPriceAmount>
+		<RowIdentifier>46</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>DK 232</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">188,78</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9252691</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091416</ArticleGroupIdentifier>
+		<ArticleName>Nasolin A-vitamin nenäsuihke 10 ml</ArticleName>
+		<BuyerArticleIdentifier>9252691</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">50,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">50,00</OrderedQuantity>
+		<EndDate>20271130</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,89</UnitPriceAmount>
+		<RowIdentifier>47</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2570770002</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">194,61</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9281819</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091416</ArticleGroupIdentifier>
+		<ArticleName>Remo-Wax korvasuihke + pumppu 10 ml</ArticleName>
+		<BuyerArticleIdentifier>9281819</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20280531</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,19</UnitPriceAmount>
+		<RowIdentifier>48</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3024348</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">81,90</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9533397</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091478</ArticleGroupIdentifier>
+		<ArticleName>Multivita Super Pore Monivitamiini 45 poretabl</ArticleName>
+		<BuyerArticleIdentifier>9533397</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">60,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">60,00</OrderedQuantity>
+		<EndDate>20270902</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,71</UnitPriceAmount>
+		<RowIdentifier>49</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>L5218/2</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">402,48</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9259357</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091478</ArticleGroupIdentifier>
+		<ArticleName>Membrasin Moisture 90 kaps</ArticleName>
+		<BuyerArticleIdentifier>9259357</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20290907</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">14,28</UnitPriceAmount>
+		<RowIdentifier>50</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2564320003</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">342,72</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9259357</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091485</ArticleGroupIdentifier>
+		<ArticleName>Membrasin Moisture 90 kaps</ArticleName>
+		<BuyerArticleIdentifier>9259357</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">16,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20290907</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">14,28</UnitPriceAmount>
+		<RowIdentifier>51</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2564320003</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">228,48</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9251184</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091485</ArticleGroupIdentifier>
+		<ArticleName>i say: Turvotus &amp; IBS-oireet 30 kaps</ArticleName>
+		<BuyerArticleIdentifier>9251184</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">48,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">96,00</OrderedQuantity>
+		<EndDate>20281116</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,31</UnitPriceAmount>
+		<RowIdentifier>52</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>30026571A</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">350,66</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9251184</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091492</ArticleGroupIdentifier>
+		<ArticleName>i say: Turvotus &amp; IBS-oireet 30 kaps</ArticleName>
+		<BuyerArticleIdentifier>9251184</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">96,00</OrderedQuantity>
+		<EndDate>20281116</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,31</UnitPriceAmount>
+		<RowIdentifier>53</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>30026571A</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">175,33</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9251184</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091508</ArticleGroupIdentifier>
+		<ArticleName>i say: Turvotus &amp; IBS-oireet 30 kaps</ArticleName>
+		<BuyerArticleIdentifier>9251184</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">24,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">96,00</OrderedQuantity>
+		<EndDate>20281116</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,31</UnitPriceAmount>
+		<RowIdentifier>54</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>30026571A</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">175,33</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9283469</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091515</ArticleGroupIdentifier>
+		<ArticleName>Bio-Karoten+E 150 kaps</ArticleName>
+		<BuyerArticleIdentifier>9283469</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">40,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20301130</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,00</UnitPriceAmount>
+		<RowIdentifier>55</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2650239</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">360,00</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9256739</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091522</ArticleGroupIdentifier>
+		<ArticleName>bertil&apos;s Omega7 Tyrniöljykapseli 150 kaps</ArticleName>
+		<BuyerArticleIdentifier>9256739</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">48,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">48,00</OrderedQuantity>
+		<EndDate>20281031</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">31,80</UnitPriceAmount>
+		<RowIdentifier>56</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>EA 20</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">1526,61</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9287209</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091539</ArticleGroupIdentifier>
+		<ArticleName>bertils Testo Boost 60 tabl</ArticleName>
+		<BuyerArticleIdentifier>9287209</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">60,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">60,00</OrderedQuantity>
+		<EndDate>20281231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,90</UnitPriceAmount>
+		<RowIdentifier>57</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>DM 271</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">654,12</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9294689</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091577</ArticleGroupIdentifier>
+		<ArticleName>APTEEKKI Valkovaseliini 100 g</ArticleName>
+		<BuyerArticleIdentifier>9294689</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">20,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">20,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">2,89</UnitPriceAmount>
+		<RowIdentifier>58</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">57,76</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9273129</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091577</ArticleGroupIdentifier>
+		<ArticleName>Beko Strong B12+fooli+B6 mustikka-karpalo 100 purutabl</ArticleName>
+		<BuyerArticleIdentifier>9273129</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">30,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">30,00</OrderedQuantity>
+		<EndDate>20270610</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,14</UnitPriceAmount>
+		<RowIdentifier>59</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2560350001</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">304,20</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9288056</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091577</ArticleGroupIdentifier>
+		<ArticleName>Bevita Eye Silmäsuihke 17 ml</ArticleName>
+		<BuyerArticleIdentifier>9288056</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">20,00</OrderedQuantity>
+		<EndDate>20271231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,46</UnitPriceAmount>
+		<RowIdentifier>60</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>A1071</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">74,65</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9280411</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091577</ArticleGroupIdentifier>
+		<ArticleName>Carbalan Plus perusvoide 30 g</ArticleName>
+		<BuyerArticleIdentifier>9280411</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">20,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">20,00</OrderedQuantity>
+		<EndDate>20280131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">1,15</UnitPriceAmount>
+		<RowIdentifier>61</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3060010</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">23,09</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9536367</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091577</ArticleGroupIdentifier>
+		<ArticleName>Favora Rauhoittava silmänympärysvoide 15 ml</ArticleName>
+		<BuyerArticleIdentifier>9536367</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20281130</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,56</UnitPriceAmount>
+		<RowIdentifier>62</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>1BATP</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">102,77</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9295932</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091577</ArticleGroupIdentifier>
+		<ArticleName>Nordic Health Sleep Lotion Junior 135 ml</ArticleName>
+		<BuyerArticleIdentifier>9295932</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20300930</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,18</UnitPriceAmount>
+		<RowIdentifier>63</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>06Y0516</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">98,11</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9532352</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091577</ArticleGroupIdentifier>
+		<ArticleName>Posivil FluZink vadelma-salmiakki 40 imeskelytabl</ArticleName>
+		<BuyerArticleIdentifier>9532352</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20270805</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,65</UnitPriceAmount>
+		<RowIdentifier>64</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2563750001</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">46,49</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9252614</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>Devisol Strong 100 µg 100 imeskelytabl</ArticleName>
+		<BuyerArticleIdentifier>9252614</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">30,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">30,00</OrderedQuantity>
+		<EndDate>20280313</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,96</UnitPriceAmount>
+		<RowIdentifier>65</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2557060001</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">238,68</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9291565</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>Dosett Medi Turkoosi Suomi 155x102x25 1kpl</ArticleName>
+		<BuyerArticleIdentifier>9291565</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,25</UnitPriceAmount>
+		<RowIdentifier>66</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">72,51</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9537170</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>FEMARELLE Unstoppable 56 kaps</ArticleName>
+		<BuyerArticleIdentifier>9537170</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20270731</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">14,37</UnitPriceAmount>
+		<RowIdentifier>67</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>UE030324</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">86,19</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9518162</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>KarpaLact Strong Purutabletti 60 tabl.</ArticleName>
+		<BuyerArticleIdentifier>9518162</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">18,00</OrderedQuantity>
+		<EndDate>20280630</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">5,56</UnitPriceAmount>
+		<RowIdentifier>68</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>DL 258</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">100,08</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9269279</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>MediGoo Herkkä raskaustesti liuska 2kpl</ArticleName>
+		<BuyerArticleIdentifier>9269279</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">30,00</OrderedQuantity>
+		<EndDate>20270228</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">1,99</UnitPriceAmount>
+		<RowIdentifier>69</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>F2503044</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">19,90</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9542736</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>Posterisan protect voide 25 g</ArticleName>
+		<BuyerArticleIdentifier>9542736</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">20,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">20,00</OrderedQuantity>
+		<EndDate>20280531</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,56</UnitPriceAmount>
+		<RowIdentifier>70</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25001373</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">131,10</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9542197</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>RFSU Vaihdevuositesti 2kpl</ArticleName>
+		<BuyerArticleIdentifier>9542197</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">14,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">14,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">5,59</UnitPriceAmount>
+		<RowIdentifier>71</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier> </RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">78,26</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9528040</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091706</ArticleGroupIdentifier>
+		<ArticleName>Vitatabs D 10 Junior 100 tabl</ArticleName>
+		<BuyerArticleIdentifier>9528040</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20281217</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,99</UnitPriceAmount>
+		<RowIdentifier>72</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25099001</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">47,88</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9288056</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091836</ArticleGroupIdentifier>
+		<ArticleName>Bevita Eye Silmäsuihke 17 ml</ArticleName>
+		<BuyerArticleIdentifier>9288056</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">20,00</OrderedQuantity>
+		<EndDate>20271231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,46</UnitPriceAmount>
+		<RowIdentifier>73</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>A1071</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">74,65</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9507173</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091836</ArticleGroupIdentifier>
+		<ArticleName>i say: Vaginal Infection emätintabletti 7 kpl</ArticleName>
+		<BuyerArticleIdentifier>9507173</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">48,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">48,00</OrderedQuantity>
+		<EndDate>20271231</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,12</UnitPriceAmount>
+		<RowIdentifier>74</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25G04A</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">341,54</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9252636</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091836</ArticleGroupIdentifier>
+		<ArticleName>Multivita Omegalive Raskaus &amp; Imetys 100 kaps</ArticleName>
+		<BuyerArticleIdentifier>9252636</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">30,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">36,00</OrderedQuantity>
+		<EndDate>20280109</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,83</UnitPriceAmount>
+		<RowIdentifier>75</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>30026688</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">294,84</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9238644</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091836</ArticleGroupIdentifier>
+		<ArticleName>TraneMax karpalovalmiste 500mg 80 kaps</ArticleName>
+		<BuyerArticleIdentifier>9238644</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20270531</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">13,29</UnitPriceAmount>
+		<RowIdentifier>76</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>24706</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">159,49</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9299507</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091836</ArticleGroupIdentifier>
+		<ArticleName>Vitatabs B-Complex Strong 100 tabl</ArticleName>
+		<BuyerArticleIdentifier>9299507</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20290126</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,37</UnitPriceAmount>
+		<RowIdentifier>77</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>26007502</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">73,70</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9539513</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091850</ArticleGroupIdentifier>
+		<ArticleName>Avene Sun Ultra Fluid Radiance SPF50+ 50ml</ArticleName>
+		<BuyerArticleIdentifier>9539513</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">30,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">30,00</OrderedQuantity>
+		<EndDate>20280131</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,68</UnitPriceAmount>
+		<RowIdentifier>78</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>5A00E</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">290,40</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9251877</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091850</ArticleGroupIdentifier>
+		<ArticleName>Beko Strong B12 1 mg mansikka purutabl 150 tabl</ArticleName>
+		<BuyerArticleIdentifier>9251877</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">20,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">20,00</OrderedQuantity>
+		<EndDate>20270526</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">11,39</UnitPriceAmount>
+		<RowIdentifier>79</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2562370001</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">227,76</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9533386</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091850</ArticleGroupIdentifier>
+		<ArticleName>Multivita Super Pore Monivitamiini 15 poretabl</ArticleName>
+		<BuyerArticleIdentifier>9533386</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">16,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">16,00</OrderedQuantity>
+		<EndDate>20270901</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">2,96</UnitPriceAmount>
+		<RowIdentifier>80</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>L5218/3</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">47,42</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9252636</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091850</ArticleGroupIdentifier>
+		<ArticleName>Multivita Omegalive Raskaus &amp; Imetys 100 kaps</ArticleName>
+		<BuyerArticleIdentifier>9252636</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">36,00</OrderedQuantity>
+		<EndDate>20280109</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,83</UnitPriceAmount>
+		<RowIdentifier>81</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>30026688</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">58,97</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9545607</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091850</ArticleGroupIdentifier>
+		<ArticleName>Uriage Roseliane CC Cream SPF50+ Light Tint 40ml</ArticleName>
+		<BuyerArticleIdentifier>9545607</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">8,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20281031</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,56</UnitPriceAmount>
+		<RowIdentifier>82</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>528907</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">76,46</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9514004</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>Favora kiinteyttävä päivävoide sk30 50 ml</ArticleName>
+		<BuyerArticleIdentifier>9514004</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">48,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">48,00</OrderedQuantity>
+		<EndDate>20280229</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,74</UnitPriceAmount>
+		<RowIdentifier>83</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>1B7ZX</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">467,63</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9536378</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>Favora Täyteläinen hoitovoide 50 ml</ArticleName>
+		<BuyerArticleIdentifier>9536378</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20270930</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,56</UnitPriceAmount>
+		<RowIdentifier>84</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>1B1K4</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">51,39</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9502608</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>Nordic Health MultiVit -suihke 25 ml</ArticleName>
+		<BuyerArticleIdentifier>9502608</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate>20270430</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">7,15</UnitPriceAmount>
+		<RowIdentifier>85</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>04Y0363</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">42,91</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9295745</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>One Touch Aloe Vera Gel limakalvoja hoitava liukuvoide 75 ml</ArticleName>
+		<BuyerArticleIdentifier>9295745</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20270531</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,76</UnitPriceAmount>
+		<RowIdentifier>86</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25063064</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">22,56</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9295745</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>One Touch Aloe Vera Gel limakalvoja hoitava liukuvoide 75 ml</ArticleName>
+		<BuyerArticleIdentifier>9295745</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20270531</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">3,76</UnitPriceAmount>
+		<RowIdentifier>87</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25063064</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">22,56</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9238556</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>Sea-Band rannekkeet 1 pari</ArticleName>
+		<BuyerArticleIdentifier>9238556</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">6,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">6,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,28</UnitPriceAmount>
+		<RowIdentifier>88</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>2439 E</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">61,67</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9545607</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>Uriage Roseliane CC Cream SPF50+ Light Tint 40ml</ArticleName>
+		<BuyerArticleIdentifier>9545607</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">18,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">40,00</OrderedQuantity>
+		<EndDate>20281031</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,56</UnitPriceAmount>
+		<RowIdentifier>89</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>528907</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">172,03</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9288947</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>UrinCUR Utipro PLUS 15 kpl RFSU</ArticleName>
+		<BuyerArticleIdentifier>9288947</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20280930</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">9,33</UnitPriceAmount>
+		<RowIdentifier>90</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>N757</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">111,96</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9277298</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>Vitatabs B12 Spearmint 1000 µg 100 tabl</ArticleName>
+		<BuyerArticleIdentifier>9277298</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20280909</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">6,23</UnitPriceAmount>
+		<RowIdentifier>91</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>25065201</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">62,30</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9250887</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779208091966</ArticleGroupIdentifier>
+		<ArticleName>It&apos;S SKIN The Fresh avokadonaamio 21 g</ArticleName>
+		<BuyerArticleIdentifier>9250887</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20280916</EndDate>
+		<OriginalInvoiceNumber>27672</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">1,06</UnitPriceAmount>
+		<RowIdentifier>92</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>570EK</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">10,62</RowAmount>
+	</InvoiceRow>
+</Finvoice>
