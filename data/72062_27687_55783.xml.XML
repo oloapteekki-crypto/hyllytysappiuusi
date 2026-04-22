@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice Version="1.3">
+  <SellerPartyDetails>
+    <SellerOrganisationName>Magnum Medical Finland Oy</SellerOrganisationName>
+    <SellerOrganisationTaxCode>Y1918478-6</SellerOrganisationTaxCode>
+    <SellerPostalAddressDetails>
+      <SellerStreetName>Tuupakantie 32</SellerStreetName>
+      <SellerTownName>Vantaa</SellerTownName>
+      <SellerPostCodeIdentifier>01740</SellerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </SellerPostalAddressDetails>
+  </SellerPartyDetails>
+  <SellerCommunicationDetails>
+    <SellerPhoneNumberIdentifier>+358 20 759 8897</SellerPhoneNumberIdentifier>
+  </SellerCommunicationDetails>
+  <SellerInformationDetails>
+    <SellerPhoneNumber>+358 20 759 8897</SellerPhoneNumber>
+    <SellerCommonEmailaddressIdentifier>info@magnummedical.fi</SellerCommonEmailaddressIdentifier>
+  </SellerInformationDetails>
+  <BuyerPartyDetails>
+    <BuyerPartyIdentifier>72062</BuyerPartyIdentifier>
+    <BuyerOrganisationName>Olo-apteekki Oy / 100</BuyerOrganisationName>
+    <BuyerPostalAddressDetails>
+      <BuyerStreetName>Muuntotie1</BuyerStreetName>
+      <BuyerTownName>VANTAA</BuyerTownName>
+      <BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </BuyerPostalAddressDetails>
+  </BuyerPartyDetails>
+  <DeliveryPartyDetails>
+    <DeliveryPartyIdentifier>72062</DeliveryPartyIdentifier>
+    <DeliveryOrganisationName>OLO-APTEEKKI VERKKOPALVELU OY</DeliveryOrganisationName>
+    <DeliveryPostalAddressDetails>
+      <DeliveryStreetName>Muuntotie 1</DeliveryStreetName>
+      <DeliveryTownName>VANTAA</DeliveryTownName>
+      <DeliveryPostCodeIdentifier>01510</DeliveryPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </DeliveryPostalAddressDetails>
+  </DeliveryPartyDetails>
+  <InvoiceDetails>
+    <InvoiceNumber>7/64-55783</InvoiceNumber>
+    <InvoiceDate Format="CCYYMMDD">20260421</InvoiceDate>
+    <RouteId></RouteId>
+    <RouteTime Format="CCYYMMDD">20260421</RouteTime>
+    <RouteDescription>PK-seutu(PKS-4)21:50</RouteDescription>
+    <CustomerOrder>27687</CustomerOrder>
+  </InvoiceDetails>
+  <InvoiceRow>
+    <ArticleIdentifier>8254474</ArticleIdentifier>
+    <ArticleName>BABE Lip &amp; Cheek Color Balm SPF 50 Roosa 20 ml</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">26</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">26</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">5.2</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">135.2</RowVatExcludedAmount>
+    <PicklistNumber>7/900-71106</PicklistNumber>
+    <ArticleBatcNumber>518911</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280731</BatcUseByDate>
+    <OriginalInvoiceNumber>27687</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8042091</ArticleIdentifier>
+    <ArticleName>HYALOFEMME 10 VAGINAL GEL 30G</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">26</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">30</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">13.9</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">361.4</RowVatExcludedAmount>
+    <PicklistNumber>7/900-71106</PicklistNumber>
+    <ArticleBatcNumber>H17120</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20270430</BatcUseByDate>
+    <OriginalInvoiceNumber>27687</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8042091</ArticleIdentifier>
+    <ArticleName>HYALOFEMME 10 VAGINAL GEL 30G</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">4</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">30</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">13.9</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">55.6</RowVatExcludedAmount>
+    <PicklistNumber>7/900-71106</PicklistNumber>
+    <ArticleBatcNumber>H17120</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20270430</BatcUseByDate>
+    <OriginalInvoiceNumber>27687</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8005015</ArticleIdentifier>
+    <ArticleName>OTOCUR 30ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">19</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">19</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">8.27</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">157.13</RowVatExcludedAmount>
+    <PicklistNumber>7/900-71106</PicklistNumber>
+    <ArticleBatcNumber>14525510</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280808</BatcUseByDate>
+    <OriginalInvoiceNumber>27687</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8250400</ArticleIdentifier>
+    <ArticleName>WIDMER REMEDERM FACE CREAM DAY &amp; NIGHT HAJUSTEETON 50ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">8</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">8</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">18.83</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">150.64</RowVatExcludedAmount>
+    <PicklistNumber>7/900-71106</PicklistNumber>
+    <ArticleBatcNumber>2514106NP</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280430</BatcUseByDate>
+    <OriginalInvoiceNumber>27687</OriginalInvoiceNumber>
+  </InvoiceRow>
+</Finvoice>
