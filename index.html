@@ -15,6 +15,7 @@ document.getElementById('manifest-link').href=URL.createObjectURL(new Blob([JSON
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;-webkit-tap-highlight-color:transparent}.app{max-width:480px;margin:0 auto;padding:16px 12px;min-height:100dvh}.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:16px;margin-bottom:12px}h1{font-size:20px;font-weight:700;margin-bottom:4px}h2{font-size:16px;font-weight:700;margin-bottom:8px}.sub{font-size:12px;color:#64748b;margin-bottom:16px}.btn{width:100%;padding:14px 0;border-radius:10px;border:none;background:#1e293b;color:#fff;font-size:15px;font-weight:600;cursor:pointer}.btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}.btn:active:not(:disabled){opacity:.8}.btn-sm{padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer}.btn-outline{background:#e2e8f0;color:#1e293b}.scan-input{width:100%;padding:14px 12px;border-radius:10px;border:2px solid #3b82f6;font-size:18px;font-family:monospace;font-weight:600;text-align:center;outline:none;background:#eff6ff;color:#1e40af}.scan-input:focus{border-color:#2563eb}.label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}.mono{font-family:'JetBrains Mono','SF Mono','Courier New',monospace;font-size:12px}.error{color:#dc2626;font-size:13px;text-align:center;margin-top:6px}.flex{display:flex}.gap-8{gap:8px}.gap-6{gap:6px}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-1{flex:1}.mb-6{margin-bottom:6px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.text-center{text-align:center}.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace}.badge-L{background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc}.badge-F{background:#fce7f3;color:#be185d;border:1.5px solid #f9a8d4}.badge-A{background:#ecfdf5;color:#047857;border:1.5px solid #6ee7b7}.badge-B{background:#fef3c7;color:#92400e;border:1.5px solid #fcd34d}.badge-U{background:#f3e8ff;color:#7c3aed;border:1.5px solid #c4b5fd}.badge-R{background:#fee2e2;color:#b91c1c;border:1.5px solid #fca5a5}.badge-J{background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc}.progress-bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden}.progress-fill{height:100%;border-radius:4px;background:#1e293b;transition:width .3s}.route-item{padding:8px 10px;border-radius:8px;margin-bottom:4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:1px solid #f1f5f9}.route-item.current{background:#eff6ff;border:2px solid #3b82f6}.route-item.completed{opacity:.5}.route-item-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.route-item-loc{font-size:11px;color:#64748b;font-family:monospace}.qty-display{display:flex;align-items:center;justify-content:center;gap:4px;padding:14px;border-radius:10px;font-family:monospace}.qty-adj{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}.qty-btn{width:44px;height:44px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}.qty-manual{width:60px;text-align:center;font-size:18px;font-weight:700;font-family:monospace;border:2px solid #e2e8f0;border-radius:8px;padding:8px 4px}.location-big{font-size:20px;font-weight:700;font-family:monospace;color:#1e293b}.scan-result{padding:10px;border-radius:8px;margin-top:8px;font-size:13px;text-align:center;font-weight:600}.scan-ok{background:#f0fdf4;color:#16a34a;border:1px solid #86efac}.scan-fail{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}.cart-card{padding:20px;border-radius:12px;margin-bottom:12px;cursor:pointer;border:3px solid #e2e8f0;text-align:center;transition:all .15s}.cart-card:active{transform:scale(.97)}.cart-card.taken{opacity:.4;cursor:not-allowed}.report-row{padding:8px 10px;border-radius:8px;margin-bottom:4px;font-size:13px;display:flex;justify-content:space-between;align-items:center}.report-ok{background:#f0fdf4;border:1px solid #dcfce7}.report-warn{background:#fffbeb;border:1px solid #fde68a}.report-err{background:#fef2f2;border:1px solid #fecaca}.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#16a34a;margin-right:6px;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
@@ -68,8 +69,54 @@ function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};cons
 function pCSV(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};const cols=r.meta?.fields||[];const skuCol=cols.find(c=>c.replace(/^\uFEFF/,'').toLowerCase()==='sku')||'sku';const nameCol=cols.find(c=>c.toLowerCase()==='name')||'name';const eanCol=cols.find(c=>c.toLowerCase()==='ean')||'ean';const locCol=cols.find(c=>c.toLowerCase().includes('storage_location')||c.toLowerCase().includes('location'))||'storage_location';r.data.forEach(row=>{const s=String(row[skuCol]||'').trim();if(!s)return;m[s]={name:String(row[nameCol]||'').trim(),ean:String(row[eanCol]||'').trim(),location:String(row[locCol]||'').trim()}});return m}
 
 /* ═══════════ STATE ═══════════ */
-let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null};
-function setState(u){Object.assign(S,u);render()}
+let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null,scanMode:'scanner'};
+
+// ── Session storage: survive page refresh ──
+const STORAGE_KEY='hyllytysappi_state_v2';
+function saveState(){
+  try{
+    const toSave={phase:S.phase,selectedCart:S.selectedCart,routeItems:S.routeItems,
+      unmatchedItems:S.unmatchedItems,rxItems:S.rxItems,shelved:S.shelved,
+      currentIdx:S.currentIdx,confirmedLoc:S.confirmedLoc,scanMode:S.scanMode,
+      xmlBoxes:S.phase==='scan'?S.xmlBoxes:null,
+      boxAltKeys:S.phase==='scan'?S.boxAltKeys:null,
+      masterData:S.phase==='scan'?S.masterData:null};
+    sessionStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));
+  }catch(e){}
+}
+function loadSavedState(){
+  try{
+    const raw=sessionStorage.getItem(STORAGE_KEY);if(!raw)return false;
+    const saved=JSON.parse(raw);
+    if(!saved.phase||saved.phase==='setup')return false;
+    if(saved.phase==='scan'&&(!saved.xmlBoxes||!saved.masterData))return false;
+    Object.assign(S,saved);
+    S.error=null;S.lastScanResult=null;S.activeBox=null;
+    return true;
+  }catch(e){return false}
+}
+function clearSavedState(){try{sessionStorage.removeItem(STORAGE_KEY)}catch(e){}}
+const wasRestored=loadSavedState();
+
+// ── Undo ──
+let undoStack=[];
+function pushUndo(action){undoStack.push(action);if(undoStack.length>50)undoStack.shift()}
+function popUndo(){
+  if(!undoStack.length)return;
+  const a=undoStack.pop();
+  if(a.type==='shelve'){S.shelved[a.vnr]=a.prev;setState({shelved:S.shelved,currentIdx:a.idx,lastScanResult:{type:'ok',text:'↩ Peruttu: '+esc(a.name)}})}
+}
+
+// ── Prevent page refresh ──
+window.addEventListener('beforeunload',function(e){
+  if(S.phase!=='setup'){saveState();e.preventDefault();e.returnValue='Hyllytyserä on kesken.'}
+});
+
+function setState(u){
+  Object.assign(S,u);
+  if(S.phase!=='setup')saveState();
+  render();
+}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function bCls(a){const k=a?.[0]||'U';return'badge badge-'+({'L':'L','F':'F','A':'A','B':'B','U':'U','R':'R','J':'J'}[k]||'U')}
 
@@ -128,10 +175,10 @@ function selectCart(id){
 
 function confirmLocation(code){if(!code)return;setState({error:null,lastScanResult:null});const cur=S.routeItems[S.currentIdx];if(!cur)return;const sc=code.trim().toUpperCase(),ex=cur.location.trim().toUpperCase();if(sc===ex){setState({confirmedLoc:ex,lastScanResult:{type:'ok',text:'✓ '+cur.location}});return}const oi=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===sc);if(oi!==-1){setState({confirmedLoc:sc,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+S.routeItems[oi].location}});return}setState({error:'Paikka ei reitillä',lastScanResult:{type:'fail',text:'Väärä'}})}
 
-function confirmEan(code){if(!code)return;setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;S.shelved[cur.vnr]=p+1;setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty}});return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty}});return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
+function confirmEan(code){if(!code)return;setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prev:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty}});return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prev:p,idx:si,name:o.name});S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty}});return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
 
-function adjustQty(v,d){S.shelved[v]=Math.max(0,(S.shelved[v]||0)+d);setState({shelved:S.shelved})}
-function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){S.shelved[v]=n;setState({shelved:S.shelved})}}
+function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=cur;setState({shelved:S.shelved})}
+function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=n;setState({shelved:S.shelved})}}
 function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
 function finishShelving(skip){if(!skip){const ts=tShelved(),tq=tQty();if(!confirm(ts<tq?`Kesken (${ts}/${tq}). Lopeta?`:'Lopeta?'))return}if(S.selectedCart)fbReleaseCart(S.selectedCart);setState({phase:'report'})}
 
@@ -162,7 +209,17 @@ function render(){
     app.innerHTML=`
       <div class="card"><h1>Purku</h1>
         <p class="sub"><span class="live-dot"></span>${sc}/${total} laatikkoa luettu</p>
-        <input type="text" id="scan-field" class="scan-input" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
+        <div style="display:flex;gap:4px;margin-bottom:8px">
+          <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='scanner'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'scanner'})">🔫 Skanneri</button>
+          <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='manual'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'manual'})">⌨ Käsin</button>
+        </div>
+        <div class="${S.scanMode==='scanner'?'':'hidden'}">
+          <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
+        </div>
+        <div class="${S.scanMode==='manual'?'':'hidden'}">
+          <input type="text" id="scan-field-manual" class="scan-input" placeholder="Syötä koodi" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value;this.value='';addBox(v)}">
+          <button class="btn" style="margin-top:6px" onclick="const i=document.getElementById('scan-field-manual');addBox(i.value);i.value='';">Lisää</button>
+        </div>
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}
         ${(()=>{
@@ -294,12 +351,23 @@ function render(){
       <div class="card">
         ${!lm?`<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:8px">1. Skannaa paikka: <b>${cur.location}</b></div>`
         :`<div style="font-size:13px;font-weight:600;color:#16a34a;margin-bottom:8px">✓ ${cur.location} — 2. Skannaa EAN</div>`}
-        <input type="text" id="scan-field" class="scan-input" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
+        <div style="display:flex;gap:4px;margin-bottom:8px">
+          <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='scanner'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'scanner'})">🔫 Skanneri</button>
+          <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='manual'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'manual'})">⌨ Käsin</button>
+        </div>
+        <div class="${S.scanMode==='scanner'?'':'hidden'}">
+          <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
+        </div>
+        <div class="${S.scanMode==='manual'?'':'hidden'}">
+          <input type="text" id="scan-field-manual" class="scan-input" placeholder="${lm?'Syötä EAN':'Syötä paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value;this.value='';${cb==='confirmLocation'?'confirmLocation(v)':'confirmEan(v)'}}">
+          <button class="btn" style="margin-top:6px" onclick="const i=document.getElementById('scan-field-manual');const v=i.value;i.value='';${cb==='confirmLocation'?'confirmLocation(v)':'confirmEan(v)'}">OK</button>
+        </div>
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
       <div class="flex gap-8 mb-12">
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx===0?'disabled':''} onclick="navTo(S.currentIdx-1)">←</button>
+        <button class="btn-sm flex-1" style="background:${undoStack.length?'#fef3c7':'#f1f5f9'};color:${undoStack.length?'#92400e':'#cbd5e1'};border:none" ${undoStack.length?'':'disabled'} onclick="popUndo()">↩ Peru</button>
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="navTo(S.currentIdx+1)">→</button></div>
       <button class="btn" style="background:#16a34a;margin-bottom:12px" onclick="finishShelving()">Lopeta → Raportti</button>`;
     return}
@@ -318,11 +386,19 @@ function render(){
       ${notDone.length?`<div class="card"><h2 style="color:#dc2626">Ei hyllytetty (${notDone.length})</h2>${notDone.map(i=>`<div class="report-row report-err"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div style="font-weight:700;color:#dc2626">0/${i.qty}</div></div>`).join('')}</div>`:''}
       ${over.length?`<div class="card"><h2 style="color:#7c3aed">Ylimäärä (${over.length})</h2>${over.map(i=>`<div class="report-row" style="background:#f5f3ff;border:1px solid #ddd6fe"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div style="font-weight:700;color:#7c3aed">${i.sq}/${i.qty}</div></div>`).join('')}</div>`:''}
       ${ok.length?`<details class="card"><summary style="color:#16a34a">OK (${ok.length})</summary>${ok.map(i=>`<div class="report-row report-ok"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div style="font-weight:700;color:#16a34a">${i.qty} ✓</div></div>`).join('')}</details>`:''}
-      <div class="flex gap-8"><button class="btn-sm btn-outline flex-1" onclick="setState({phase:'cartSelect',selectedCart:null,routeItems:[],shelved:{},currentIdx:0})">Toinen kärry</button>
-        <button class="btn flex-1" style="padding:10px" onclick="setState({phase:'scan',selectedCart:null,routeItems:[],shelved:{},currentIdx:0})">Purkuun</button></div>`;
+      <div class="flex gap-8"><button class="btn-sm btn-outline flex-1" onclick="clearSavedState();undoStack=[];setState({phase:'cartSelect',selectedCart:null,routeItems:[],shelved:{},currentIdx:0})">Toinen kärry</button>
+        <button class="btn flex-1" style="padding:10px" onclick="clearSavedState();undoStack=[];setState({phase:'scan',selectedCart:null,routeItems:[],shelved:{},currentIdx:0})">Purkuun</button></div>`;
   }
 }
-render();
+if(wasRestored){
+  render();
+  const nb=document.createElement('div');
+  nb.style.cssText='position:fixed;top:0;left:0;right:0;padding:10px;background:#eff6ff;border-bottom:2px solid #3b82f6;text-align:center;font-size:13px;font-weight:600;color:#1e40af;z-index:999';
+  nb.innerHTML='✓ Edellinen erä palautettu <button onclick="this.parentElement.remove()" style="margin-left:12px;background:#3b82f6;color:#fff;border:none;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">OK</button> <button onclick="clearSavedState();location.reload()" style="margin-left:4px;background:#e2e8f0;color:#475569;border:none;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Alusta</button>';
+  document.body.prepend(nb);
+} else {
+  render();
+}
 </script>
 </body>
 </html>
