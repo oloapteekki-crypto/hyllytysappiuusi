@@ -169,12 +169,29 @@ function render(){
           const unscanned=Object.keys(S.xmlBoxes).filter(k=>!fbIsBoxScanned(k));
           if(!unscanned.length)return'<div style="margin-top:8px;padding:8px;border-radius:8px;background:#f0fdf4;text-align:center;font-size:13px;color:#16a34a;font-weight:600">✓ Kaikki laatikot luettu!</div>';
           return'<details style="margin-top:10px"><summary style="font-size:12px;color:#64748b;cursor:pointer">Lukemattomat laatikot ('+unscanned.length+')</summary>'+
-            '<div style="margin-top:6px;max-height:200px;overflow-y:auto">'+unscanned.map(k=>{
+            '<div style="margin-top:6px">'+unscanned.map(k=>{
               const items=S.xmlBoxes[k];const qty=items.reduce((s,i)=>s+i.qty,0);
-              return'<div style="padding:6px 8px;border-radius:6px;margin-bottom:3px;background:#f8fafc;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">'+
-                '<span class="mono" style="font-size:11px">...'+k.slice(-8)+'</span>'+
-                '<span style="font-size:11px;color:#64748b">'+items.length+' tuot. / '+qty+' kpl</span>'+
-                '<button class="btn-sm" style="padding:3px 8px;font-size:11px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe" onclick="addBox(\''+k.replace(/'/g,"\\'")+'\')">Lisää</button></div>'
+              // Enrich and group by cart
+              const byCart={};const rxI=[];const uusiI=[];
+              items.forEach(item=>{const e=enrichItem(item);
+                if(e.parsedLoc&&e.parsedLoc.type==='rx')rxI.push(e);
+                else if(!e.location)uusiI.push(e);
+                else{const cid=e.cartId||'?';if(!byCart[cid])byCart[cid]=[];byCart[cid].push(e)}});
+              let detail='';
+              CARTS.forEach(c=>{if(!byCart[c.id]||!byCart[c.id].length)return;
+                detail+='<div style="margin:4px 0 4px 8px"><span style="font-size:11px;font-weight:700">'+c.icon+' '+c.name+':</span>';
+                byCart[c.id].forEach(i=>{detail+='<div style="font-size:11px;color:#475569;padding:1px 0 1px 12px">'+esc(i.name)+' <span style="color:#94a3b8">'+i.qty+' kpl → '+(i.location||'?')+(i.ean&&i.ean!=='null'?' | EAN '+i.ean:'')+'</span></div>'});
+                detail+='</div>'});
+              if(rxI.length){detail+='<div style="margin:4px 0 4px 8px"><span style="font-size:11px;font-weight:700">💊 RX:</span>';
+                rxI.forEach(i=>{detail+='<div style="font-size:11px;color:#7f1d1d;padding:1px 0 1px 12px">'+esc(i.name)+' → '+i.location+'</div>'});detail+='</div>'}
+              if(uusiI.length){detail+='<div style="margin:4px 0 4px 8px"><span style="font-size:11px;font-weight:700">📦 UUSI:</span>';
+                uusiI.forEach(i=>{detail+='<div style="font-size:11px;color:#78350f;padding:1px 0 1px 12px">'+esc(i.name)+' ('+i.qty+')</div>'});detail+='</div>'}
+              return'<details style="padding:6px 8px;border-radius:6px;margin-bottom:4px;background:#f8fafc;border:1px solid #e2e8f0">'+
+                '<summary style="display:flex;justify-content:space-between;align-items:center;font-size:12px;cursor:pointer">'+
+                '<span class="mono">...'+k.slice(-8)+'</span>'+
+                '<span style="color:#64748b">'+items.length+' tuot. / '+qty+' kpl</span>'+
+                '</summary>'+detail+
+                '<button class="btn-sm" style="width:100%;margin-top:6px;padding:6px;font-size:12px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe" onclick="event.stopPropagation();addBox(\''+k.replace(/'/g,"\\'")+'\')">Lisää laatikko</button></details>'
             }).join('')+'</div></details>';
         })()}</div>
 
@@ -217,7 +234,7 @@ function render(){
       </details>`:''}`
 
     app.innerHTML+=`<button class="btn" style="background:#16a34a" onclick="setState({phase:'cartSelect'})">Valitse kärry → Hyllytys</button>`;
-    setTimeout(refocus,50);return}
+    return}
 
   if(S.phase==='cartSelect'){
     const all=getAllEnriched();
@@ -279,7 +296,7 @@ function render(){
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx===0?'disabled':''} onclick="navTo(S.currentIdx-1)">←</button>
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="navTo(S.currentIdx+1)">→</button></div>
       <button class="btn" style="background:#16a34a;margin-bottom:12px" onclick="finishShelving()">Lopeta → Raportti</button>`;
-    setTimeout(refocus,50);return}
+    return}
 
   if(S.phase==='report'){
     const ok=[],under=[],over=[],notDone=[];
