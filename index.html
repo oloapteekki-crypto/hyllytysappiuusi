@@ -34,8 +34,25 @@ function initFirebase(){
     const val=snap.val()||{};
     fbData.scannedBoxes=val.scannedBoxes||{};
     fbData.cartsTaken=val.cartsTaken||{};
-    if(S.phase==='scan'||S.phase==='cartSelect')render();
+    // Only update counters, don't re-render whole page (avoids keyboard popup)
+    updateCounters();
   });
+}
+function updateCounters(){
+  // cartSelect phase has no input - safe to re-render fully
+  if(S.phase==='cartSelect'){render();return}
+  const el=document.getElementById('live-counters');
+  if(!el||!S.xmlBoxes)return;
+  const total=Object.keys(S.xmlBoxes).length,sc=fbScannedCount();
+  const all=getAllEnriched();
+  const cc={};CARTS.forEach(c=>{cc[c.id]={items:0,qty:0}});
+  let rxQ=0,newQ=0;
+  all.forEach(i=>{if(i.parsedLoc?.type==='rx')rxQ+=i.qty;else if(!i.parsedLoc)newQ+=i.qty;else if(i.cartId&&cc[i.cartId]){cc[i.cartId].items++;cc[i.cartId].qty+=i.qty}});
+  el.innerHTML=`${sc}/${total} laatikkoa luettu`;
+  // Update cart counts
+  CARTS.forEach(c=>{const cel=document.getElementById('cart-count-'+c.id);if(cel)cel.textContent=cc[c.id].qty+' kpl / '+cc[c.id].items+' tuotetta'});
+  const rxEl=document.getElementById('rx-count');if(rxEl)rxEl.textContent=rxQ?'💊 Reseptilääkkeet: '+rxQ+' kpl':'';
+  const newEl=document.getElementById('new-count');if(newEl)newEl.textContent=newQ?'📦 UUSI-hyllyyn: '+newQ+' kpl':'';
 }
 function fbAddBox(sscc,items){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).set({sscc,items,by:sessionId,t:Date.now()})}
 function fbRemoveBox(sscc){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).remove()}
@@ -208,18 +225,13 @@ function render(){
 
     app.innerHTML=`
       <div class="card"><h1>Purku</h1>
-        <p class="sub"><span class="live-dot"></span>${sc}/${total} laatikkoa luettu</p>
+        <p class="sub"><span class="live-dot"></span><span id="live-counters">${sc}/${total} laatikkoa luettu</span></p>
         <div style="display:flex;gap:4px;margin-bottom:8px">
           <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='scanner'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'scanner'})">🔫 Skanneri</button>
           <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='manual'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'manual'})">⌨ Käsin</button>
         </div>
-        <div class="${S.scanMode==='scanner'?'':'hidden'}">
-          <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
-        </div>
-        <div class="${S.scanMode==='manual'?'':'hidden'}">
-          <input type="text" id="scan-field-manual" class="scan-input" placeholder="Syötä koodi" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value;this.value='';addBox(v)}">
-          <button class="btn" style="margin-top:6px" onclick="const i=document.getElementById('scan-field-manual');addBox(i.value);i.value='';">Lisää</button>
-        </div>
+        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
+        <button class="btn" style="margin-top:6px;${S.scanMode==='scanner'?'display:none':''}" onclick="handleScan('addBox')">Lisää</button>
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}
         ${(()=>{
@@ -285,9 +297,9 @@ function render(){
       <div class="card"><h2>Kärryt</h2>
         ${CARTS.map(c=>`<div style="padding:10px 12px;border-radius:8px;margin-bottom:6px;border-left:4px solid ${c.color};background:#fafbfc">
           <div class="flex justify-between items-center"><div>${c.icon} <b>${c.name}</b></div><div style="font-size:14px;font-weight:700">${cc[c.id].qty} kpl</div></div>
-          <div style="font-size:11px;color:#64748b;margin-top:2px">Levyt: ${c.shelves.join(', ')} — ${cc[c.id].items} tuotetta</div></div>`).join('')}
-        ${rxQ?`<div style="padding:8px 12px;border-radius:8px;background:#fef2f2;font-size:13px;margin-bottom:6px">💊 Reseptilääkkeet: ${rxQ} kpl</div>`:''}
-        ${newQ?`<div style="padding:8px 12px;border-radius:8px;background:#fffbeb;font-size:13px;margin-bottom:6px">📦 UUSI-hyllyyn: ${newQ} kpl</div>`:''}</div>
+          <div id="cart-count-${c.id}" style="font-size:11px;color:#64748b;margin-top:2px">${cc[c.id].qty} kpl / ${cc[c.id].items} tuotetta</div></div>`).join('')}
+        <div id="rx-count" style="padding:8px 12px;border-radius:8px;background:#fef2f2;font-size:13px;margin-bottom:6px;${rxQ?'':'display:none'}">${rxQ?'💊 Reseptilääkkeet: '+rxQ+' kpl':''}</div>
+        <div id="new-count" style="padding:8px 12px;border-radius:8px;background:#fffbeb;font-size:13px;margin-bottom:6px;${newQ?'':'display:none'}">${newQ?'📦 UUSI-hyllyyn: '+newQ+' kpl':''}</div></div>
 
       ${sc>0?`<details class="card"><summary>Skannatut laatikot (${sc})</summary>
         ${Object.keys(fbData.scannedBoxes).map(key=>{const box=fbData.scannedBoxes[key];const sscc=box.sscc||key;const cnt=box.items?box.items.length:0;const qty=box.items?box.items.reduce((s,i)=>s+i.qty,0):0;
@@ -297,6 +309,7 @@ function render(){
       </details>`:''}`
 
     app.innerHTML+=`<button class="btn" style="background:#16a34a" onclick="setState({phase:'cartSelect'})">Valitse kärry → Hyllytys</button>`;
+    setTimeout(()=>{const inp=document.getElementById('scan-field');if(inp)inp.focus()},50);
     return}
 
   if(S.phase==='cartSelect'){
@@ -355,13 +368,8 @@ function render(){
           <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='scanner'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'scanner'})">🔫 Skanneri</button>
           <button style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;${S.scanMode==='manual'?'background:#1e293b;color:#fff':'background:#e2e8f0;color:#475569'}" onclick="setState({scanMode:'manual'})">⌨ Käsin</button>
         </div>
-        <div class="${S.scanMode==='scanner'?'':'hidden'}">
-          <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
-        </div>
-        <div class="${S.scanMode==='manual'?'':'hidden'}">
-          <input type="text" id="scan-field-manual" class="scan-input" placeholder="${lm?'Syötä EAN':'Syötä paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value;this.value='';${cb==='confirmLocation'?'confirmLocation(v)':'confirmEan(v)'}}">
-          <button class="btn" style="margin-top:6px" onclick="const i=document.getElementById('scan-field-manual');const v=i.value;i.value='';${cb==='confirmLocation'?'confirmLocation(v)':'confirmEan(v)'}">OK</button>
-        </div>
+        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
+        <button class="btn" style="margin-top:6px;${S.scanMode==='scanner'?'display:none':''}" onclick="handleScan('${cb}')">OK</button>
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
@@ -370,6 +378,7 @@ function render(){
         <button class="btn-sm flex-1" style="background:${undoStack.length?'#fef3c7':'#f1f5f9'};color:${undoStack.length?'#92400e':'#cbd5e1'};border:none" ${undoStack.length?'':'disabled'} onclick="popUndo()">↩ Peru</button>
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="navTo(S.currentIdx+1)">→</button></div>
       <button class="btn" style="background:#16a34a;margin-bottom:12px" onclick="finishShelving()">Lopeta → Raportti</button>`;
+    setTimeout(()=>{const inp=document.getElementById('scan-field');if(inp)inp.focus()},50);
     return}
 
   if(S.phase==='report'){
