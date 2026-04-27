@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice version="1.2">
+	<SellerPartyDetails>
+		<SellerPartyIdentifier>Medifon Oy</SellerPartyIdentifier>
+		<SellerOrganisationName>Medifon Oy</SellerOrganisationName>
+		<SellerOrganisationTaxCode>0471598-6</SellerOrganisationTaxCode>
+		<SellerPostalAddressDetails>
+			<SellerStreetName>Kutojantie 5</SellerStreetName>
+			<SellerTownName>Espoo</SellerTownName>
+			<SellerPostCodeIdentifier>02630</SellerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</SellerPostalAddressDetails>
+	</SellerPartyDetails>
+	<BuyerPartyDetails>
+		<BuyerPartyIdentifier>12164</BuyerPartyIdentifier>
+		<BuyerOrganisationName>Olo-apteekki Oy / Verkkokauppa</BuyerOrganisationName>
+		<BuyerPostalAddressDetails>
+			<BuyerStreetName>Muuntotie 1</BuyerStreetName>
+			<BuyerTownName>Vantaa</BuyerTownName>
+			<BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</BuyerPostalAddressDetails>
+	</BuyerPartyDetails>
+	<InvoiceDetails>
+		<InvoiceTypeCode>DEV01</InvoiceTypeCode>
+		<InvoiceTypeText>TOIMITUSILMOITUS</InvoiceTypeText>
+		<OriginCode>Origin</OriginCode>
+		<InvoiceNumber>635596</InvoiceNumber>
+		<InvoiceDate Format="CCYYMMDD">20260424</InvoiceDate>
+	</InvoiceDetails>
+	<InvoiceRow>
+		<ArticleIdentifier>9560138</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779318869332</ArticleGroupIdentifier>
+		<ArticleName>TULOSSA 15.4. Apteq Pehmeä Harjatikku 40 kpl</ArticleName>
+		<BuyerArticleIdentifier>9560138</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate></EndDate>
+		<OriginalInvoiceNumber>135248</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">2,79</UnitPriceAmount>
+		<RowIdentifier>1</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>_</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">33,50</RowAmount>
+	</InvoiceRow>
+</Finvoice>
