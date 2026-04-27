@@ -218,7 +218,12 @@ function showScanWrap(){
   if(wrap)wrap.style.display='block';
   if(!scanFieldFocused){
     const inp=document.getElementById('scan-field');
-    if(inp){inp.focus();scanFieldFocused=true}
+    if(inp){
+      inp.focus();
+      // Dismiss keyboard immediately - MT90 "Fill in EditText" remembers the field
+      setTimeout(()=>inp.blur(),100);
+      scanFieldFocused=true;
+    }
   }
 }
 function hideScanWrap(){
@@ -425,6 +430,7 @@ function render(){
   }
 }
 if(wasRestored){
+  initFirebase();
   render();
   const nb=document.createElement('div');
   nb.style.cssText='position:fixed;top:0;left:0;right:0;padding:10px;background:#eff6ff;border-bottom:2px solid #3b82f6;text-align:center;font-size:13px;font-weight:600;color:#1e40af;z-index:999';
