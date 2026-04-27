@@ -67,7 +67,7 @@ function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};cons
 function pCSV(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};const cols=r.meta?.fields||[];const skuCol=cols.find(c=>c.replace(/^\uFEFF/,'').toLowerCase()==='sku')||'sku';const nameCol=cols.find(c=>c.toLowerCase()==='name')||'name';const eanCol=cols.find(c=>c.toLowerCase()==='ean')||'ean';const locCol=cols.find(c=>c.toLowerCase().includes('storage_location')||c.toLowerCase().includes('location'))||'storage_location';r.data.forEach(row=>{const s=String(row[skuCol]||'').trim();if(!s)return;m[s]={name:String(row[nameCol]||'').trim(),ean:String(row[eanCol]||'').trim(),location:String(row[locCol]||'').trim()}});return m}
 
 /* ═══════════ STATE ═══════════ */
-let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null};
+let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null};
 function setState(u){Object.assign(S,u);render()}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function bCls(a){const k=a?.[0]||'U';return'badge badge-'+({'L':'L','F':'F','A':'A','B':'B','U':'U','R':'R','J':'J'}[k]||'U')}
@@ -113,7 +113,7 @@ function addBox(code){
   if(fbIsBoxScanned(sscc)){setState({error:'Jo skannattu',lastScanResult:{type:'fail',text:'Jo skannattu'}});return}
   const items=S.xmlBoxes[sscc].map(i=>{const e=enrichItem(i);return{vnr:e.vnr,altVnr:e.altVnr,name:e.name,ean:e.ean,qty:e.qty,location:e.location,cartId:e.cartId,physAisle:e.physAisle}});
   fbAddBox(sscc,items);
-  setState({lastScanResult:{type:'ok',text:'✓ Laatikko ('+items.length+' tuotetta)'}});
+  setState({activeBox:{sscc,items},lastScanResult:{type:'ok',text:'✓ Laatikko ('+items.length+' tuotetta)'}});
 }
 
 function selectCart(id){
@@ -157,9 +157,33 @@ function render(){
     app.innerHTML=`
       <div class="card"><h1>Purku</h1>
         <p class="sub"><span class="live-dot"></span>${sc}/${total} laatikkoa luettu</p>
-        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
+        <input type="text" id="scan-field" class="scan-input" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
+
+      ${S.activeBox?(()=>{
+        const items=S.activeBox.items;const byCart={};const rx=[];const uusi=[];
+        items.forEach(i=>{const pl=i.parsedLoc||pLoc(i.location||'');
+          if(pl&&pl.type==='rx')rx.push(i);
+          else if(!i.location)uusi.push(i);
+          else{const cid=i.cartId||'?';if(!byCart[cid])byCart[cid]=[];byCart[cid].push(i)}});
+        let bx='<div class="card"><div class="flex justify-between items-center mb-8"><h2 style="margin:0">Laatikko ...'+S.activeBox.sscc.slice(-6)+'</h2>'+
+          '<button class="btn-sm btn-outline" style="font-size:11px;padding:4px 10px" onclick="setState({activeBox:null})">✕ Sulje</button></div>';
+        CARTS.forEach(c=>{if(!byCart[c.id]||!byCart[c.id].length)return;
+          bx+='<div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;border-left:4px solid '+c.color+';background:#fafbfc">'+
+            '<div style="font-size:13px;font-weight:700;margin-bottom:6px">'+c.icon+' '+c.name+'</div>';
+          byCart[c.id].forEach(i=>{bx+='<div style="padding:3px 0;font-size:12px"><div class="flex justify-between"><span>'+esc(i.name)+'</span>'+
+            '<span style="font-weight:700;white-space:nowrap;margin-left:8px">'+i.qty+' kpl</span></div>'+
+            '<div class="mono" style="color:#94a3b8">'+(i.location||'—')+(i.ean&&i.ean!=='null'?' | EAN '+i.ean:'')+'</div></div>'});
+          bx+='</div>'});
+        if(rx.length){bx+='<div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;border-left:4px solid #b91c1c;background:#fef2f2">'+
+          '<div style="font-size:13px;font-weight:700;color:#b91c1c;margin-bottom:6px">💊 Reseptilääkkeet</div>';
+          rx.forEach(i=>{bx+='<div style="font-size:12px;color:#7f1d1d;padding:3px 0">'+esc(i.name)+' → '+i.location+' ('+i.qty+' kpl)</div>'});bx+='</div>'}
+        if(uusi.length){bx+='<div style="padding:10px 12px;border-radius:8px;border-left:4px solid #f59e0b;background:#fffbeb">'+
+          '<div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">📦 UUSI-hyllyyn</div>';
+          uusi.forEach(i=>{bx+='<div style="font-size:12px;color:#78350f;padding:3px 0">'+esc(i.name)+' ('+i.qty+' kpl)</div>'});bx+='</div>'}
+        bx+='</div>';return bx;
+      })():''}
       <div class="card"><h2>Kärryt</h2>
         ${CARTS.map(c=>`<div style="padding:10px 12px;border-radius:8px;margin-bottom:6px;border-left:4px solid ${c.color};background:#fafbfc">
           <div class="flex justify-between items-center"><div>${c.icon} <b>${c.name}</b></div><div style="font-size:14px;font-weight:700">${cc[c.id].qty} kpl</div></div>
@@ -221,7 +245,7 @@ function render(){
       <div class="card">
         ${!lm?`<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:8px">1. Skannaa paikka: <b>${cur.location}</b></div>`
         :`<div style="font-size:13px;font-weight:600;color:#16a34a;margin-bottom:8px">✓ ${cur.location} — 2. Skannaa EAN</div>`}
-        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
+        <input type="text" id="scan-field" class="scan-input" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
