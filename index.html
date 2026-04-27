@@ -135,7 +135,7 @@ function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!
 function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
 function finishShelving(skip){if(!skip){const ts=tShelved(),tq=tQty();if(!confirm(ts<tq?`Kesken (${ts}/${tq}). Lopeta?`:'Lopeta?'))return}if(S.selectedCart)fbReleaseCart(S.selectedCart);setState({phase:'report'})}
 
-function handleScan(cb){const inp=document.getElementById('scan-field');if(!inp)return;const v=inp.value;inp.value='';inp.focus();if(!v)return;if(cb==='addBox')addBox(v);else if(cb==='confirmLocation')confirmLocation(v);else if(cb==='confirmEan')confirmEan(v)}
+function handleScan(cb){const inp=document.getElementById('scan-field');if(!inp)return;const v=inp.value;inp.value='';if(!v)return;if(cb==='addBox')addBox(v);else if(cb==='confirmLocation')confirmLocation(v);else if(cb==='confirmEan')confirmEan(v)}
 
 function showScannedBox(key){
   const box=fbData.scannedBoxes[key];if(!box||!box.items)return;
@@ -162,7 +162,7 @@ function render(){
     app.innerHTML=`
       <div class="card"><h1>Purku</h1>
         <p class="sub"><span class="live-dot"></span>${sc}/${total} laatikkoa luettu</p>
-        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
+        <input type="text" id="scan-field" class="scan-input" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}
         ${(()=>{
@@ -171,16 +171,20 @@ function render(){
           return'<details style="margin-top:10px"><summary style="font-size:12px;color:#64748b;cursor:pointer">Lukemattomat laatikot ('+unscanned.length+')</summary>'+
             '<div style="margin-top:6px">'+unscanned.map(k=>{
               const items=S.xmlBoxes[k];const qty=items.reduce((s,i)=>s+i.qty,0);
-              // Enrich and group by cart
-              const byCart={};const rxI=[];const uusiI=[];
+              // Enrich and group by shelf (physAisle)
+              const byShelf={};const rxI=[];const uusiI=[];
               items.forEach(item=>{const e=enrichItem(item);
                 if(e.parsedLoc&&e.parsedLoc.type==='rx')rxI.push(e);
                 else if(!e.location)uusiI.push(e);
-                else{const cid=e.cartId||'?';if(!byCart[cid])byCart[cid]=[];byCart[cid].push(e)}});
+                else{const shelf=e.physAisle||'?';if(!byShelf[shelf])byShelf[shelf]=[];byShelf[shelf].push(e)}});
               let detail='';
-              CARTS.forEach(c=>{if(!byCart[c.id]||!byCart[c.id].length)return;
-                detail+='<div style="margin:4px 0 4px 8px"><span style="font-size:11px;font-weight:700">'+c.icon+' '+c.name+':</span>';
-                byCart[c.id].forEach(i=>{detail+='<div style="font-size:11px;color:#475569;padding:1px 0 1px 12px">'+esc(i.name)+' <span style="color:#94a3b8">'+i.qty+' kpl → '+(i.location||'?')+(i.ean&&i.ean!=='null'?' | EAN '+i.ean:'')+'</span></div>'});
+              // Sort shelves by route order
+              const shelfKeys=Object.keys(byShelf).sort((a,b)=>pI(a)-pI(b));
+              shelfKeys.forEach(shelf=>{
+                const cart=CARTS.find(c=>c.aisles.includes(shelf));
+                detail+='<div style="margin:4px 0 4px 0;padding:6px 8px;border-radius:6px;border-left:3px solid '+(cart?cart.color:'#94a3b8')+';background:#fafbfc">';
+                detail+='<div style="font-size:11px;font-weight:700;margin-bottom:2px">'+(cart?cart.icon:'')+' '+shelf+'</div>';
+                byShelf[shelf].forEach(i=>{detail+='<div style="font-size:11px;color:#475569;padding:1px 0 1px 8px">'+esc(i.name)+' <span style="color:#94a3b8">'+i.qty+' kpl → '+(i.location||'?')+(i.ean&&i.ean!=='null'?' | EAN '+i.ean:'')+'</span></div>'});
                 detail+='</div>'});
               if(rxI.length){detail+='<div style="margin:4px 0 4px 8px"><span style="font-size:11px;font-weight:700">💊 RX:</span>';
                 rxI.forEach(i=>{detail+='<div style="font-size:11px;color:#7f1d1d;padding:1px 0 1px 12px">'+esc(i.name)+' → '+i.location+'</div>'});detail+='</div>'}
@@ -196,17 +200,19 @@ function render(){
         })()}</div>
 
       ${S.activeBox?(()=>{
-        const items=S.activeBox.items;const byCart={};const rx=[];const uusi=[];
+        const items=S.activeBox.items;const byShelf={};const rx=[];const uusi=[];
         items.forEach(i=>{const pl=i.parsedLoc||pLoc(i.location||'');
           if(pl&&pl.type==='rx')rx.push(i);
           else if(!i.location)uusi.push(i);
-          else{const cid=i.cartId||'?';if(!byCart[cid])byCart[cid]=[];byCart[cid].push(i)}});
+          else{const shelf=i.physAisle||'?';if(!byShelf[shelf])byShelf[shelf]=[];byShelf[shelf].push(i)}});
         let bx='<div class="card"><div class="flex justify-between items-center mb-8"><h2 style="margin:0">Laatikko ...'+S.activeBox.sscc.slice(-6)+'</h2>'+
           '<button class="btn-sm btn-outline" style="font-size:11px;padding:4px 10px" onclick="setState({activeBox:null})">✕ Sulje</button></div>';
-        CARTS.forEach(c=>{if(!byCart[c.id]||!byCart[c.id].length)return;
-          bx+='<div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;border-left:4px solid '+c.color+';background:#fafbfc">'+
-            '<div style="font-size:13px;font-weight:700;margin-bottom:6px">'+c.icon+' '+c.name+'</div>';
-          byCart[c.id].forEach(i=>{bx+='<div style="padding:3px 0;font-size:12px"><div class="flex justify-between"><span>'+esc(i.name)+'</span>'+
+        const shelfKeys=Object.keys(byShelf).sort((a,b)=>pI(a)-pI(b));
+        shelfKeys.forEach(shelf=>{
+          const cart=CARTS.find(c=>c.aisles.includes(shelf));
+          bx+='<div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;border-left:4px solid '+(cart?cart.color:'#94a3b8')+';background:#fafbfc">'+
+            '<div style="font-size:13px;font-weight:700;margin-bottom:6px">'+(cart?cart.icon:'')+' '+shelf+'</div>';
+          byShelf[shelf].forEach(i=>{bx+='<div style="padding:3px 0;font-size:12px"><div class="flex justify-between"><span>'+esc(i.name)+'</span>'+
             '<span style="font-weight:700;white-space:nowrap;margin-left:8px">'+i.qty+' kpl</span></div>'+
             '<div class="mono" style="color:#94a3b8">'+(i.location||'—')+(i.ean&&i.ean!=='null'?' | EAN '+i.ean:'')+'</div></div>'});
           bx+='</div>'});
@@ -288,7 +294,7 @@ function render(){
       <div class="card">
         ${!lm?`<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:8px">1. Skannaa paikka: <b>${cur.location}</b></div>`
         :`<div style="font-size:13px;font-weight:600;color:#16a34a;margin-bottom:8px">✓ ${cur.location} — 2. Skannaa EAN</div>`}
-        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
+        <input type="text" id="scan-field" class="scan-input" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
