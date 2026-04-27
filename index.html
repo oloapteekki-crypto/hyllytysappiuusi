@@ -37,6 +37,7 @@ function initFirebase(){
   });
 }
 function fbAddBox(sscc,items){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).set({sscc,items,by:sessionId,t:Date.now()})}
+function fbRemoveBox(sscc){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).remove()}
 function fbTakeCart(id){if(dbRef)dbRef.child('cartsTaken/'+id).set({by:sessionId,t:Date.now()})}
 function fbReleaseCart(id){if(dbRef)dbRef.child('cartsTaken/'+id).remove()}
 function fbIsBoxScanned(sscc){return!!fbData.scannedBoxes[sscc.replace(/[.#$/[\]]/g,'_')]}
@@ -157,7 +158,7 @@ function render(){
     app.innerHTML=`
       <div class="card"><h1>Purku</h1>
         <p class="sub"><span class="live-dot"></span>${sc}/${total} laatikkoa luettu</p>
-        <input type="text" id="scan-field" class="scan-input" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
+        <input type="text" id="scan-field" class="scan-input" readonly placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
@@ -182,6 +183,7 @@ function render(){
         if(uusi.length){bx+='<div style="padding:10px 12px;border-radius:8px;border-left:4px solid #f59e0b;background:#fffbeb">'+
           '<div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">📦 UUSI-hyllyyn</div>';
           uusi.forEach(i=>{bx+='<div style="font-size:12px;color:#78350f;padding:3px 0">'+esc(i.name)+' ('+i.qty+' kpl)</div>'});bx+='</div>'}
+        bx+='<button class="btn-sm" style="width:100%;margin-top:8px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5" onclick="if(confirm(\'Poista laatikko?\')){fbRemoveBox(\''+S.activeBox.sscc+'\');setState({activeBox:null,lastScanResult:{type:\'ok\',text:\'Laatikko poistettu\'}})}">Poista laatikko</button>';
         bx+='</div>';return bx;
       })():''}
       <div class="card"><h2>Kärryt</h2>
@@ -245,7 +247,7 @@ function render(){
       <div class="card">
         ${!lm?`<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:8px">1. Skannaa paikka: <b>${cur.location}</b></div>`
         :`<div style="font-size:13px;font-weight:600;color:#16a34a;margin-bottom:8px">✓ ${cur.location} — 2. Skannaa EAN</div>`}
-        <input type="text" id="scan-field" class="scan-input" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
+        <input type="text" id="scan-field" class="scan-input" readonly placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
