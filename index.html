@@ -136,8 +136,12 @@ function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;const c=S.routeIte
 function finishShelving(skip){if(!skip){const ts=tShelved(),tq=tQty();if(!confirm(ts<tq?`Kesken (${ts}/${tq}). Lopeta?`:'Lopeta?'))return}if(S.selectedCart)fbReleaseCart(S.selectedCart);setState({phase:'report'})}
 
 function handleScan(cb){const inp=document.getElementById('scan-field');if(!inp)return;const v=inp.value;inp.value='';inp.focus();if(!v)return;if(cb==='addBox')addBox(v);else if(cb==='confirmLocation')confirmLocation(v);else if(cb==='confirmEan')confirmEan(v)}
+
+function showScannedBox(key){
+  const box=fbData.scannedBoxes[key];if(!box||!box.items)return;
+  setState({activeBox:{sscc:box.sscc||key,items:box.items}});
+}
 function refocus(){const inp=document.getElementById('scan-field');if(inp&&document.activeElement!==inp)inp.focus()}
-setInterval(refocus,2000);
 
 /* ═══════════ RENDER ═══════════ */
 function render(){
@@ -158,9 +162,21 @@ function render(){
     app.innerHTML=`
       <div class="card"><h1>Purku</h1>
         <p class="sub"><span class="live-dot"></span>${sc}/${total} laatikkoa luettu</p>
-        <input type="text" id="scan-field" class="scan-input" readonly placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
+        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa laatikko" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('addBox')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
-        ${S.error?`<div class="error">${S.error}</div>`:''}</div>
+        ${S.error?`<div class="error">${S.error}</div>`:''}
+        ${(()=>{
+          const unscanned=Object.keys(S.xmlBoxes).filter(k=>!fbIsBoxScanned(k));
+          if(!unscanned.length)return'<div style="margin-top:8px;padding:8px;border-radius:8px;background:#f0fdf4;text-align:center;font-size:13px;color:#16a34a;font-weight:600">✓ Kaikki laatikot luettu!</div>';
+          return'<details style="margin-top:10px"><summary style="font-size:12px;color:#64748b;cursor:pointer">Lukemattomat laatikot ('+unscanned.length+')</summary>'+
+            '<div style="margin-top:6px;max-height:200px;overflow-y:auto">'+unscanned.map(k=>{
+              const items=S.xmlBoxes[k];const qty=items.reduce((s,i)=>s+i.qty,0);
+              return'<div style="padding:6px 8px;border-radius:6px;margin-bottom:3px;background:#f8fafc;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">'+
+                '<span class="mono" style="font-size:11px">...'+k.slice(-8)+'</span>'+
+                '<span style="font-size:11px;color:#64748b">'+items.length+' tuot. / '+qty+' kpl</span>'+
+                '<button class="btn-sm" style="padding:3px 8px;font-size:11px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe" onclick="addBox(\''+k.replace(/'/g,"\\'")+'\')">Lisää</button></div>'
+            }).join('')+'</div></details>';
+        })()}</div>
 
       ${S.activeBox?(()=>{
         const items=S.activeBox.items;const byCart={};const rx=[];const uusi=[];
@@ -192,7 +208,15 @@ function render(){
           <div style="font-size:11px;color:#64748b;margin-top:2px">Levyt: ${c.shelves.join(', ')} — ${cc[c.id].items} tuotetta</div></div>`).join('')}
         ${rxQ?`<div style="padding:8px 12px;border-radius:8px;background:#fef2f2;font-size:13px;margin-bottom:6px">💊 Reseptilääkkeet: ${rxQ} kpl</div>`:''}
         ${newQ?`<div style="padding:8px 12px;border-radius:8px;background:#fffbeb;font-size:13px;margin-bottom:6px">📦 UUSI-hyllyyn: ${newQ} kpl</div>`:''}</div>
-      <button class="btn" style="background:#16a34a" onclick="setState({phase:'cartSelect'})">Valitse kärry → Hyllytys</button>`;
+
+      ${sc>0?`<details class="card"><summary>Skannatut laatikot (${sc})</summary>
+        ${Object.keys(fbData.scannedBoxes).map(key=>{const box=fbData.scannedBoxes[key];const sscc=box.sscc||key;const cnt=box.items?box.items.length:0;const qty=box.items?box.items.reduce((s,i)=>s+i.qty,0):0;
+          return`<div class="flex justify-between items-center" style="padding:6px 0;border-bottom:1px solid #f1f5f9">
+            <div onclick="showScannedBox('${key}')" style="cursor:pointer;flex:1"><span class="mono">...${sscc.slice(-8)}</span> <span style="font-size:12px;color:#64748b">${cnt} tuot. / ${qty} kpl</span></div>
+            <button class="btn-sm" style="padding:4px 10px;font-size:11px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5" onclick="if(confirm('Poista?')){fbRemoveBox('${sscc}')}">Poista</button></div>`}).join('')}
+      </details>`:''}`
+
+    app.innerHTML+=`<button class="btn" style="background:#16a34a" onclick="setState({phase:'cartSelect'})">Valitse kärry → Hyllytys</button>`;
     setTimeout(refocus,50);return}
 
   if(S.phase==='cartSelect'){
@@ -247,7 +271,7 @@ function render(){
       <div class="card">
         ${!lm?`<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:8px">1. Skannaa paikka: <b>${cur.location}</b></div>`
         :`<div style="font-size:13px;font-weight:600;color:#16a34a;margin-bottom:8px">✓ ${cur.location} — 2. Skannaa EAN</div>`}
-        <input type="text" id="scan-field" class="scan-input" readonly placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
+        <input type="text" id="scan-field" class="scan-input" inputmode="numeric" placeholder="${lm?'Skannaa EAN':'Skannaa paikka'}" onkeydown="if(event.key==='Enter'){event.preventDefault();handleScan('${cb}')}">
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}</div>
 
