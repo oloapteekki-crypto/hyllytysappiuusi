@@ -29,7 +29,7 @@ document.getElementById('manifest-link').href=URL.createObjectURL(new Blob([JSON
 firebase.initializeApp({apiKey:"AIzaSyBA_nMeugv0lSxjVm1il1iJo7v33Fs__X8",authDomain:"hyllytysappi.firebaseapp.com",databaseURL:"https://hyllytysappi-default-rtdb.europe-west1.firebasedatabase.app",projectId:"hyllytysappi",storageBucket:"hyllytysappi.firebasestorage.app",messagingSenderId:"312430303554",appId:"1:312430303554:web:1fa95efa74fa370bdc10db"});
 const db=firebase.database();
 const sessionId=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-let dbRef=null,fbData={scannedBoxes:{},cartsTaken:{}};
+let dbRef=null,fbData={scannedBoxes:{},cartsTaken:{},cartBatches:{},shelved:{}};
 
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function initFirebase(){
@@ -38,30 +38,31 @@ function initFirebase(){
     const val=snap.val()||{};
     fbData.scannedBoxes=val.scannedBoxes||{};
     fbData.cartsTaken=val.cartsTaken||{};
+    fbData.cartBatches=val.cartBatches||{};
+    fbData.shelved=val.shelved||{};
     // Only update counters, don't re-render whole page (avoids keyboard popup)
     updateCounters();
   });
 }
 function updateCounters(){
-  // cartSelect phase has no input - safe to re-render fully
   if(S.phase==='cartSelect'){render();return}
   const el=document.getElementById('live-counters');
   if(!el||!S.xmlBoxes)return;
   const total=Object.keys(S.xmlBoxes).length,sc=fbScannedCount();
-  const all=getAllEnriched();
-  const cc={};CARTS.forEach(c=>{cc[c.id]={items:0,qty:0}});
-  let rxQ=0,newQ=0;
-  all.forEach(i=>{if(i.parsedLoc?.type==='rx')rxQ+=i.qty;else if(!i.parsedLoc)newQ+=i.qty;else if(i.cartId&&cc[i.cartId]){cc[i.cartId].items++;cc[i.cartId].qty+=i.qty}});
   el.innerHTML=`${sc}/${total} laatikkoa luettu`;
-  // Update cart counts
-  CARTS.forEach(c=>{const cel=document.getElementById('cart-count-'+c.id);if(cel)cel.textContent=cc[c.id].qty+' kpl / '+cc[c.id].items+' tuotetta'});
-  const rxEl=document.getElementById('rx-count');if(rxEl)rxEl.textContent=rxQ?'💊 Reseptilääkkeet: '+rxQ+' kpl':'';
-  const newEl=document.getElementById('new-count');if(newEl)newEl.textContent=newQ?'📦 UUSI-hyllyyn: '+newQ+' kpl':'';
 }
 function fbAddBox(sscc,items){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).set({sscc,items,by:sessionId,t:Date.now()})}
 function fbRemoveBox(sscc){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).remove()}
-function fbTakeCart(id){if(dbRef)dbRef.child('cartsTaken/'+id).set({by:sessionId,t:Date.now()})}
-function fbReleaseCart(id){if(dbRef)dbRef.child('cartsTaken/'+id).remove()}
+function fbTakeCart(id,batchId){if(dbRef)dbRef.child('cartsTaken/'+id+'_'+batchId).set({by:sessionId,t:Date.now()})}
+function fbReleaseCart(id,batchId){if(dbRef)dbRef.child('cartsTaken/'+id+'_'+batchId).remove()}
+function fbIsBatchTaken(id,batchId){return!!fbData.cartsTaken[id+'_'+batchId]}
+
+function resetDay(){
+  if(!confirm('Nollaa KAIKKI päivän data? Skannatut laatikot, kärryt, hyllytykset — kaikki katoaa.'))return;
+  if(dbRef)dbRef.remove();
+  clearSavedState();
+  setState({phase:'scan',activeBox:null,lastScanResult:null,error:null});
+}
 function fbIsBoxScanned(sscc){return!!fbData.scannedBoxes[sscc.replace(/[.#$/[\]]/g,'_')]}
 function fbScannedCount(){return Object.keys(fbData.scannedBoxes).length}
 function fbAllItems(){const r=[];for(const k in fbData.scannedBoxes){const b=fbData.scannedBoxes[k];if(b.items)b.items.forEach(i=>r.push(i))}return r}
@@ -90,7 +91,7 @@ function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};cons
 function pCSV(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};const cols=r.meta?.fields||[];const skuCol=cols.find(c=>c.replace(/^\uFEFF/,'').toLowerCase()==='sku')||'sku';const nameCol=cols.find(c=>c.toLowerCase()==='name')||'name';const eanCol=cols.find(c=>c.toLowerCase()==='ean')||'ean';const locCol=cols.find(c=>c.toLowerCase().includes('storage_location')||c.toLowerCase().includes('location'))||'storage_location';r.data.forEach(row=>{const s=String(row[skuCol]||'').trim();if(!s)return;m[s]={name:String(row[nameCol]||'').trim(),ean:String(row[eanCol]||'').trim(),location:String(row[locCol]||'').trim()}});return m}
 
 /* ═══════════ STATE ═══════════ */
-let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null,scanMode:'scanner'};
+let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,selectedBatch:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null,scanMode:'scanner'};
 
 // ── Session storage: survive page refresh ──
 const STORAGE_KEY='hyllytysappi_state_v2';
@@ -185,13 +186,15 @@ function addBox(code){
   setState({activeBox:{sscc,items},lastScanResult:{type:'ok',text:'✓ Laatikko ('+items.length+' tuotetta)'}});
 }
 
-function selectCart(id){
-  const all=getAllEnriched();
-  const ci=all.filter(i=>i.cartId===id);
-  const rx=all.filter(i=>i.parsedLoc?.type==='rx');
-  const um=all.filter(i=>!i.parsedLoc);
-  fbTakeCart(id);
-  setState({selectedCart:id,routeItems:sSort(ci),rxItems:rx,unmatchedItems:um,shelved:{},currentIdx:0,phase:'shelve',confirmedLoc:null,lastScanResult:null,error:null});
+function selectCart(id,batchId){
+  const batches=getCartBatchList(id);
+  const batch=batches.find(b=>b.id===batchId)||batches[batches.length-1];
+  const ci=getBatchEnriched(id,batch);
+  const prev=fbData.shelved[id+'_'+batch.id]||{};
+  const remaining=[];
+  ci.forEach(i=>{const left=i.qty-(prev[i.vnr]||0);if(left>0)remaining.push({...i,qty:left})});
+  fbTakeCart(id,batch.id);
+  setState({selectedCart:id,selectedBatch:batch,routeItems:sSort(remaining),rxItems:[],unmatchedItems:[],shelved:{},currentIdx:0,phase:'shelve',confirmedLoc:null,lastScanResult:null,error:null});
 }
 
 function confirmLocation(code){if(!code)return;setState({error:null,lastScanResult:null});const cur=S.routeItems[S.currentIdx];if(!cur)return;const sc=code.trim().toUpperCase(),ex=cur.location.trim().toUpperCase();if(sc===ex){setState({confirmedLoc:ex,lastScanResult:{type:'ok',text:'✓ '+cur.location}});return}const oi=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===sc);if(oi!==-1){setState({confirmedLoc:sc,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+S.routeItems[oi].location}});return}setState({error:'Paikka ei reitillä',lastScanResult:{type:'fail',text:'Väärä'}})}
@@ -201,7 +204,63 @@ function confirmEan(code){if(!code)return;setState({error:null,lastScanResult:nu
 function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=cur;setState({shelved:S.shelved})}
 function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=n;setState({shelved:S.shelved})}}
 function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
-function finishShelving(skip){if(!skip){const ts=tShelved(),tq=tQty();if(!confirm(ts<tq?`Kesken (${ts}/${tq}). Lopeta?`:'Lopeta?'))return}if(S.selectedCart)fbReleaseCart(S.selectedCart);setState({phase:'report'})}
+function fbSaveShelved(cartId,batchId,shelved){
+  if(dbRef)dbRef.child('shelved/'+cartId+'_'+batchId).transaction(current=>{
+    const merged=current||{};
+    for(const vnr in shelved){merged[vnr]=(merged[vnr]||0)+shelved[vnr]}
+    return merged;
+  });
+}
+
+function fbCartBatchCount(cartId){
+  const batches=fbData.cartBatches?fbData.cartBatches[cartId]:null;
+  return batches?Object.keys(batches).length:0;
+}
+function fbCloseCartBatch(cartId){
+  if(!dbRef)return;
+  const batchId=Date.now().toString(36);
+  dbRef.child('cartBatches/'+cartId+'/'+batchId).set({by:sessionId,t:Date.now()});
+}
+function fbLastBatchTime(cartId){
+  const batches=fbData.cartBatches?fbData.cartBatches[cartId]:null;
+  if(!batches)return 0;
+  let max=0;for(const k in batches){if(batches[k].t>max)max=batches[k].t}
+  return max;
+}
+function getCartBatchList(cartId){
+  const batches=fbData.cartBatches?fbData.cartBatches[cartId]:null;
+  if(!batches)return[{id:'current',since:0,until:Infinity,num:1}];
+  const sorted=Object.entries(batches).map(([id,v])=>({id,t:v.t})).sort((a,b)=>a.t-b.t);
+  const list=[];let prev=0;
+  for(let i=0;i<sorted.length;i++){list.push({id:sorted[i].id,since:prev,until:sorted[i].t,num:i+1});prev=sorted[i].t}
+  list.push({id:'current',since:prev,until:Infinity,num:sorted.length+1});
+  return list;
+}
+function getBatchEnriched(cartId,batch){
+  const items=[];
+  for(const k in fbData.scannedBoxes){const b=fbData.scannedBoxes[k];
+    if(b.t>batch.since&&(batch.until===Infinity?true:b.t<=batch.until)&&b.items)b.items.forEach(i=>items.push(i))}
+  const all=[];
+  items.forEach(item=>{const e=enrichItem(item);if(e.cartId!==cartId)return;
+    const ex=all.find(i=>i.vnr===e.vnr);if(ex)ex.qty+=e.qty;else all.push(e)});
+  return all;
+}
+function getCurrentBatchEnriched(cartId){
+  const batches=getCartBatchList(cartId);
+  return getBatchEnriched(cartId,batches[batches.length-1]);
+}
+function getBatchRemaining(cartId,batch){
+  const items=getBatchEnriched(cartId,batch);
+  const prev=fbData.shelved[cartId+'_'+batch.id]||{};
+  return items.filter(i=>(i.qty-(prev[i.vnr]||0))>0).length;
+}
+
+function finishShelving(skip){
+  if(!skip){const ts=tShelved(),tq=tQty();if(!confirm(ts<tq?`Kesken (${ts}/${tq}). Lopeta?`:'Lopeta?'))return}
+  if(S.selectedCart&&S.selectedBatch)fbSaveShelved(S.selectedCart,S.selectedBatch.id,S.shelved);
+  if(S.selectedCart&&S.selectedBatch)fbReleaseCart(S.selectedCart,S.selectedBatch.id);
+  setState({phase:'report'});
+}
 
 function handleScan(cb){const inp=document.getElementById('scan-field');if(!inp)return;const v=inp.value;inp.value='';if(!v)return;if(cb==='addBox')addBox(v);else if(cb==='confirmLocation')confirmLocation(v);else if(cb==='confirmEan')confirmEan(v)}
 
@@ -255,9 +314,8 @@ function render(){
   if(S.phase==='scan'){
     const total=Object.keys(S.xmlBoxes).length,sc=fbScannedCount();
     const all=getAllEnriched();
-    const cc={};CARTS.forEach(c=>{cc[c.id]={items:0,qty:0}});
-    let rxQ=0,newQ=0;
-    all.forEach(i=>{if(i.parsedLoc?.type==='rx')rxQ+=i.qty;else if(!i.parsedLoc)newQ+=i.qty;else if(i.cartId&&cc[i.cartId]){cc[i.cartId].items++;cc[i.cartId].qty+=i.qty}});
+    let rxQ=0,newQ=0,palletQ=0;
+    all.forEach(i=>{if(i.parsedLoc?.type==='rx')rxQ+=i.qty;else if(!i.parsedLoc)newQ+=i.qty;else if(!i.cartId&&i.parsedLoc)palletQ+=i.qty});
 
     app.innerHTML=`
       <div class="card"><h1>Purku</h1>
@@ -327,11 +385,17 @@ function render(){
         bx+='</div>';return bx;
       })():''}
       <div class="card"><h2>Kärryt</h2>
-        ${CARTS.map(c=>`<div style="padding:10px 12px;border-radius:8px;margin-bottom:6px;border-left:4px solid ${c.color};background:#fafbfc">
-          <div class="flex justify-between items-center"><div>${c.icon} <b>${c.name}</b></div><div style="font-size:14px;font-weight:700">${cc[c.id].qty} kpl</div></div>
-          <div id="cart-count-${c.id}" style="font-size:11px;color:#64748b;margin-top:2px">${cc[c.id].qty} kpl / ${cc[c.id].items} tuotetta</div></div>`).join('')}
-        <div id="rx-count" style="padding:8px 12px;border-radius:8px;background:#fef2f2;font-size:13px;margin-bottom:6px;${rxQ?'':'display:none'}">${rxQ?'💊 Reseptilääkkeet: '+rxQ+' kpl':''}</div>
-        <div id="new-count" style="padding:8px 12px;border-radius:8px;background:#fffbeb;font-size:13px;margin-bottom:6px;${newQ?'':'display:none'}">${newQ?'📦 UUSI-hyllyyn: '+newQ+' kpl':''}</div></div>
+        ${CARTS.map(c=>{
+          const batchNum=fbCartBatchCount(c.id)+1;
+          const batchItems=getCurrentBatchEnriched(c.id);
+          return`<div style="padding:8px 12px;border-radius:8px;margin-bottom:6px;border-left:4px solid ${c.color};background:#fafbfc">
+          <div class="flex justify-between items-center"><div>${c.icon} <b>${c.name} #${batchNum}</b></div>
+            <span style="font-size:13px;font-weight:700">${batchItems.length} tuotetta</span></div>
+          ${batchItems.length>0?`<button class="btn-sm" style="margin-top:6px;width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;font-size:12px" onclick="if(confirm('${c.name} #${batchNum} valmis hyllytykseen?')){fbCloseCartBatch('${c.id}');setState({phase:'cartSelect'})}">Kärry valmis → Hyllytykseen</button>`:''}
+          </div>`}).join('')}
+        ${rxQ?`<div style="padding:8px 12px;border-radius:8px;background:#fef2f2;font-size:13px;margin-bottom:6px">💊 Reseptilääkkeet: ${rxQ} kpl</div>`:''}
+        ${newQ?`<div style="padding:8px 12px;border-radius:8px;background:#fffbeb;font-size:13px;margin-bottom:6px">📦 UUSI-hyllyyn: ${newQ} kpl</div>`:''}
+        ${palletQ?`<div style="padding:8px 12px;border-radius:8px;background:#f8fafc;font-size:13px;margin-bottom:6px;border:1px solid #e2e8f0">🏗 Lavapaikat (L4/L5): ${palletQ} kpl</div>`:''}</div>
 
       ${sc>0?`<details class="card"><summary>Skannatut laatikot (${sc})</summary>
         ${Object.keys(fbData.scannedBoxes).map(key=>{const box=fbData.scannedBoxes[key];const sscc=box.sscc||key;const cnt=box.items?box.items.length:0;const qty=box.items?box.items.reduce((s,i)=>s+i.qty,0):0;
@@ -340,23 +404,31 @@ function render(){
             <button class="btn-sm" style="padding:4px 10px;font-size:11px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5" onclick="if(confirm('Poista?')){fbRemoveBox('${sscc}')}">Poista</button></div>`}).join('')}
       </details>`:''}`
 
-    app.innerHTML+=`<button class="btn" style="background:#16a34a" onclick="setState({phase:'cartSelect'})">Valitse kärry → Hyllytys</button>`;
+    app.innerHTML+=`<button class="btn" style="background:#16a34a" onclick="setState({phase:'cartSelect'})">Valitse kärry → Hyllytys</button>
+      <button class="btn-sm" style="width:100%;margin-top:12px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5" onclick="resetDay()">🗑 Nollaa päivän data</button>`;
     updateScanPlaceholder('Skannaa laatikko');showScanWrap();
     return}
 
   if(S.phase==='cartSelect'){
     hideScanWrap();
-    const all=getAllEnriched();
-    app.innerHTML=`<div class="card"><h1>Valitse kärry</h1><p class="sub">Ota kärry ja aloita hyllytys</p></div>
-      ${CARTS.map(c=>{const items=all.filter(i=>i.cartId===c.id);const qty=items.reduce((s,i)=>s+i.qty,0);
-        const tk=fbData.cartsTaken[c.id],mine=tk&&tk.by===sessionId,taken=tk&&!mine;
-        return`<div class="cart-card ${taken?'taken':''}" style="border-color:${c.color}" onclick="${taken?'':`selectCart('${c.id}')`}">
-          <div style="font-size:32px;margin-bottom:8px">${c.icon}</div>
-          <div style="font-size:18px;font-weight:700">${c.name}</div>
+    let cards='';
+    CARTS.forEach(c=>{
+      const batches=getCartBatchList(c.id);
+      batches.forEach(batch=>{
+        const remaining=getBatchRemaining(c.id,batch);
+        if(remaining===0&&batch.id!=='current')return;
+        const taken=fbIsBatchTaken(c.id,batch.id);
+        if(taken)return; // Hide batches being shelved
+        cards+=`<div class="cart-card" style="border-color:${c.color}${remaining===0?' ;opacity:0.5':''}" onclick="${remaining>0?`selectCart('${c.id}','${batch.id}')`:''}" >
+          <div style="font-size:24px;margin-bottom:4px">${c.icon}</div>
+          <div style="font-size:16px;font-weight:700">${c.name} #${batch.num}</div>
           <div style="font-size:13px;color:#64748b;margin:4px 0">Levyt: ${c.shelves.join(', ')}</div>
-          <div style="font-size:20px;font-weight:800;margin:8px 0">${qty} kpl</div>
-          <div style="font-size:14px;font-weight:700">${items.length} tuotetta</div>
-          ${taken?'<div style="margin-top:8px;font-size:12px;color:#dc2626;font-weight:600">⛔ Toinen hyllyttää</div>':''}</div>`}).join('')}
+          <div style="font-size:18px;font-weight:800;margin:6px 0">${remaining} hyllyttämätöntä</div>
+          ${batch.id==='current'?'<div style="font-size:11px;color:#3b82f6">⏳ Täyttyy</div>':''}</div>`;
+      });
+    });
+    app.innerHTML=`<div class="card"><h1>Valitse kärry</h1><p class="sub">Ota kärry ja aloita hyllytys</p></div>
+      ${cards}
       <button class="btn-sm btn-outline" style="width:100%;margin-top:8px" onclick="setState({phase:'scan'})">← Takaisin</button>`;return}
 
   if(S.phase==='shelve'){
@@ -368,7 +440,7 @@ function render(){
     const cb=lm?'confirmEan':'confirmLocation';
 
     app.innerHTML=`
-      <div class="mb-12"><div class="flex justify-between items-center mb-6"><div>${cart?.icon||''} <b>${cart?.name||''}</b></div>
+      <div class="mb-12"><div class="flex justify-between items-center mb-6"><div>${cart?.icon||''} <b>${cart?.name||''} #${S.selectedBatch?.num||''}</b></div>
         <span style="font-size:12px;color:#94a3b8">${ts}/${tq} (${pct}%)</span></div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
 
@@ -416,7 +488,7 @@ function render(){
     S.routeItems.forEach(i=>{const s=S.shelved[i.vnr]||0;if(s===i.qty)ok.push({...i,sq:s});else if(s>i.qty)over.push({...i,sq:s});else if(s>0)under.push({...i,sq:s});else notDone.push({...i,sq:0})});
     const ts=tShelved(),tq=tQty(),cart=CARTS.find(c=>c.id===S.selectedCart);
     app.innerHTML=`
-      <div class="card"><h1>${cart?.icon||''} ${cart?.name||''} — Raportti</h1>
+      <div class="card"><h1>${cart?.icon||''} ${cart?.name||''} #${S.selectedBatch?.num||''} — Raportti</h1>
         <div class="flex gap-8" style="margin:12px 0">
           <div style="flex:1;padding:10px;border-radius:8px;background:#f0fdf4;text-align:center"><div style="font-size:22px;font-weight:700;color:#16a34a">${ts}</div><div style="font-size:11px;color:#047857">Hyllytetty</div></div>
           <div style="flex:1;padding:10px;border-radius:8px;background:#f8fafc;text-align:center"><div style="font-size:22px;font-weight:700">${tq}</div><div style="font-size:11px;color:#64748b">Odotettu</div></div>
@@ -425,8 +497,8 @@ function render(){
       ${notDone.length?`<div class="card"><h2 style="color:#dc2626">Ei hyllytetty (${notDone.length})</h2>${notDone.map(i=>`<div class="report-row report-err"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div style="font-weight:700;color:#dc2626">0/${i.qty}</div></div>`).join('')}</div>`:''}
       ${over.length?`<div class="card"><h2 style="color:#7c3aed">Ylimäärä (${over.length})</h2>${over.map(i=>`<div class="report-row" style="background:#f5f3ff;border:1px solid #ddd6fe"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div style="font-weight:700;color:#7c3aed">${i.sq}/${i.qty}</div></div>`).join('')}</div>`:''}
       ${ok.length?`<details class="card"><summary style="color:#16a34a">OK (${ok.length})</summary>${ok.map(i=>`<div class="report-row report-ok"><div style="font-weight:600;font-size:12px">${esc(i.name)}</div><div style="font-weight:700;color:#16a34a">${i.qty} ✓</div></div>`).join('')}</details>`:''}
-      <div class="flex gap-8"><button class="btn-sm btn-outline flex-1" onclick="clearSavedState();undoStack=[];setState({phase:'cartSelect',selectedCart:null,routeItems:[],shelved:{},currentIdx:0})">Toinen kärry</button>
-        <button class="btn flex-1" style="padding:10px" onclick="clearSavedState();undoStack=[];setState({phase:'scan',selectedCart:null,routeItems:[],shelved:{},currentIdx:0})">Purkuun</button></div>`;
+      <div class="flex gap-8"><button class="btn-sm btn-outline flex-1" onclick="clearSavedState();undoStack=[];setState({phase:'cartSelect',selectedCart:null,selectedBatch:null,routeItems:[],shelved:{},currentIdx:0})">Toinen kärry</button>
+        <button class="btn flex-1" style="padding:10px" onclick="clearSavedState();undoStack=[];setState({phase:'scan',selectedCart:null,selectedBatch:null,routeItems:[],shelved:{},currentIdx:0})">Jatka purkua</button></div>`;
   }
 }
 if(wasRestored){
