@@ -91,7 +91,7 @@ function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};cons
 function pCSV(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};const cols=r.meta?.fields||[];const skuCol=cols.find(c=>c.replace(/^\uFEFF/,'').toLowerCase()==='sku')||'sku';const nameCol=cols.find(c=>c.toLowerCase()==='name')||'name';const eanCol=cols.find(c=>c.toLowerCase()==='ean')||'ean';const locCol=cols.find(c=>c.toLowerCase().includes('storage_location')||c.toLowerCase().includes('location'))||'storage_location';r.data.forEach(row=>{const s=String(row[skuCol]||'').trim();if(!s)return;m[s]={name:String(row[nameCol]||'').trim(),ean:String(row[eanCol]||'').trim(),location:String(row[locCol]||'').trim()}});return m}
 
 /* ═══════════ STATE ═══════════ */
-let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,selectedBatch:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null,scanMode:'scanner'};
+let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,selectedBatch:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null,scanMode:'scanner',productLookup:null};
 
 // ── Session storage: survive page refresh ──
 const STORAGE_KEY='hyllytysappi_state_v2';
@@ -183,7 +183,7 @@ function addBox(code){
   if(fbIsBoxScanned(sscc)){setState({error:'Jo skannattu',lastScanResult:{type:'fail',text:'Jo skannattu'}});return}
   const items=S.xmlBoxes[sscc].map(i=>{const e=enrichItem(i);return{vnr:e.vnr,altVnr:e.altVnr,name:e.name,ean:e.ean,qty:e.qty,location:e.location,cartId:e.cartId,physAisle:e.physAisle}});
   fbAddBox(sscc,items);
-  setState({activeBox:{sscc,items},lastScanResult:{type:'ok',text:'✓ Laatikko ('+items.length+' tuotetta)'}});
+  setState({activeBox:{sscc,items},lastScanResult:{type:'ok',text:'✓ Laatikko ('+items.length+' tuotetta)'},productLookup:null});
 }
 
 function selectCart(id,batchId){
@@ -266,9 +266,56 @@ function handleScan(cb){const inp=document.getElementById('scan-field');if(!inp)
 
 function processScan(val){
   if(!val)return;
-  if(S.phase==='scan')addBox(val);
+  if(S.phase==='scan'){
+    // Try box first, then EAN product lookup
+    // Box codes are typically 18-20 digits (SSCC) or match xmlBoxes keys
+    const isBox=S.xmlBoxes[val]||Object.keys(S.xmlBoxes).find(k=>k.endsWith(val)||val.endsWith(k))||(S.boxAltKeys&&S.boxAltKeys[val]);
+    if(isBox||val.length>=15){
+      addBox(val);
+    } else {
+      lookupEan(val);
+    }
+  }
   else if(S.phase==='shelve'&&!S.confirmedLoc)confirmLocation(val);
   else if(S.phase==='shelve')confirmEan(val);
+}
+
+function lookupEan(ean){
+  if(!ean||!S.masterData)return;
+  // Search masterData for matching EAN
+  let found=null;
+  for(const sku in S.masterData){
+    const m=S.masterData[sku];
+    if(m.ean&&m.ean!=='null'&&(m.ean===ean||ean.endsWith(m.ean)||m.ean.endsWith(ean))){
+      found={sku,name:m.name,ean:m.ean,location:m.location};break;
+    }
+  }
+  if(!found){setState({lastScanResult:{type:'fail',text:'EAN '+ean+' ei löydy'},error:null,activeBox:null});return}
+  // Enrich with location info
+  const pl=pLoc((found.location||'').trim());
+  const pa=pl?gPA(pl):null;
+  const cartId=pa?getCart(pa):null;
+  const cart=cartId?CARTS.find(c=>c.id===cartId):null;
+  // Count qty from all scanned boxes
+  let totalQty=0;
+  for(const k in fbData.scannedBoxes){
+    const b=fbData.scannedBoxes[k];
+    if(b.items)b.items.forEach(i=>{
+      if(i.ean===found.ean||i.vnr===found.sku)totalQty+=i.qty;
+    });
+  }
+  // Build result
+  let info=cart?cart.icon+' '+cart.name:'';
+  if(pa&&pa!=='RX'&&pa!=='JK')info+=' — levy '+pa;
+  if(pl&&pl.type==='rx')info='💊 Reseptilääke';
+  if(pl&&pl.type==='cold')info='❄️ Jääkaappi';
+  if(!pl)info='📦 UUSI-hyllyyn';
+  const locStr=found.location||'—';
+  setState({
+    lastScanResult:{type:'ok',text:info},
+    error:null,
+    productLookup:{name:found.name,ean:found.ean,sku:found.sku,location:locStr,cart,pa,qty:totalQty}
+  });
 }
 
 let scanFieldFocused=false;
@@ -324,6 +371,22 @@ function render(){
         ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}">${S.lastScanResult.text}</div>`:''}
         ${S.error?`<div class="error">${S.error}</div>`:''}
         </div>
+
+      ${S.productLookup?`<div class="card" style="border-left:4px solid ${S.productLookup.cart?S.productLookup.cart.color:'#94a3b8'}">
+        <div class="flex justify-between items-center mb-6">
+          <h2 style="margin:0">Tuotehaku</h2>
+          <button class="btn-sm btn-outline" style="font-size:11px;padding:4px 10px" onclick="setState({productLookup:null})">✕</button>
+        </div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">${esc(S.productLookup.name)}</div>
+        <div class="mono" style="color:#64748b;margin-bottom:8px">EAN ${S.productLookup.ean} | VNR ${S.productLookup.sku}</div>
+        <div style="padding:10px;border-radius:8px;background:#f8fafc">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">${S.productLookup.cart?S.productLookup.cart.icon+' '+S.productLookup.cart.name:S.productLookup.pa==='RX'?'💊 Reseptilääke':S.productLookup.pa==='JK'?'❄️ Jääkaappi':'📦 UUSI-hyllyyn'}</div>
+          ${S.productLookup.pa&&S.productLookup.pa!=='RX'&&S.productLookup.pa!=='JK'?`<div style="font-size:13px;color:#475569">Levy: <b>${S.productLookup.pa}</b></div>`:''}
+          <div style="font-size:13px;color:#475569">Paikka: <b>${esc(S.productLookup.location)}</b></div>
+          ${S.productLookup.qty>0?`<div style="font-size:13px;color:#475569;margin-top:4px">Skannatuissa laatikoissa: <b>${S.productLookup.qty} kpl</b></div>`:''}
+        </div>
+      </div>`:''}
+
         ${(()=>{
           const unscanned=Object.keys(S.xmlBoxes).filter(k=>!fbIsBoxScanned(k));
           if(!unscanned.length)return'<div style="margin-top:8px;padding:8px;border-radius:8px;background:#f0fdf4;text-align:center;font-size:13px;color:#16a34a;font-weight:600">✓ Kaikki laatikot luettu!</div>';
