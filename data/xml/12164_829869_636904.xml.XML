@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice version="1.2">
+	<SellerPartyDetails>
+		<SellerPartyIdentifier>Medifon Oy</SellerPartyIdentifier>
+		<SellerOrganisationName>Medifon Oy</SellerOrganisationName>
+		<SellerOrganisationTaxCode>0471598-6</SellerOrganisationTaxCode>
+		<SellerPostalAddressDetails>
+			<SellerStreetName>Kutojantie 5</SellerStreetName>
+			<SellerTownName>Espoo</SellerTownName>
+			<SellerPostCodeIdentifier>02630</SellerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</SellerPostalAddressDetails>
+	</SellerPartyDetails>
+	<BuyerPartyDetails>
+		<BuyerPartyIdentifier>12164</BuyerPartyIdentifier>
+		<BuyerOrganisationName>Olo-apteekki Oy / Verkkokauppa</BuyerOrganisationName>
+		<BuyerPostalAddressDetails>
+			<BuyerStreetName>Muuntotie 1</BuyerStreetName>
+			<BuyerTownName>Vantaa</BuyerTownName>
+			<BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</BuyerPostalAddressDetails>
+	</BuyerPartyDetails>
+	<InvoiceDetails>
+		<InvoiceTypeCode>DEV01</InvoiceTypeCode>
+		<InvoiceTypeText>TOIMITUSILMOITUS</InvoiceTypeText>
+		<OriginCode>Origin</OriginCode>
+		<InvoiceNumber>636904</InvoiceNumber>
+		<InvoiceDate Format="CCYYMMDD">20260429</InvoiceDate>
+	</InvoiceDetails>
+	<InvoiceRow>
+		<ArticleIdentifier>9524245</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779468419067</ArticleGroupIdentifier>
+		<ArticleName>bertil&apos;s Elivo Entsyymikapseli 20 kaps</ArticleName>
+		<BuyerArticleIdentifier>9524245</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">1,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">1,00</OrderedQuantity>
+		<EndDate>20280129</EndDate>
+		<OriginalInvoiceNumber>27790</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">5,71</UnitPriceAmount>
+		<RowIdentifier>1</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>26030501</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">5,71</RowAmount>
+	</InvoiceRow>
+</Finvoice>
