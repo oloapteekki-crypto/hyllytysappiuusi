@@ -62,17 +62,33 @@ function updateCounters(){
   const total=Object.keys(S.xmlBoxes).length,sc=fbScannedCount();
   el.innerHTML=`${sc}/${total} laatikkoa luettu`;
 }
-function fbAddBox(sscc,items){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).set({sscc,items,by:sessionId,t:Date.now()})}
-function fbRemoveBox(sscc){if(dbRef)dbRef.child('scannedBoxes/'+sscc.replace(/[.#$/[\]]/g,'_')).remove()}
-function fbTakeCart(id,batchId){if(dbRef)dbRef.child('cartsTaken/'+id+'_'+batchId).set({by:sessionId,t:Date.now()})}
-function fbReleaseCart(id,batchId){if(dbRef)dbRef.child('cartsTaken/'+id+'_'+batchId).remove()}
+function fbAddBox(sscc,items){
+  const key=sscc.replace(/[.#$/[\]]/g,'_');
+  const data={sscc,items,by:sessionId,t:Date.now()};
+  fbData.scannedBoxes[key]=data;
+  if(dbRef)dbRef.child('scannedBoxes/'+key).set(data);
+}
+function fbRemoveBox(sscc){
+  const key=sscc.replace(/[.#$/[\]]/g,'_');
+  delete fbData.scannedBoxes[key];
+  if(dbRef)dbRef.child('scannedBoxes/'+key).remove();
+}
+function fbTakeCart(id,batchId){
+  fbData.cartsTaken[id+'_'+batchId]={by:sessionId,t:Date.now()};
+  if(dbRef)dbRef.child('cartsTaken/'+id+'_'+batchId).set(fbData.cartsTaken[id+'_'+batchId]);
+}
+function fbReleaseCart(id,batchId){
+  delete fbData.cartsTaken[id+'_'+batchId];
+  if(dbRef)dbRef.child('cartsTaken/'+id+'_'+batchId).remove();
+}
 function fbIsBatchTaken(id,batchId){return!!fbData.cartsTaken[id+'_'+batchId]}
 
 function resetDay(){
   if(!confirm('Nollaa KAIKKI päivän data? Skannatut laatikot, kärryt, hyllytykset — kaikki katoaa.'))return;
+  fbData={scannedBoxes:{},cartsTaken:{},cartBatches:{},shelved:{}};
   if(dbRef)dbRef.remove();
   clearSavedState();
-  setState({phase:'scan',activeBox:null,lastScanResult:null,error:null});
+  setState({phase:'scan',activeBox:null,lastScanResult:null,error:null,productLookup:null});
 }
 function fbIsBoxScanned(sscc){return!!fbData.scannedBoxes[sscc.replace(/[.#$/[\]]/g,'_')]}
 function fbScannedCount(){return Object.keys(fbData.scannedBoxes).length}
@@ -227,11 +243,10 @@ function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);
 function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=n;setState({shelved:S.shelved})}}
 function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
 function fbSaveShelved(cartId,batchId,shelved){
-  if(dbRef)dbRef.child('shelved/'+cartId+'_'+batchId).transaction(current=>{
-    const merged=current||{};
-    for(const vnr in shelved){merged[vnr]=(merged[vnr]||0)+shelved[vnr]}
-    return merged;
-  });
+  const key=cartId+'_'+batchId;
+  if(!fbData.shelved[key])fbData.shelved[key]={};
+  for(const vnr in shelved){fbData.shelved[key][vnr]=(fbData.shelved[key][vnr]||0)+shelved[vnr]}
+  if(dbRef)dbRef.child('shelved/'+key).set(fbData.shelved[key]);
 }
 
 function fbCartBatchCount(cartId){
@@ -241,7 +256,13 @@ function fbCartBatchCount(cartId){
 function fbCloseCartBatch(cartId){
   if(!dbRef)return;
   const batchId=Date.now().toString(36);
-  dbRef.child('cartBatches/'+cartId+'/'+batchId).set({by:sessionId,t:Date.now()});
+  const data={by:sessionId,t:Date.now()};
+  // Update local data immediately so UI reflects the change
+  if(!fbData.cartBatches)fbData.cartBatches={};
+  if(!fbData.cartBatches[cartId])fbData.cartBatches[cartId]={};
+  fbData.cartBatches[cartId][batchId]=data;
+  // Then write to Firebase
+  dbRef.child('cartBatches/'+cartId+'/'+batchId).set(data);
 }
 function fbLastBatchTime(cartId){
   const batches=fbData.cartBatches?fbData.cartBatches[cartId]:null;
@@ -373,57 +394,73 @@ function camStop(){
 
 function lookupEan(ean){
   if(!ean||!S.masterData)return;
-  // Search masterData for matching EAN
-  let found=null;
-  for(const sku in S.masterData){
-    const m=S.masterData[sku];
-    if(m.ean&&m.ean!=='null'&&(m.ean===ean||ean.endsWith(m.ean)||m.ean.endsWith(ean))){
-      found={sku,name:m.name,ean:m.ean,location:m.location};break;
+  const matchEan=(a,b)=>a&&a!=='null'&&(a===b||b.endsWith(a)||a.endsWith(b));
+
+  // First: check active box items (already enriched with correct location)
+  if(S.activeBox&&S.activeBox.items){
+    const boxItem=S.activeBox.items.find(i=>matchEan(i.ean,ean));
+    if(boxItem){
+      const pl=pLoc((boxItem.location||'').trim());
+      const pa=boxItem.physAisle||null;
+      const cartId=boxItem.cartId||null;
+      const cart=cartId?CARTS.find(c=>c.id===cartId):null;
+      let info=cart?cart.icon+' '+cart.name:'';
+      if(pa&&pa!=='RX'&&pa!=='JK')info+=' — levy '+pa;
+      if(pl&&pl.type==='rx')info='💊 Reseptilääke';
+      if(pl&&pl.type==='cold')info='❄️ Jääkaappi';
+      if(!pl)info='📦 UUSI-hyllyyn';
+      // Track scanned
+      if(!S.activeBox.scannedEans)S.activeBox.scannedEans={};
+      S.activeBox.scannedEans[ean]=(S.activeBox.scannedEans[ean]||0)+1;
+      const totalBoxItems=S.activeBox.items.reduce((s,i)=>s+i.qty,0);
+      const totalScanned=Object.values(S.activeBox.scannedEans).reduce((s,v)=>s+v,0);
+      let ab=S.activeBox;
+      if(totalScanned>=totalBoxItems){ab=null;updateScanPlaceholder('Skannaa laatikko')}
+      else{updateScanPlaceholder('Lue tuote ('+totalScanned+'/'+totalBoxItems+')')}
+      setState({lastScanResult:{type:'ok',text:info},error:null,activeBox:ab,
+        productLookup:{name:boxItem.name,ean:boxItem.ean||ean,sku:boxItem.vnr,location:boxItem.location||'—',cart,pa,qty:boxItem.qty}});
+      return;
     }
   }
+
+  // Fallback: search masterData by EAN, prefer entries with valid location
+  let found=null,foundNoLoc=null;
+  for(const sku in S.masterData){
+    const m=S.masterData[sku];
+    if(matchEan(m.ean,ean)){
+      const hasLoc=pLoc((m.location||'').trim());
+      if(hasLoc){found={sku,name:m.name,ean:m.ean,location:m.location};break}
+      if(!foundNoLoc)foundNoLoc={sku,name:m.name,ean:m.ean,location:m.location};
+    }
+  }
+  if(!found)found=foundNoLoc;
   if(!found){setState({lastScanResult:{type:'fail',text:'EAN '+ean+' ei löydy'},error:null});return}
-  // Enrich with location info
+
   const pl=pLoc((found.location||'').trim());
   const pa=pl?gPA(pl):null;
   const cartId=pa?getCart(pa):null;
   const cart=cartId?CARTS.find(c=>c.id===cartId):null;
-  // Count qty from all scanned boxes
   let totalQty=0;
-  for(const k in fbData.scannedBoxes){
-    const b=fbData.scannedBoxes[k];
-    if(b.items)b.items.forEach(i=>{
-      if(i.ean===found.ean||i.vnr===found.sku)totalQty+=i.qty;
-    });
-  }
-  // Track scanned product in active box
-  let ab=S.activeBox;
-  if(ab){
-    if(!ab.scannedEans)ab.scannedEans={};
-    ab.scannedEans[ean]=(ab.scannedEans[ean]||0)+1;
-    // Check if all box items scanned
-    const totalBoxItems=ab.items.reduce((s,i)=>s+i.qty,0);
-    const totalScanned=Object.values(ab.scannedEans).reduce((s,v)=>s+v,0);
-    if(totalScanned>=totalBoxItems){
-      // All done - clear box
-      ab=null;
-      updateScanPlaceholder('Skannaa laatikko');
-    } else {
-      updateScanPlaceholder('Lue tuote ('+totalScanned+'/'+totalBoxItems+')');
-    }
-  }
-  // Build result
+  for(const k in fbData.scannedBoxes){const b=fbData.scannedBoxes[k];
+    if(b.items)b.items.forEach(i=>{if(i.ean===found.ean||i.vnr===found.sku)totalQty+=i.qty})}
   let info=cart?cart.icon+' '+cart.name:'';
   if(pa&&pa!=='RX'&&pa!=='JK')info+=' — levy '+pa;
   if(pl&&pl.type==='rx')info='💊 Reseptilääke';
   if(pl&&pl.type==='cold')info='❄️ Jääkaappi';
   if(!pl)info='📦 UUSI-hyllyyn';
   const locStr=found.location||'—';
-  setState({
-    lastScanResult:{type:'ok',text:info},
-    error:null,
-    activeBox:ab,
-    productLookup:{name:found.name,ean:found.ean,sku:found.sku,location:locStr,cart,pa,qty:totalQty}
-  });
+  // Track scanned in active box
+  let ab=S.activeBox;
+  if(ab){
+    if(!ab.scannedEans)ab.scannedEans={};
+    ab.scannedEans[ean]=(ab.scannedEans[ean]||0)+1;
+    const totalBoxItems=ab.items.reduce((s,i)=>s+i.qty,0);
+    const totalScanned=Object.values(ab.scannedEans).reduce((s,v)=>s+v,0);
+    if(totalScanned>=totalBoxItems){ab=null;updateScanPlaceholder('Skannaa laatikko')}
+    else{updateScanPlaceholder('Lue tuote ('+totalScanned+'/'+totalBoxItems+')')}
+  }
+  setState({lastScanResult:{type:'ok',text:info},error:null,activeBox:ab,
+    productLookup:{name:found.name,ean:found.ean,sku:found.sku,location:locStr,cart,pa,qty:totalQty}});
 }
 
 let scanFieldFocused=false;
@@ -600,13 +637,15 @@ function render(){
         const remaining=getBatchRemaining(c.id,batch);
         if(remaining===0&&batch.id!=='current')return;
         const taken=fbIsBatchTaken(c.id,batch.id);
-        if(taken)return; // Hide batches being shelved
-        cards+=`<div class="cart-card" style="border-color:${c.color}${remaining===0?' ;opacity:0.5':''}" onclick="${remaining>0?`selectCart('${c.id}','${batch.id}')`:''}" >
+        if(taken)return;
+        const isCurrent=batch.id==='current';
+        const selectable=!isCurrent&&remaining>0;
+        cards+=`<div class="cart-card" style="border-color:${c.color}${!selectable?';opacity:0.4;cursor:not-allowed':''}" onclick="${selectable?`selectCart('${c.id}','${batch.id}')`:''}" >
           <div style="font-size:24px;margin-bottom:4px">${c.icon}</div>
           <div style="font-size:16px;font-weight:700">${c.name} #${batch.num}</div>
           <div style="font-size:13px;color:#64748b;margin:4px 0">Levyt: ${c.shelves.join(', ')}</div>
           <div style="font-size:18px;font-weight:800;margin:6px 0">${remaining} hyllyttämätöntä</div>
-          ${batch.id==='current'?'<div style="font-size:11px;color:#3b82f6">⏳ Täyttyy</div>':''}</div>`;
+          ${isCurrent?'<div style="font-size:11px;color:#3b82f6">⏳ Täyttyy — paina purussa "Kärry valmis"</div>':''}</div>`;
       });
     });
     app.innerHTML=`<div class="card"><h1>Valitse kärry</h1><p class="sub">Ota kärry ja aloita hyllytys</p></div>
