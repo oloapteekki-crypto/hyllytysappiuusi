@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice version="1.2">
+	<SellerPartyDetails>
+		<SellerPartyIdentifier>Medifon Oy</SellerPartyIdentifier>
+		<SellerOrganisationName>Medifon Oy</SellerOrganisationName>
+		<SellerOrganisationTaxCode>0471598-6</SellerOrganisationTaxCode>
+		<SellerPostalAddressDetails>
+			<SellerStreetName>Kutojantie 5</SellerStreetName>
+			<SellerTownName>Espoo</SellerTownName>
+			<SellerPostCodeIdentifier>02630</SellerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</SellerPostalAddressDetails>
+	</SellerPartyDetails>
+	<BuyerPartyDetails>
+		<BuyerPartyIdentifier>12164</BuyerPartyIdentifier>
+		<BuyerOrganisationName>Olo-apteekki Oy / Verkkokauppa</BuyerOrganisationName>
+		<BuyerPostalAddressDetails>
+			<BuyerStreetName>Muuntotie 1</BuyerStreetName>
+			<BuyerTownName>Vantaa</BuyerTownName>
+			<BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</BuyerPostalAddressDetails>
+	</BuyerPartyDetails>
+	<InvoiceDetails>
+		<InvoiceTypeCode>DEV01</InvoiceTypeCode>
+		<InvoiceTypeText>TOIMITUSILMOITUS</InvoiceTypeText>
+		<OriginCode>Origin</OriginCode>
+		<InvoiceNumber>638616</InvoiceNumber>
+		<InvoiceDate Format="CCYYMMDD">20260506</InvoiceDate>
+	</InvoiceDetails>
+	<InvoiceRow>
+		<ArticleIdentifier>9550238</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779657686584</ArticleGroupIdentifier>
+		<ArticleName>Puhdas+ Beauty Kollageeni &amp; biotiini KAMPANJA 120+30 vegekaps</ArticleName>
+		<BuyerArticleIdentifier>9550238</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">48,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">100,00</OrderedQuantity>
+		<EndDate>20271014</EndDate>
+		<OriginalInvoiceNumber>138224</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,96</UnitPriceAmount>
+		<RowIdentifier>1</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>P222</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">429,84</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>9550238</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779657686799</ArticleGroupIdentifier>
+		<ArticleName>Puhdas+ Beauty Kollageeni &amp; biotiini KAMPANJA 120+30 vegekaps</ArticleName>
+		<BuyerArticleIdentifier>9550238</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">52,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">100,00</OrderedQuantity>
+		<EndDate>20271014</EndDate>
+		<OriginalInvoiceNumber>138224</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,96</UnitPriceAmount>
+		<RowIdentifier>2</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>P222</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">465,66</RowAmount>
+	</InvoiceRow>
+</Finvoice>
