@@ -40,7 +40,7 @@ document.getElementById('manifest-link').href=URL.createObjectURL(new Blob([JSON
 firebase.initializeApp({apiKey:"AIzaSyBA_nMeugv0lSxjVm1il1iJo7v33Fs__X8",authDomain:"hyllytysappi.firebaseapp.com",databaseURL:"https://hyllytysappi-default-rtdb.europe-west1.firebasedatabase.app",projectId:"hyllytysappi",storageBucket:"hyllytysappi.firebasestorage.app",messagingSenderId:"312430303554",appId:"1:312430303554:web:1fa95efa74fa370bdc10db"});
 const db=firebase.database();
 const sessionId=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-let dbRef=null,fbData={scannedBoxes:{},cartsTaken:{},cartBatches:{},shelved:{}};
+let dbRef=null,fbData={scannedBoxes:{},cartsTaken:{},cartBatches:{},shelved:{},progress:{}};
 
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function initFirebase(){
@@ -51,6 +51,7 @@ function initFirebase(){
     fbData.cartsTaken=val.cartsTaken||{};
     fbData.cartBatches=val.cartBatches||{};
     fbData.shelved=val.shelved||{};
+    fbData.progress=val.progress||{};
     // Only update counters, don't re-render whole page (avoids keyboard popup)
     updateCounters();
   });
@@ -85,7 +86,7 @@ function fbIsBatchTaken(id,batchId){return!!fbData.cartsTaken[id+'_'+batchId]}
 
 function resetDay(){
   if(!confirm('Nollaa KAIKKI päivän data? Skannatut laatikot, kärryt, hyllytykset — kaikki katoaa.'))return;
-  fbData={scannedBoxes:{},cartsTaken:{},cartBatches:{},shelved:{}};
+  fbData={scannedBoxes:{},cartsTaken:{},cartBatches:{},shelved:{},progress:{}};
   if(dbRef)dbRef.remove();
   clearSavedState();
   setState({phase:'scan',activeBox:null,lastScanResult:null,error:null,productLookup:null});
@@ -173,6 +174,7 @@ window.addEventListener('beforeunload',function(e){
 function setState(u){
   Object.assign(S,u);
   if(S.phase!=='setup')saveState();
+  if(S.phase==='shelve'&&S.selectedCart&&S.selectedBatch)fbSyncShelvedProgress();
   render();
 }
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -231,22 +233,113 @@ function selectCart(id,batchId){
   const prev=fbData.shelved[id+'_'+batch.id]||{};
   const remaining=[];
   ci.forEach(i=>{const left=i.qty-(prev[i.vnr]||0);if(left>0)remaining.push({...i,qty:left})});
+  
+  // Check for saved progress (from crashed session)
+  const progress=fbGetProgress(id,batch.id);
+  let shelved={},currentIdx=0,confirmedLoc=null;
+  if(progress&&progress.shelved){
+    shelved=progress.shelved;
+    currentIdx=progress.idx||0;
+    confirmedLoc=progress.confirmedLoc||null;
+  }
+  
   fbTakeCart(id,batch.id);
-  setState({selectedCart:id,selectedBatch:batch,routeItems:sSort(remaining),rxItems:[],unmatchedItems:[],shelved:{},currentIdx:0,phase:'shelve',confirmedLoc:null,lastScanResult:null,error:null,shelveStartTime:Date.now()});
+  setState({selectedCart:id,selectedBatch:batch,routeItems:sSort(remaining),rxItems:[],unmatchedItems:[],shelved,currentIdx,phase:'shelve',confirmedLoc,lastScanResult:progress?{type:'ok',text:'↩ Jatkettu edellisestä'}:null,error:null,shelveStartTime:Date.now()});
 }
 
 function confirmLocation(code){if(!code)return;setState({error:null,lastScanResult:null});const cur=S.routeItems[S.currentIdx];if(!cur)return;const sc=code.trim().toUpperCase(),ex=cur.location.trim().toUpperCase();if(sc===ex){setState({confirmedLoc:ex,lastScanResult:{type:'ok',text:'✓ '+cur.location}});return}const oi=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===sc);if(oi!==-1){setState({confirmedLoc:sc,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+S.routeItems[oi].location}});return}setState({error:'Paikka ei reitillä',lastScanResult:{type:'fail',text:'Väärä'}})}
 
-function confirmEan(code){if(!code)return;setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prev:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty}});return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prev:p,idx:si,name:o.name});S.shelved[o.vnr]=p+1;setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty}});return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
+/* ═══════════ SPEECH RECOGNITION ═══════════ */
+let speechRec=null,speechActive=false;
+
+function startListening(vnr,qty){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){return}
+  stopListening();
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  speechRec=new SR();
+  speechRec.lang='fi-FI';
+  speechRec.continuous=false;
+  speechRec.interimResults=false;
+  speechActive=true;
+  
+  speechRec.onresult=function(e){
+    const text=e.results[0][0].transcript.trim().toLowerCase();
+    // Parse number from speech
+    const numMap={'nolla':0,'yksi':1,'kaksi':2,'kolme':3,'neljä':4,'viisi':5,'kuusi':6,'seitsemän':7,'kahdeksan':8,'yhdeksän':9,'kymmenen':10};
+    let num=parseInt(text,10);
+    if(isNaN(num)&&numMap[text]!==undefined)num=numMap[text];
+    if(isNaN(num)){setState({lastScanResult:{type:'fail',text:'🎤 "'+text+'" — ei tunnistettu numeroa'}});startListening(vnr,qty);return}
+    
+    const prev=S.shelved[vnr]||0;
+    const newQty=prev+num;
+    pushUndo({type:'shelve',vnr:vnr,prev:prev,idx:S.currentIdx,name:S.routeItems[S.currentIdx]?.name||vnr});
+    S.shelved[vnr]=Math.min(newQty,qty);
+    
+    if(S.shelved[vnr]>=qty){
+      // Complete — auto-advance
+      setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'🎤 +'+num+' → '+S.shelved[vnr]+'/'+qty+' ✓ Valmis!'}});
+      speechActive=false;
+      setTimeout(()=>autoAdvance(),800);
+    } else {
+      setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'🎤 +'+num+' → '+S.shelved[vnr]+'/'+qty}});
+      startListening(vnr,qty);
+    }
+  };
+  speechRec.onerror=function(e){
+    if(e.error==='no-speech'||e.error==='aborted'){if(speechActive)startListening(vnr,qty)}
+    else{speechActive=false;setState({lastScanResult:{type:'fail',text:'🎤 Virhe: '+e.error}})}
+  };
+  speechRec.onend=function(){if(speechActive)startListening(vnr,qty)};
+  
+  try{speechRec.start()}catch(e){}
+  setState({lastScanResult:{type:'ok',text:'🎤 Kuuntelen... sano loppumäärä'}});
+}
+
+function stopListening(){
+  speechActive=false;
+  if(speechRec){try{speechRec.abort()}catch(e){}speechRec=null}
+}
+
+function autoAdvance(){
+  // Find next unshelved item
+  for(let i=S.currentIdx+1;i<S.routeItems.length;i++){
+    if((S.shelved[S.routeItems[i].vnr]||0)<S.routeItems[i].qty){
+      navTo(i);return;
+    }
+  }
+  // All done
+  finishShelving(true);
+}
+
+function confirmEan(code){if(!code)return;stopListening();setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prev:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;if(p+1>=cur.qty){setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' — 🎤 sano loppumäärä'}});startListening(cur.vnr,cur.qty)}return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prev:p,idx:si,name:o.name});S.shelved[o.vnr]=p+1;if(p+1>=o.qty){setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' — 🎤 sano loppumäärä'}});startListening(o.vnr,o.qty)}return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
 
 function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=cur;setState({shelved:S.shelved})}
 function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=n;setState({shelved:S.shelved})}}
-function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
+function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;stopListening();const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
 function fbSaveShelved(cartId,batchId,shelved){
   const key=cartId+'_'+batchId;
   if(!fbData.shelved[key])fbData.shelved[key]={};
   for(const vnr in shelved){fbData.shelved[key][vnr]=(fbData.shelved[key][vnr]||0)+shelved[vnr]}
   if(dbRef)dbRef.child('shelved/'+key).set(fbData.shelved[key]);
+}
+
+// Sync current shelving progress to Firebase (called after each scan)
+function fbSyncShelvedProgress(){
+  if(!S.selectedCart||!S.selectedBatch||!dbRef)return;
+  const key=S.selectedCart+'_'+S.selectedBatch.id+'_progress';
+  dbRef.child('progress/'+key).set({shelved:S.shelved,idx:S.currentIdx,confirmedLoc:S.confirmedLoc,t:Date.now()});
+}
+// Load shelving progress when resuming
+function fbGetProgress(cartId,batchId){
+  const key=cartId+'_'+batchId+'_progress';
+  const p=fbData.progress?fbData.progress[key]:null;
+  return p||null;
+}
+// Clear progress when done
+function fbClearProgress(cartId,batchId){
+  const key=cartId+'_'+batchId+'_progress';
+  if(fbData.progress)delete fbData.progress[key];
+  if(dbRef)dbRef.child('progress/'+key).remove();
 }
 
 function fbCartBatchCount(cartId){
@@ -299,9 +392,11 @@ function getBatchRemaining(cartId,batch){
 }
 
 function finishShelving(skip){
+  stopListening();
   if(!skip){const ts=tShelved(),tq=tQty();if(!confirm(ts<tq?`Kesken (${ts}/${tq}). Lopeta?`:'Lopeta?'))return}
   if(S.selectedCart&&S.selectedBatch)fbSaveShelved(S.selectedCart,S.selectedBatch.id,S.shelved);
   if(S.selectedCart&&S.selectedBatch)fbReleaseCart(S.selectedCart,S.selectedBatch.id);
+  if(S.selectedCart&&S.selectedBatch)fbClearProgress(S.selectedCart,S.selectedBatch.id);
   // Save performance data
   if(currentWorker&&S.shelveStartTime&&dbRef){
     const ts=tShelved(),tq=tQty(),elapsed=Date.now()-S.shelveStartTime;
@@ -481,7 +576,7 @@ function hideScanWrap(){
   const wrap=document.getElementById('scan-wrap');
   if(wrap)wrap.style.display='none';
   scanFieldFocused=false;
-  camStop();
+  camStop();stopListening();
   const overlay=document.getElementById('cam-overlay');
   const btn=document.getElementById('cam-toggle');
   if(overlay)overlay.style.display='none';
@@ -637,9 +732,35 @@ function render(){
         const remaining=getBatchRemaining(c.id,batch);
         if(remaining===0&&batch.id!=='current')return;
         const taken=fbIsBatchTaken(c.id,batch.id);
-        if(taken)return;
+        const takenData=fbData.cartsTaken[c.id+'_'+batch.id];
+        const isMine=takenData&&takenData.by===sessionId;
         const isCurrent=batch.id==='current';
-        const selectable=!isCurrent&&remaining>0;
+        const selectable=!isCurrent&&remaining>0&&!taken;
+        // Auto-release if taken more than 30 min ago
+        if(taken&&takenData&&Date.now()-takenData.t>30*60*1000){
+          fbReleaseCart(c.id,batch.id);
+          return; // Will re-render and show as available
+        }
+        if(taken&&!isMine){
+          // Show locked batch with release button
+          cards+=`<div class="cart-card" style="border-color:#94a3b8;opacity:0.7">
+            <div style="font-size:24px;margin-bottom:4px">🔒</div>
+            <div style="font-size:16px;font-weight:700">${c.name} #${batch.num}</div>
+            <div style="font-size:13px;color:#dc2626;margin:4px 0">Hyllytys kesken (toinen laite)</div>
+            <div style="font-size:18px;font-weight:800;margin:6px 0">${remaining} hyllyttämätöntä</div>
+            <button class="btn-sm" style="width:100%;margin-top:4px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;font-size:12px" onclick="if(confirm('Vapauta kärry? Toisen laitteen hyllytys keskeytyy.')){fbReleaseCart('${c.id}','${batch.id}');setState({phase:'cartSelect'})}">Vapauta lukitus</button></div>`;
+          return;
+        }
+        if(isMine){
+          // Show own locked batch with resume button
+          cards+=`<div class="cart-card" style="border-color:${c.color}">
+            <div style="font-size:24px;margin-bottom:4px">${c.icon}</div>
+            <div style="font-size:16px;font-weight:700">${c.name} #${batch.num}</div>
+            <div style="font-size:13px;color:#f59e0b;margin:4px 0">Oma hyllytys kesken</div>
+            <div style="font-size:18px;font-weight:800;margin:6px 0">${remaining} hyllyttämätöntä</div>
+            <button class="btn-sm" style="width:100%;margin-top:4px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;font-size:12px" onclick="selectCart('${c.id}','${batch.id}')">Jatka hyllytystä</button></div>`;
+          return;
+        }
         cards+=`<div class="cart-card" style="border-color:${c.color}${!selectable?';opacity:0.4;cursor:not-allowed':''}" onclick="${selectable?`selectCart('${c.id}','${batch.id}')`:''}" >
           <div style="font-size:24px;margin-bottom:4px">${c.icon}</div>
           <div style="font-size:16px;font-weight:700">${c.name} #${batch.num}</div>
