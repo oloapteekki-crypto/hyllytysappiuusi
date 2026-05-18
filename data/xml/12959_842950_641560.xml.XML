@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice version="1.2">
+	<SellerPartyDetails>
+		<SellerPartyIdentifier>Medifon Oy</SellerPartyIdentifier>
+		<SellerOrganisationName>Medifon Oy</SellerOrganisationName>
+		<SellerOrganisationTaxCode>0471598-6</SellerOrganisationTaxCode>
+		<SellerPostalAddressDetails>
+			<SellerStreetName>Kutojantie 5</SellerStreetName>
+			<SellerTownName>Espoo</SellerTownName>
+			<SellerPostCodeIdentifier>02630</SellerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</SellerPostalAddressDetails>
+	</SellerPartyDetails>
+	<BuyerPartyDetails>
+		<BuyerPartyIdentifier>12959</BuyerPartyIdentifier>
+		<BuyerOrganisationName>Olo-apteekki / Verkkokauppa</BuyerOrganisationName>
+		<BuyerPostalAddressDetails>
+			<BuyerStreetName>Muuntotie 1</BuyerStreetName>
+			<BuyerTownName>Vantaa</BuyerTownName>
+			<BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+			<CountryCode>FI</CountryCode>
+			<CountryName>Finland</CountryName>
+		</BuyerPostalAddressDetails>
+	</BuyerPartyDetails>
+	<InvoiceDetails>
+		<InvoiceTypeCode>DEV01</InvoiceTypeCode>
+		<InvoiceTypeText>TOIMITUSILMOITUS</InvoiceTypeText>
+		<OriginCode>Origin</OriginCode>
+		<InvoiceNumber>641560</InvoiceNumber>
+		<InvoiceDate Format="CCYYMMDD">20260515</InvoiceDate>
+	</InvoiceDetails>
+	<InvoiceRow>
+		<ArticleIdentifier>182865</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779986408192</ArticleGroupIdentifier>
+		<ArticleName>Cuplaton 300 mg/ml Tipat, emulsio 30 ml</ArticleName>
+		<BuyerArticleIdentifier>182865</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20271031</EndDate>
+		<OriginalInvoiceNumber>28004</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,77</UnitPriceAmount>
+		<RowIdentifier>1</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3045520</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">107,70</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>136618</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779986408192</ArticleGroupIdentifier>
+		<ArticleName>Burana 400 mg Tabl 20 kpl</ArticleName>
+		<BuyerArticleIdentifier>136618</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20290131</EndDate>
+		<OriginalInvoiceNumber>28004</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">4,20</UnitPriceAmount>
+		<RowIdentifier>2</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3063364</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">42,00</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>182824</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779986408680</ArticleGroupIdentifier>
+		<ArticleName>Cuplaton 100 mg Kaps 100 kpl</ArticleName>
+		<BuyerArticleIdentifier>182824</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">20,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">20,00</OrderedQuantity>
+		<EndDate>20280930</EndDate>
+		<OriginalInvoiceNumber>28004</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">11,96</UnitPriceAmount>
+		<RowIdentifier>3</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3069788</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">239,20</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>430473</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779986408680</ArticleGroupIdentifier>
+		<ArticleName>Pyrvin 100 mg Tabl 40 kpl</ArticleName>
+		<BuyerArticleIdentifier>430473</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20281031</EndDate>
+		<OriginalInvoiceNumber>28004</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">29,23</UnitPriceAmount>
+		<RowIdentifier>4</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3049225</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">292,30</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>085282</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779986408901</ArticleGroupIdentifier>
+		<ArticleName>Hydrocortison 2,5 % Emulsiovoide 50 g</ArticleName>
+		<BuyerArticleIdentifier>085282</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">10,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">10,00</OrderedQuantity>
+		<EndDate>20290228</EndDate>
+		<OriginalInvoiceNumber>28004</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">10,24</UnitPriceAmount>
+		<RowIdentifier>5</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3062987</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">102,40</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>160443</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779986408932</ArticleGroupIdentifier>
+		<ArticleName>Strepsils Mansikka 1,2 mg/0,6 mg imeskelytabletti 36 kpl</ArticleName>
+		<BuyerArticleIdentifier>160443</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">12,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">12,00</OrderedQuantity>
+		<EndDate>20270731</EndDate>
+		<OriginalInvoiceNumber>28004</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">8,43</UnitPriceAmount>
+		<RowIdentifier>6</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>TR076</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">101,16</RowAmount>
+	</InvoiceRow>
+	<InvoiceRow>
+		<ArticleIdentifier>571604</ArticleIdentifier>
+		<ArticleGroupIdentifier>00164382779986409137</ArticleGroupIdentifier>
+		<ArticleName>Burana-C 400 mg Tabl 10 kpl</ArticleName>
+		<BuyerArticleIdentifier>571604</BuyerArticleIdentifier>
+		<DeliveredQuantity QuantityUnitCode="Kpl">4,00</DeliveredQuantity>
+		<OrderedQuantity QuantityUnitCode="Kpl">4,00</OrderedQuantity>
+		<EndDate>20280131</EndDate>
+		<OriginalInvoiceNumber>28004</OriginalInvoiceNumber>
+		<UnitPriceAmount AmountCurrencyIdentifier="EUR" UnitPriceUnitCode="e/kpl">2,60</UnitPriceAmount>
+		<RowIdentifier>7</RowIdentifier>
+		<RowFreeText/>
+		<OrderIdentifier></OrderIdentifier>
+		<RowDeliveryDetails>
+			<RowManufacturerIdentifier>3062914</RowManufacturerIdentifier>
+			<RowAgreementIdentifier></RowAgreementIdentifier>
+		</RowDeliveryDetails>
+		<RowAmount AmountCurrencyIdentifier="EUR">10,40</RowAmount>
+	</InvoiceRow>
+</Finvoice>
