@@ -186,28 +186,66 @@ function getAllEnriched(){const items=fbAllItems(),all=[];items.forEach(item=>{c
 function tShelved(){return S.routeItems.reduce((s,i)=>s+Math.min(S.shelved[i.vnr]||0,i.qty),0)}
 function tQty(){return S.routeItems.reduce((s,i)=>s+i.qty,0)}
 
-/* ═══════════ GITHUB ═══════════ */
-const RAW='https://raw.githubusercontent.com/oloapteekki-crypto/hyllytysappiuusi/main/';
-const API='https://api.github.com/repos/oloapteekki-crypto/hyllytysappiuusi/contents/data/xml';
+/* ═══════════ FILE MANAGEMENT (Firebase) ═══════════ */
+const filesRef=db.ref('files');
 
-async function loadFromGitHub(){
+async function uploadFiles(){
+  const csvInput=document.getElementById('csv-upload');
+  const xmlInput=document.getElementById('xml-upload');
+  if(!csvInput.files.length&&!xmlInput.files.length){setState({error:'Valitse vähintään yksi tiedosto'});return}
+  setState({error:null,loadProgress:'Ladataan...'});
+  try{
+    // Upload CSV if selected
+    if(csvInput.files.length){
+      setState({loadProgress:'Ladataan tuoterekisteriä...'});
+      const csvText=await csvInput.files[0].text();
+      await filesRef.child('csv').set(csvText);
+      await filesRef.child('csvUpdated').set(Date.now());
+      await filesRef.child('csvName').set(csvInput.files[0].name);
+    }
+    // Upload XMLs if selected
+    if(xmlInput.files.length){
+      setState({loadProgress:'Ladataan XML-tiedostoja...'});
+      // Clear old XMLs
+      await filesRef.child('xml').remove();
+      for(let i=0;i<xmlInput.files.length;i++){
+        setState({loadProgress:`XML ${i+1}/${xmlInput.files.length}...`});
+        const name=xmlInput.files[i].name.replace(/[.#$/[\]]/g,'_');
+        const text=await xmlInput.files[i].text();
+        await filesRef.child('xml/'+name).set(text);
+      }
+      await filesRef.child('xmlUpdated').set(Date.now());
+    }
+    setState({loadProgress:null,error:null,lastScanResult:{type:'ok',text:'✓ Tiedostot ladattu!'}});
+  }catch(e){setState({error:'Latausvirhe: '+e.message,loadProgress:null})}
+}
+
+async function loadFromFirebase(){
   setState({error:null,loadProgress:'Haetaan tuoterekisteriä...'});
   try{
-    const csv=await(await fetch(RAW+'data/tuoterekisteri.csv',{cache:'no-store'})).text();
-    const master=pCSV(csv);
-    setState({loadProgress:'Haetaan XML-listaa...'});
-    const dir=await(await fetch(API,{cache:'no-store'})).json();
-    const xf=dir.filter(f=>f.name.toLowerCase().endsWith('.xml'));
-    if(!xf.length)throw new Error('Ei XML-tiedostoja');
+    // Load CSV
+    const csvSnap=await filesRef.child('csv').once('value');
+    const csvText=csvSnap.val();
+    if(!csvText)throw new Error('Tuoterekisteriä ei löydy — lataa tiedostot ensin tietokoneella');
+    const master=pCSV(csvText);
+    
+    // Load XMLs
+    setState({loadProgress:'Haetaan XML-tiedostoja...'});
+    const xmlSnap=await filesRef.child('xml').once('value');
+    const xmlData=xmlSnap.val();
+    if(!xmlData)throw new Error('XML-tiedostoja ei löydy — lataa ne ensin tietokoneella');
+    
+    const xmlKeys=Object.keys(xmlData);
     const allB={},allAlt={};
-    for(let i=0;i<xf.length;i++){
-      setState({loadProgress:`XML ${i+1}/${xf.length}...`});
-      const boxes=pXML(await(await fetch(xf[i].download_url,{cache:'no-store'})).text());
+    for(let i=0;i<xmlKeys.length;i++){
+      setState({loadProgress:`XML ${i+1}/${xmlKeys.length}...`});
+      const boxes=pXML(xmlData[xmlKeys[i]]);
       if(boxes._altKeys){Object.assign(allAlt,boxes._altKeys);delete boxes._altKeys}
       for(const[k,v]of Object.entries(boxes)){if(!allB[k])allB[k]=[];v.forEach(item=>{const e=allB[k].find(x=>x.vnr===item.vnr);if(e)e.qty+=item.qty;else allB[k].push({...item})})}
     }
+    
     initFirebase();
-    setState({xmlBoxes:allB,boxAltKeys:allAlt,masterData:master,phase:'scan',loadProgress:null,loadInfo:`${xf.length} XML, ${Object.keys(allB).length} laatikkoa`});
+    setState({xmlBoxes:allB,boxAltKeys:allAlt,masterData:master,phase:'scan',loadProgress:null,loadInfo:`${xmlKeys.length} XML, ${Object.keys(allB).length} laatikkoa`});
   }catch(e){setState({error:e.message,loadProgress:null})}
 }
 
@@ -605,8 +643,24 @@ function render(){
           <option value="">— Valitse —</option>
           ${WORKERS.map(w=>`<option value="${w}" ${w===currentWorker?'selected':''}>${w}</option>`).join('')}
         </select></div>
-      <button class="btn" onclick="loadFromGitHub()" ${S.loadProgress?'disabled':''}>${S.loadProgress||'Lataa tiedot palvelimelta'}</button>
-      ${S.error?`<div class="error" style="margin-top:8px">${S.error}</div>`:''}</div>`;return}
+      <button class="btn" onclick="loadFromFirebase()" ${S.loadProgress?'disabled':''}>${S.loadProgress||'📱 Lataa tiedot'}</button>
+      ${S.error?`<div class="error" style="margin-top:8px">${S.error}</div>`:''}
+      ${S.lastScanResult?`<div class="scan-result ${S.lastScanResult.type==='ok'?'scan-ok':'scan-fail'}" style="margin-top:8px">${S.lastScanResult.text}</div>`:''}
+    </div>
+
+    <details class="card">
+      <summary style="font-size:14px;font-weight:600;color:#1e40af;cursor:pointer">💻 Päivitä tiedostot (tietokone)</summary>
+      <div style="margin-top:12px">
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px">Raahaa tiedostot tietokoneelta. Puhelimet hakevat ne automaattisesti.</p>
+        <div class="mb-8"><label class="label">Tuoterekisteri (CSV)</label>
+          <input type="file" id="csv-upload" accept=".csv" style="font-size:14px;width:100%"></div>
+        <div class="mb-8"><label class="label">Toimitusilmoitukset (XML) — valitse kaikki</label>
+          <input type="file" id="xml-upload" accept=".xml,.XML" multiple style="font-size:14px;width:100%"></div>
+        <button class="btn" style="background:#1e40af" onclick="uploadFiles()" ${S.loadProgress?'disabled':''}>
+          ${S.loadProgress||'Lataa Firebaseen'}</button>
+        <p style="font-size:11px;color:#94a3b8;margin-top:8px">CSV:n voi ladata erikseen — vanhat XML:t korvataan uusilla</p>
+      </div>
+    </details>`;return}
 
   if(S.phase==='scan'){
     const total=Object.keys(S.xmlBoxes).length,sc=fbScannedCount();
