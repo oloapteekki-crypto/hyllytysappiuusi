@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice Version="1.3">
+  <SellerPartyDetails>
+    <SellerOrganisationName>Magnum Medical Finland Oy</SellerOrganisationName>
+    <SellerOrganisationTaxCode>Y1918478-6</SellerOrganisationTaxCode>
+    <SellerPostalAddressDetails>
+      <SellerStreetName>Tuupakantie 32</SellerStreetName>
+      <SellerTownName>Vantaa</SellerTownName>
+      <SellerPostCodeIdentifier>01740</SellerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </SellerPostalAddressDetails>
+  </SellerPartyDetails>
+  <SellerCommunicationDetails>
+    <SellerPhoneNumberIdentifier>+358 20 759 8897</SellerPhoneNumberIdentifier>
+  </SellerCommunicationDetails>
+  <SellerInformationDetails>
+    <SellerPhoneNumber>+358 20 759 8897</SellerPhoneNumber>
+    <SellerCommonEmailaddressIdentifier>info@magnummedical.fi</SellerCommonEmailaddressIdentifier>
+  </SellerInformationDetails>
+  <BuyerPartyDetails>
+    <BuyerPartyIdentifier>72062</BuyerPartyIdentifier>
+    <BuyerOrganisationName>Olo-apteekki Oy / 100</BuyerOrganisationName>
+    <BuyerPostalAddressDetails>
+      <BuyerStreetName>Muuntotie1</BuyerStreetName>
+      <BuyerTownName>VANTAA</BuyerTownName>
+      <BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </BuyerPostalAddressDetails>
+  </BuyerPartyDetails>
+  <DeliveryPartyDetails>
+    <DeliveryPartyIdentifier>72062</DeliveryPartyIdentifier>
+    <DeliveryOrganisationName>OLO-APTEEKKI VERKKOPALVELU OY</DeliveryOrganisationName>
+    <DeliveryPostalAddressDetails>
+      <DeliveryStreetName>Muuntotie 1</DeliveryStreetName>
+      <DeliveryTownName>VANTAA</DeliveryTownName>
+      <DeliveryPostCodeIdentifier>01510</DeliveryPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </DeliveryPostalAddressDetails>
+  </DeliveryPartyDetails>
+  <InvoiceDetails>
+    <InvoiceNumber>7/64-71587</InvoiceNumber>
+    <InvoiceDate Format="CCYYMMDD">20260522</InvoiceDate>
+    <RouteId></RouteId>
+    <RouteTime Format="CCYYMMDD">20260522</RouteTime>
+    <RouteDescription>PK-seutu(PKS-4)21:50</RouteDescription>
+    <CustomerOrder>28125</CustomerOrder>
+  </InvoiceDetails>
+  <InvoiceRow>
+    <ArticleIdentifier>8225871</ArticleIdentifier>
+    <ArticleName>BABE HEALTHYAGING+ MULTI REJUVENATING REVITALISING BOOSTER 50ml</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">1</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">1</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">21.45</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">21.45</RowVatExcludedAmount>
+    <PicklistNumber>7/900-91816</PicklistNumber>
+    <ArticleBatcNumber>516111</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280630</BatcUseByDate>
+    <OriginalInvoiceNumber>28125</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8245633</ArticleIdentifier>
+    <ArticleName>NOGEL MAITOHAPPOBAKTEERITIPAT 8ML PROBIO-TEC, LGG, BB-12</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">9.2</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">55.2</RowVatExcludedAmount>
+    <PicklistNumber>7/900-91816</PicklistNumber>
+    <ArticleBatcNumber>1225</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20270331</BatcUseByDate>
+    <OriginalInvoiceNumber>28125</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8250377</ArticleIdentifier>
+    <ArticleName>WIDMER NUTRIDERM DAY CREAM HAJUSTEETON 50ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">15.9</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">95.4</RowVatExcludedAmount>
+    <PicklistNumber>7/900-91816</PicklistNumber>
+    <ArticleBatcNumber>2521048NP</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20290531</BatcUseByDate>
+    <OriginalInvoiceNumber>28125</OriginalInvoiceNumber>
+  </InvoiceRow>
+</Finvoice>
