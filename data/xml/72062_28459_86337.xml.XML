@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<Finvoice Version="1.3">
+  <SellerPartyDetails>
+    <SellerOrganisationName>Magnum Medical Finland Oy</SellerOrganisationName>
+    <SellerOrganisationTaxCode>Y1918478-6</SellerOrganisationTaxCode>
+    <SellerPostalAddressDetails>
+      <SellerStreetName>Tuupakantie 32</SellerStreetName>
+      <SellerTownName>Vantaa</SellerTownName>
+      <SellerPostCodeIdentifier>01740</SellerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </SellerPostalAddressDetails>
+  </SellerPartyDetails>
+  <SellerCommunicationDetails>
+    <SellerPhoneNumberIdentifier>+358 20 759 8897</SellerPhoneNumberIdentifier>
+  </SellerCommunicationDetails>
+  <SellerInformationDetails>
+    <SellerPhoneNumber>+358 20 759 8897</SellerPhoneNumber>
+    <SellerCommonEmailaddressIdentifier>info@magnummedical.fi</SellerCommonEmailaddressIdentifier>
+  </SellerInformationDetails>
+  <BuyerPartyDetails>
+    <BuyerPartyIdentifier>72062</BuyerPartyIdentifier>
+    <BuyerOrganisationName>Olo-apteekki Oy / 100</BuyerOrganisationName>
+    <BuyerPostalAddressDetails>
+      <BuyerStreetName>Muuntotie1</BuyerStreetName>
+      <BuyerTownName>VANTAA</BuyerTownName>
+      <BuyerPostCodeIdentifier>01510</BuyerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </BuyerPostalAddressDetails>
+  </BuyerPartyDetails>
+  <DeliveryPartyDetails>
+    <DeliveryPartyIdentifier>72062</DeliveryPartyIdentifier>
+    <DeliveryOrganisationName>OLO-APTEEKKI VERKKOPALVELU OY</DeliveryOrganisationName>
+    <DeliveryPostalAddressDetails>
+      <DeliveryStreetName>Muuntotie 1</DeliveryStreetName>
+      <DeliveryTownName>VANTAA</DeliveryTownName>
+      <DeliveryPostCodeIdentifier>01510</DeliveryPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Finland</CountryName>
+    </DeliveryPostalAddressDetails>
+  </DeliveryPartyDetails>
+  <InvoiceDetails>
+    <InvoiceNumber>7/64-86337</InvoiceNumber>
+    <InvoiceDate Format="CCYYMMDD">20260618</InvoiceDate>
+    <RouteId></RouteId>
+    <RouteTime Format="CCYYMMDD">20260618</RouteTime>
+    <RouteDescription>PK-seutu(PKS-4)21:50</RouteDescription>
+    <CustomerOrder>28459</CustomerOrder>
+  </InvoiceDetails>
+  <InvoiceRow>
+    <ArticleIdentifier>8005574</ArticleIdentifier>
+    <ArticleName>CERADERM 100ML SUIHKEPULLO</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">20</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">20</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">3.33</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">66.6</RowVatExcludedAmount>
+    <PicklistNumber>7/900-110791</PicklistNumber>
+    <ArticleBatcNumber>061261</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20290331</BatcUseByDate>
+    <OriginalInvoiceNumber>28459</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8248271</ArticleIdentifier>
+    <ArticleName>NOGEL FOLAATTI QUATREFOLIC 400MCG 70TABL</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">3</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">3</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">6.9</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">20.7</RowVatExcludedAmount>
+    <PicklistNumber>7/900-110791</PicklistNumber>
+    <ArticleBatcNumber>051125</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20281105</BatcUseByDate>
+    <OriginalInvoiceNumber>28459</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8233995</ArticleIdentifier>
+    <ArticleName>Scholl In-Balance pohjall. Plantar Fasciitis/S</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">13.33</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">79.98</RowVatExcludedAmount>
+    <PicklistNumber>7/900-110791</PicklistNumber>
+    <ArticleBatcNumber>VNE6068PS</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20290430</BatcUseByDate>
+    <OriginalInvoiceNumber>28459</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8218407</ArticleIdentifier>
+    <ArticleName>Scholl Sieniä torjuva kenkäsuihke 250 ml</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">6</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">6</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">5.66</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">33.96</RowVatExcludedAmount>
+    <PicklistNumber>7/900-110791</PicklistNumber>
+    <ArticleBatcNumber>304679</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20280930</BatcUseByDate>
+    <OriginalInvoiceNumber>28459</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8262114</ArticleIdentifier>
+    <ArticleName>UROVIA SILVER GEL 25ML</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">5</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">5</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">10.71</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">53.55</RowVatExcludedAmount>
+    <PicklistNumber>7/900-110791</PicklistNumber>
+    <ArticleBatcNumber>360W</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20270930</BatcUseByDate>
+    <OriginalInvoiceNumber>28459</OriginalInvoiceNumber>
+  </InvoiceRow>
+  <InvoiceRow>
+    <ArticleIdentifier>8265035</ArticleIdentifier>
+    <ArticleName>WIDMER SUN GEL 50  HAJUSTEETON 100 ML uusi</ArticleName>
+    <DeliveredQuantity QuantityUnitCode="kpl">2</DeliveredQuantity>
+    <OrderedQuantity QuantityUnitCode="kpl">2</OrderedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR">12.1</UnitPriceAmount>
+    <RowVatExcludedAmount AmountCurrencyIdentifier="EUR">24.2</RowVatExcludedAmount>
+    <PicklistNumber>7/900-110791</PicklistNumber>
+    <ArticleBatcNumber>2546085NP</ArticleBatcNumber>
+    <BatcUseByDate Format="CCYYMMDD">20281031</BatcUseByDate>
+    <OriginalInvoiceNumber>28459</OriginalInvoiceNumber>
+  </InvoiceRow>
+</Finvoice>
