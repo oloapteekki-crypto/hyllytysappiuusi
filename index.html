@@ -310,8 +310,10 @@ function startListening(vnr,qty){
     
     const prev=S.shelved[vnr]||0;
     const newQty=prev+num;
-    pushUndo({type:'shelve',vnr:vnr,prev:prev,idx:S.currentIdx,name:S.routeItems[S.currentIdx]?.name||vnr});
+    const item=S.routeItems[S.currentIdx];
+    pushUndo({type:'shelve',vnr:vnr,prev:prev,idx:S.currentIdx,name:item?.name||vnr});
     S.shelved[vnr]=Math.min(newQty,qty);
+    logShelveEvent(vnr,item?.name||vnr,item?.location||'',num,S.shelved[vnr],qty,'voice');
     
     if(S.shelved[vnr]>=qty){
       // Complete — auto-advance
@@ -349,10 +351,10 @@ function autoAdvance(){
   finishShelving(true);
 }
 
-function confirmEan(code){if(!code)return;stopListening();setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prev:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;if(p+1>=cur.qty){setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' — 🎤 sano loppumäärä'}});startListening(cur.vnr,cur.qty)}return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prev:p,idx:si,name:o.name});S.shelved[o.vnr]=p+1;if(p+1>=o.qty){setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' — 🎤 sano loppumäärä'}});startListening(o.vnr,o.qty)}return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
+function confirmEan(code){if(!code)return;stopListening();setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prev:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;logShelveEvent(cur.vnr,cur.name,cur.location,1,p+1,cur.qty,'scan');if(p+1>=cur.qty){setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' — 🎤 sano loppumäärä'}});startListening(cur.vnr,cur.qty)}return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prev:p,idx:si,name:o.name});S.shelved[o.vnr]=p+1;logShelveEvent(o.vnr,o.name,o.location,1,p+1,o.qty,'scan');if(p+1>=o.qty){setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' — 🎤 sano loppumäärä'}});startListening(o.vnr,o.qty)}return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
 
-function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=cur;setState({shelved:S.shelved})}
-function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v})}S.shelved[v]=n;setState({shelved:S.shelved})}}
+function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',cur-prev,cur,item?.qty||0,'manual')}S.shelved[v]=cur;setState({shelved:S.shelved})}
+function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',n-prev,n,item?.qty||0,'manual')}S.shelved[v]=n;setState({shelved:S.shelved})}}
 function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;stopListening();const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
 function fbSaveShelved(cartId,batchId,shelved){
   const key=cartId+'_'+batchId;
@@ -366,6 +368,24 @@ function fbSyncShelvedProgress(){
   if(!S.selectedCart||!S.selectedBatch||!dbRef)return;
   const key=S.selectedCart+'_'+S.selectedBatch.id+'_progress';
   dbRef.child('progress/'+key).set({shelved:S.shelved,idx:S.currentIdx,confirmedLoc:S.confirmedLoc,t:Date.now()});
+}
+
+// Log individual shelving events with timestamps
+function logShelveEvent(vnr,name,location,qtyAdded,newTotal,expectedQty,method){
+  if(!dbRef||!S.selectedCart||!S.selectedBatch)return;
+  const logKey=Date.now().toString(36)+Math.random().toString(36).slice(2,4);
+  dbRef.child('scanLog/'+todayKey()+'/'+logKey).set({
+    t:Date.now(),
+    worker:currentWorker,
+    cart:S.selectedCart,
+    batch:S.selectedBatch.id,
+    batchNum:S.selectedBatch.num,
+    vnr,name,location,
+    added:qtyAdded,
+    total:newTotal,
+    expected:expectedQty,
+    method // 'scan','voice','manual'
+  });
 }
 // Load shelving progress when resuming
 function fbGetProgress(cartId,batchId){
