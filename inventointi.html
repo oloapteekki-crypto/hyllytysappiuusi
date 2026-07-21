@@ -685,6 +685,10 @@ if(viewMode){
       if(eanInput.files.length){readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(eanInput.files[0],'utf-8')}))}
       else{readers.push(Promise.resolve(null))}
       Promise.all(readers).then(async([maxxText,magText,eanText])=>{
+        // Clear old inventointi data
+        if(btn)btn.textContent='Poistetaan vanha data...';
+        await db.ref('inventointi').remove();
+        
         const maxx=parseMaxx(maxxText);
         const magento=parseMagento(magText);
         let eanMap=eanText?parseProductRegister(eanText):{};
