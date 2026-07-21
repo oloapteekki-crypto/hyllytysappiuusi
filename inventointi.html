@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#7c3aed">
+<title>Inventointi — Olo-apteekki</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;background:#faf5ff;color:#1e293b}
+.app{max-width:500px;margin:0 auto;padding:16px 12px;min-height:100dvh}
+.card{background:#fff;border-radius:12px;border:1px solid #e9d5ff;padding:16px;margin-bottom:12px}
+h1{font-size:20px;font-weight:700;margin-bottom:4px;color:#6d28d9}
+h2{font-size:16px;font-weight:700;margin-bottom:8px}
+.sub{font-size:12px;color:#7c3aed;margin-bottom:16px}
+.btn{width:100%;padding:14px 0;border-radius:10px;border:none;background:#6d28d9;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.btn:disabled{background:#e2e8f0;color:#94a3b8}
+.btn:active:not(:disabled){opacity:.8}
+.btn-sm{padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.btn-outline{background:#ede9fe;color:#6d28d9}
+.label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;text-transform:uppercase}
+.mono{font-family:monospace;font-size:12px}
+.error{color:#dc2626;font-size:13px;text-align:center;margin-top:6px}
+.flex{display:flex}.gap-8{gap:8px}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-1{flex:1}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}
+.scan-result{padding:10px;border-radius:8px;margin-top:8px;font-size:13px;text-align:center;font-weight:600}
+.scan-ok{background:#f0fdf4;color:#16a34a;border:1px solid #86efac}
+.scan-fail{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
+.progress-bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;border-radius:4px;background:#7c3aed;transition:width .3s}
+.shelf-btn{padding:12px;border-radius:10px;border:2px solid #e9d5ff;background:#faf5ff;text-align:center;cursor:pointer;font-weight:600;font-size:14px}
+.shelf-btn:active{background:#ede9fe}
+.shelf-btn.done{opacity:.4;border-color:#86efac;background:#f0fdf4}
+.item-card{padding:12px;border-radius:10px;border:2px solid #e9d5ff;margin-bottom:8px}
+.item-card.current{border-color:#7c3aed;background:#faf5ff}
+.item-card.counted{opacity:.5;border-color:#86efac}
+.qty-big{font-size:40px;font-weight:800;font-family:monospace;text-align:center;padding:16px}
+.qty-expected{color:#94a3b8}.qty-counted{color:#7c3aed}.qty-match{color:#16a34a}.qty-diff{color:#dc2626}
+.voice-btn{width:80px;height:80px;border-radius:50%;border:none;font-size:32px;cursor:pointer;transition:all .15s}
+.voice-btn.listening{background:#dc2626;color:#fff;animation:pulse2 1.5s infinite}
+.voice-btn.idle{background:#ede9fe;color:#7c3aed}
+@keyframes pulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.deviation{padding:8px 10px;border-radius:8px;margin-bottom:4px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.dev-plus{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+.dev-minus{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.dev-ok{background:#f0fdf4;border:1px solid #dcfce7;color:#16a34a}
+.scan-input{width:100%;padding:14px 12px;border-radius:10px;border:2px solid #7c3aed;font-size:18px;font-family:monospace;font-weight:600;text-align:center;outline:none;background:#faf5ff;color:#6d28d9}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+/* ═══════════ WORKERS ═══════════ */
+const WORKERS=[
+  'Abdulhalim A.','Aada K.','Alaa H.','Anton T.','Dilgash O.',
+  'Elsa H.','Farah D.','Henri H.','Ida J.','Jenni L.','Jesperi H.',
+  'Jim W.','Johanna L.','Khadija M.','Lubna A.','Mikael T.',
+  'Milla S.','Mio R.','Nea H.','Ninni T.','Robert J.','Tilda T.'
+].sort();
+let currentWorker=localStorage.getItem('inventointi_worker')||'';
+
+/* ═══════════ ROUTE (same as hyllytysappi) ═══════════ */
+const PR=[{id:"L1",asc:1},{id:"FA",asc:1},{id:"L2",asc:0},{id:"L3",asc:1},{id:"L4",asc:0},{id:"L5",asc:1},{id:"A2",asc:0},{id:"A3",asc:1},{id:"A4",asc:0},{id:"A5",asc:1},{id:"A6",asc:0},{id:"A1",asc:1},{id:"A7",asc:0},{id:"B1",asc:1},{id:"B2",asc:0},{id:"B3",asc:1},{id:"B4",asc:0},{id:"UU",asc:1}];
+const PO=PR.map(p=>p.id);
+function aisleIdx(a){const i=PO.indexOf(a);return i===-1?999:i}
+function aisleAsc(a){const p=PR.find(x=>x.id===a);return p?p.asc:1}
+
+function pLoc(l){
+  if(!l||typeof l!=='string')return null;
+  const t=l.trim();if(!t)return null;
+  const p=t.split('-');
+  if(p.length===4)return{aisle:p[0],shelf:p[1],level:p[2],pos:p[3],raw:t,shelfKey:p[0]+'-'+p[1]};
+  if(p.length===3)return{aisle:p[0],shelf:p[1],level:p[2],pos:'0',raw:t,shelfKey:p[0]+'-'+p[1]};
+  return null;
+}
+
+function sortByRoute(items){
+  return[...items].sort((a,b)=>{
+    if(!a.loc&&!b.loc)return 0;if(!a.loc)return 1;if(!b.loc)return-1;
+    const ai=aisleIdx(a.loc.aisle),bi=aisleIdx(b.loc.aisle);
+    if(ai!==bi)return ai-bi;
+    const asc=aisleAsc(a.loc.aisle);
+    const s=a.loc.shelf.localeCompare(b.loc.shelf,undefined,{numeric:1});if(s)return asc?s:-s;
+    const l=a.loc.level.localeCompare(b.loc.level);if(l)return asc?l:-l;
+    const p=a.loc.pos.localeCompare(b.loc.pos,undefined,{numeric:1});return asc?p:-p;
+  });
+}
+
+/* ═══════════ STATE ═══════════ */
+let S={
+  phase:'setup',products:null,shelves:null,
+  selectedShelf:null,shelfItems:null,currentIdx:0,
+  counted:{},error:null,result:null,
+  allCounted:{} // persists across shelves
+};
+let undoStack=[];
+
+function setState(u){Object.assign(S,u);render()}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* ═══════════ CSV PARSING ═══════════ */
+function parseMaxx(text){
+  // InventointialustaXRP: semicolon, latin1, 3 header rows, columns at indices: 0=name, 3=VNR, 4=location, 10=saldo
+  const lines=text.replace(/\r/g,'').split('\n');
+  const data={};
+  for(let i=3;i<lines.length;i++){
+    const cols=lines[i].split(';');
+    if(cols.length<11)continue;
+    const name=cols[0].trim();
+    const vnr=cols[3].trim();
+    const location=cols[4].trim();
+    const saldoStr=cols[10].trim().replace(',','.');
+    const saldo=parseFloat(saldoStr)||0;
+    if(!vnr)continue;
+    data[vnr]={name,vnr,location,saldo};
+  }
+  return data;
+}
+
+function parseMagento(text){
+  if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+  const r=Papa.parse(text,{header:true,skipEmptyLines:true});
+  const data={};
+  r.data.forEach(row=>{
+    const sku=String(row.sku||'').trim().replace(/"/g,'');
+    const unshipped=parseFloat(String(row.qty_unshipped||'0').replace(',','.'))||0;
+    if(sku)data[sku]={unshipped};
+  });
+  return data;
+}
+
+function parseProductRegister(text){
+  if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+  const r=Papa.parse(text,{header:true,skipEmptyLines:true});
+  const data={};
+  const cols=r.meta?.fields||[];
+  const skuCol=cols.find(c=>c.replace(/^\uFEFF/,'').toLowerCase()==='sku')||'sku';
+  const eanCol=cols.find(c=>c.toLowerCase()==='ean')||'ean';
+  r.data.forEach(row=>{
+    const sku=String(row[skuCol]||'').trim();
+    const ean=String(row[eanCol]||'').trim();
+    if(sku&&ean&&ean!=='null')data[sku]=ean;
+  });
+  return data;
+}
+
+/* ═══════════ MERGE & LOAD ═══════════ */
+function loadFiles(){
+  const maxxInput=document.getElementById('maxx-file');
+  const magInput=document.getElementById('mag-file');
+  const eanInput=document.getElementById('ean-file');
+  if(!maxxInput.files.length||!magInput.files.length){setState({error:'Valitse molemmat tiedostot'});return}
+  
+  setState({error:null,result:{type:'ok',text:'Ladataan...'}});
+  
+  const readers=[];
+  // Read Maxx (latin1)
+  readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(maxxInput.files[0],'iso-8859-15')}));
+  // Read Magento (utf-8)
+  readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(magInput.files[0],'utf-8')}));
+  // Read EAN file if provided
+  if(eanInput.files.length){
+    readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(eanInput.files[0],'utf-8')}));
+  } else {
+    readers.push(Promise.resolve(null));
+  }
+  
+  Promise.all(readers).then(([maxxText,magText,eanText])=>{
+    const maxx=parseMaxx(maxxText);
+    const magento=parseMagento(magText);
+    const eanMap=eanText?parseProductRegister(eanText):{};
+    
+    // Merge: for each Maxx product, add unshipped from Magento
+    const products=[];
+    for(const vnr in maxx){
+      const m=maxx[vnr];
+      const mag=magento[vnr]||{unshipped:0};
+      const loc=pLoc(m.location);
+      if(!loc)continue; // Skip products without valid location
+      const expected=Math.round(m.saldo+mag.unshipped);
+      const ean=eanMap[vnr]||'';
+      products.push({
+        vnr,name:m.name,ean,location:m.location,loc,
+        saldo:m.saldo,unshipped:mag.unshipped,expected,
+        shelfKey:loc.shelfKey
+      });
+    }
+    
+    // Group by shelf
+    const shelves={};
+    products.forEach(p=>{
+      if(!shelves[p.shelfKey])shelves[p.shelfKey]={key:p.shelfKey,aisle:p.loc.aisle,shelf:p.loc.shelf,count:0};
+      shelves[p.shelfKey].count++;
+    });
+    
+    // Sort shelves by route
+    const shelfList=Object.values(shelves).sort((a,b)=>{
+      const ai=aisleIdx(a.aisle),bi=aisleIdx(b.aisle);
+      if(ai!==bi)return ai-bi;
+      return a.shelf.localeCompare(b.shelf,undefined,{numeric:1});
+    });
+    
+    setState({
+      products,shelves:shelfList,phase:'shelfSelect',
+      result:{type:'ok',text:`✓ ${products.length} tuotetta, ${shelfList.length} hyllyä`},
+      allCounted:{}
+    });
+  }).catch(e=>{setState({error:'Virhe: '+e.message,result:null})});
+}
+
+/* ═══════════ SHELF SELECTION ═══════════ */
+function selectShelf(key){
+  const items=S.products.filter(p=>p.shelfKey===key);
+  const sorted=sortByRoute(items);
+  setState({
+    selectedShelf:key,shelfItems:sorted,currentIdx:0,
+    counted:{},phase:'counting',result:null,error:null
+  });
+  undoStack=[];
+}
+
+/* ═══════════ COUNTING ═══════════ */
+function countItem(vnr,qty){
+  const prev=S.counted[vnr];
+  const item=S.shelfItems.find(i=>i.vnr===vnr);
+  undoStack.push({vnr,prev,idx:S.currentIdx});
+  if(undoStack.length>50)undoStack.shift();
+  S.counted[vnr]=qty;
+  S.allCounted[vnr]=qty;
+  
+  // Auto-advance if counted
+  const cur=S.shelfItems[S.currentIdx];
+  if(cur&&cur.vnr===vnr){
+    // Move to next uncounted
+    let next=-1;
+    for(let i=S.currentIdx+1;i<S.shelfItems.length;i++){
+      if(S.counted[S.shelfItems[i].vnr]===undefined){next=i;break}
+    }
+    if(next!==-1){
+      setTimeout(()=>setState({currentIdx:next}),600);
+    }
+  }
+  setState({counted:S.counted,allCounted:S.allCounted,result:{type:'ok',text:'✓ '+esc(item?.name||vnr)+': '+qty+' kpl'}});
+}
+
+function popUndo(){
+  if(!undoStack.length)return;
+  const u=undoStack.pop();
+  if(u.prev===undefined)delete S.counted[u.vnr]; else S.counted[u.vnr]=u.prev;
+  if(u.prev===undefined)delete S.allCounted[u.vnr]; else S.allCounted[u.vnr]=u.prev;
+  setState({counted:S.counted,allCounted:S.allCounted,currentIdx:u.idx,result:{type:'ok',text:'↩ Peruttu'}});
+}
+
+function navTo(idx){if(idx>=0&&idx<S.shelfItems.length)setState({currentIdx:idx,result:null})}
+
+function finishShelf(){
+  // Save counted to allCounted and go back to shelf select
+  setState({phase:'shelfSelect',selectedShelf:null,shelfItems:null,result:{type:'ok',text:'✓ Hylly valmis'}});
+}
+
+/* ═══════════ SPEECH RECOGNITION ═══════════ */
+let speechRec=null,speechActive=false,speechVnr=null;
+
+function startVoice(vnr){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Puheentunnistus ei tuettu');return}
+  stopVoice();
+  speechVnr=vnr;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  speechRec=new SR();
+  speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
+  speechActive=true;
+  
+  speechRec.onresult=function(e){
+    const text=e.results[0][0].transcript.trim().toLowerCase();
+    const numMap={'nolla':0,'yksi':1,'kaksi':2,'kolme':3,'neljä':4,'viisi':5,'kuusi':6,'seitsemän':7,'kahdeksan':8,'yhdeksän':9,'kymmenen':10,
+      'yksitoista':11,'kaksitoista':12,'kolmetoista':13,'neljätoista':14,'viisitoista':15,
+      'kuusitoista':16,'seitsemäntoista':17,'kahdeksantoista':18,'yhdeksäntoista':19,'kaksikymmentä':20};
+    let num=parseInt(text,10);
+    if(isNaN(num)&&numMap[text]!==undefined)num=numMap[text];
+    if(isNaN(num)){setState({result:{type:'fail',text:'🎤 "'+text+'" — ei tunnistettu'}});speechActive=false;render();return}
+    countItem(speechVnr,num);
+    speechActive=false;
+  };
+  speechRec.onerror=function(e){
+    if(e.error==='no-speech'){if(speechActive){try{speechRec.start()}catch(ex){}}}
+    else{speechActive=false;setState({result:{type:'fail',text:'🎤 Virhe: '+e.error}})}
+  };
+  speechRec.onend=function(){if(speechActive){try{speechRec.start()}catch(e){}}};
+  try{speechRec.start()}catch(e){}
+  setState({result:{type:'ok',text:'🎤 Kuuntelen...'}});
+}
+
+function stopVoice(){speechActive=false;if(speechRec){try{speechRec.abort()}catch(e){}speechRec=null}}
+
+/* ═══════════ SCAN INPUT ═══════════ */
+function handleScanInput(val){
+  if(!val||!S.shelfItems)return;
+  // Find item by EAN or VNR
+  const item=S.shelfItems.find(i=>(i.ean&&(i.ean===val||val.endsWith(i.ean)||i.ean.endsWith(val)))||i.vnr===val);
+  if(item){
+    const idx=S.shelfItems.indexOf(item);
+    setState({currentIdx:idx,result:{type:'ok',text:'→ '+esc(item.name)}});
+  } else {
+    setState({result:{type:'fail',text:'EAN/VNR ei löydy tältä hyllyltä'}});
+  }
+}
+
+/* ═══════════ CSV EXPORT ═══════════ */
+function generateCSV(){
+  const rows=[['VNR','Nimi','EAN','Paikka','Maxx Saldo','Keräilemätön','Odotettu','Inventoitu','Erotus','Inventoija','Aika']];
+  const now=new Date().toLocaleString('fi-FI');
+  S.products.forEach(p=>{
+    if(S.allCounted[p.vnr]!==undefined){
+      const counted=S.allCounted[p.vnr];
+      const diff=counted-p.expected;
+      rows.push([p.vnr,p.name,p.ean,p.location,p.saldo,p.unshipped,p.expected,counted,diff,currentWorker,now]);
+    }
+  });
+  return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+}
+
+function generateDeviationCSV(){
+  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+  S.products.forEach(p=>{
+    if(S.allCounted[p.vnr]!==undefined){
+      const counted=S.allCounted[p.vnr];
+      const diff=counted-p.expected;
+      if(diff!==0)rows.push([p.vnr,p.name,p.ean,p.location,p.expected,counted,diff,currentWorker]);
+    }
+  });
+  return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+}
+
+function downloadCSV(content,filename){
+  const bom='\uFEFF';
+  const blob=new Blob([bom+content],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ═══════════ RENDER ═══════════ */
+function render(){
+  const app=document.getElementById('app');
+
+  /* SETUP */
+  if(S.phase==='setup'){
+    stopVoice();
+    app.innerHTML=`<div class="card"><h1>📋 Inventointi</h1><p class="sub">Olo-apteekki</p>
+      <div class="mb-12"><label class="label">Käyttäjä</label>
+        <select style="width:100%;padding:10px;border-radius:8px;border:2px solid #e9d5ff;font-size:15px;font-weight:600" onchange="currentWorker=this.value;localStorage.setItem('inventointi_worker',this.value)">
+          <option value="">— Valitse —</option>
+          ${WORKERS.map(w=>`<option value="${w}" ${w===currentWorker?'selected':''}>${w}</option>`).join('')}
+        </select></div>
+      <div class="mb-8"><label class="label">Maxx saldo (InventointialustaXRP)</label>
+        <input type="file" id="maxx-file" accept=".csv" style="font-size:14px;width:100%"></div>
+      <div class="mb-8"><label class="label">Keräilemätön (Magento inventory)</label>
+        <input type="file" id="mag-file" accept=".csv" style="font-size:14px;width:100%"></div>
+      <div class="mb-12"><label class="label">Tuoterekisteri / EAN (valinnainen)</label>
+        <input type="file" id="ean-file" accept=".csv" style="font-size:14px;width:100%"></div>
+      <button class="btn" onclick="loadFiles()">Lataa ja yhdistä</button>
+      ${S.error?`<div class="error">${S.error}</div>`:''}
+      ${S.result?`<div class="scan-result ${S.result.type==='ok'?'scan-ok':'scan-fail'}">${S.result.text}</div>`:''}</div>`;
+    return;
+  }
+
+  /* SHELF SELECT */
+  if(S.phase==='shelfSelect'){
+    stopVoice();
+    const totalCounted=Object.keys(S.allCounted).length;
+    const totalProducts=S.products.length;
+    const deviations=S.products.filter(p=>S.allCounted[p.vnr]!==undefined&&S.allCounted[p.vnr]!==p.expected).length;
+    
+    app.innerHTML=`<div class="card"><h1>📋 Valitse hylly</h1>
+      <p class="sub">Inventoitu: ${totalCounted}/${totalProducts}${deviations?' — ⚠ '+deviations+' eroa':''}</p>
+      ${S.result?`<div class="scan-result ${S.result.type==='ok'?'scan-ok':'scan-fail'}" style="margin-bottom:12px">${S.result.text}</div>`:''}
+      <div class="flex gap-8 mb-12">
+        <button class="btn-sm btn-outline flex-1" onclick="setState({phase:'deviations'})">⚠ Erot (${deviations})</button>
+        <button class="btn-sm btn-outline flex-1" onclick="downloadCSV(generateCSV(),'inventointi_'+new Date().toISOString().slice(0,10)+'.csv')">📥 CSV</button>
+      </div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        ${S.shelves.map(sh=>{
+          const items=S.products.filter(p=>p.shelfKey===sh.key);
+          const counted=items.filter(p=>S.allCounted[p.vnr]!==undefined).length;
+          const done=counted===items.length&&items.length>0;
+          return`<div class="shelf-btn ${done?'done':''}" onclick="selectShelf('${sh.key}')">
+            <div style="font-size:16px;font-weight:700">${sh.key}</div>
+            <div style="font-size:11px;color:#64748b">${counted}/${items.length}</div>
+          </div>`}).join('')}
+      </div>
+      <button class="btn-sm btn-outline" style="width:100%;margin-top:12px" onclick="setState({phase:'setup',products:null,shelves:null,allCounted:{}})">← Takaisin</button>`;
+    return;
+  }
+
+  /* DEVIATIONS */
+  if(S.phase==='deviations'){
+    stopVoice();
+    const devs=S.products.filter(p=>S.allCounted[p.vnr]!==undefined&&S.allCounted[p.vnr]!==p.expected)
+      .map(p=>({...p,counted:S.allCounted[p.vnr],diff:S.allCounted[p.vnr]-p.expected}))
+      .sort((a,b)=>a.diff-b.diff);
+    
+    app.innerHTML=`<div class="card"><h1>⚠ Inventointierot</h1>
+      <p class="sub">${devs.length} tuotetta${currentWorker?' — 👤 '+currentWorker:''}</p>
+      <div class="flex gap-8 mb-12">
+        <button class="btn-sm btn-outline flex-1" onclick="downloadCSV(generateDeviationCSV(),'erot_'+new Date().toISOString().slice(0,10)+'.csv')">📥 Erot CSV</button>
+        <button class="btn-sm btn-outline flex-1" onclick="setState({phase:'shelfSelect'})">← Hyllyt</button>
+      </div></div>
+      ${devs.length?devs.map(d=>`<div class="deviation ${d.diff>0?'dev-plus':'dev-minus'}">
+        <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${esc(d.name)}</div>
+          <div class="mono" style="color:#64748b">${d.location} | VNR ${d.vnr}</div></div>
+        <div style="text-align:right;white-space:nowrap;margin-left:8px">
+          <div style="font-weight:700">${d.counted} / ${d.expected}</div>
+          <div style="font-size:12px;font-weight:700">${d.diff>0?'+':'' }${d.diff}</div></div></div>`).join('')
+      :'<div class="card" style="text-align:center;padding:24px"><div style="font-size:36px;margin-bottom:8px">✓</div><h2 style="color:#16a34a">Ei eroja</h2></div>'}`;
+    return;
+  }
+
+  /* COUNTING */
+  if(S.phase==='counting'){
+    const items=S.shelfItems;
+    const cur=items[S.currentIdx];
+    const totalHere=items.length;
+    const countedHere=items.filter(i=>S.counted[i.vnr]!==undefined).length;
+    const pct=totalHere>0?Math.round(countedHere/totalHere*100):0;
+    const curCounted=cur?S.counted[cur.vnr]:undefined;
+    const curExpected=cur?cur.expected:0;
+    const isDone=curCounted!==undefined;
+
+    app.innerHTML=`
+      <div class="card">
+        <div class="flex justify-between items-center">
+          <h2 style="margin:0;color:#6d28d9">📍 ${S.selectedShelf}</h2>
+          <span style="font-size:12px;color:#94a3b8">${countedHere}/${totalHere} (${pct}%)</span></div>
+        ${currentWorker?`<div style="font-size:11px;color:#7c3aed;margin-top:2px">👤 ${currentWorker}</div>`:''}
+        <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      ${cur?`<div class="item-card current">
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:4px">${S.currentIdx+1}/${totalHere}</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:4px">${esc(cur.name)}</div>
+        <div class="mono" style="color:#64748b;margin-bottom:8px">${cur.location} | VNR ${cur.vnr}${cur.ean?' | EAN '+cur.ean:''}</div>
+        
+        <div style="text-align:center;margin-bottom:8px">
+          <div style="font-size:12px;color:#64748b">Odotettu</div>
+          <div class="qty-big qty-expected">${curExpected}</div>
+        </div>
+        
+        ${isDone?`<div style="text-align:center;margin-bottom:12px">
+          <div style="font-size:12px;color:#64748b">Inventoitu</div>
+          <div class="qty-big ${curCounted===curExpected?'qty-match':'qty-diff'}">${curCounted} ${curCounted===curExpected?'✓':curCounted>curExpected?'▲'+(curCounted-curExpected):'▼'+(curExpected-curCounted)}</div>
+        </div>`:''}
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0">
+          <button class="voice-btn ${speechActive&&speechVnr===cur.vnr?'listening':'idle'}" onclick="${speechActive?'stopVoice()':'startVoice(\\''+cur.vnr+'\\')'}">
+            ${speechActive&&speechVnr===cur.vnr?'⏹':'🎤'}</button>
+        </div>
+        
+        <input type="text" class="scan-input" placeholder="Tai syötä/skannaa" style="margin-bottom:8px"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();this.value='';if(!isNaN(parseInt(v)))countItem('${cur.vnr}',parseInt(v));else handleScanInput(v)}">
+      </div>`:'<div class="card" style="text-align:center;padding:24px">Hylly tyhjä</div>'}
+
+      ${S.result?`<div class="scan-result ${S.result.type==='ok'?'scan-ok':'scan-fail'}">${S.result.text}</div>`:''}
+      ${S.error?`<div class="error">${S.error}</div>`:''}
+
+      <div class="flex gap-8" style="margin-top:12px">
+        <button class="btn-sm btn-outline flex-1" ${S.currentIdx===0?'disabled':''} onclick="stopVoice();navTo(S.currentIdx-1)">←</button>
+        <button class="btn-sm flex-1" style="background:${undoStack.length?'#fef3c7':'#f1f5f9'};color:${undoStack.length?'#92400e':'#cbd5e1'};border:none" ${undoStack.length?'':'disabled'} onclick="stopVoice();popUndo()">↩ Peru</button>
+        <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=items.length-1?'disabled':''} onclick="stopVoice();navTo(S.currentIdx+1)">→</button>
+      </div>
+
+      <button class="btn" style="margin-top:12px;background:#16a34a" onclick="stopVoice();finishShelf()">Valmis → Valitse hylly</button>
+
+      <details style="margin-top:12px"><summary style="font-size:13px;color:#64748b;cursor:pointer">Kaikki tuotteet (${totalHere})</summary>
+        <div style="margin-top:8px;max-height:300px;overflow-y:auto">
+          ${items.map((it,idx)=>{const c=S.counted[it.vnr];const isCur=idx===S.currentIdx;
+            return`<div style="padding:6px 8px;border-radius:6px;margin-bottom:3px;font-size:12px;cursor:pointer;${isCur?'background:#ede9fe;border:1px solid #c4b5fd':c!==undefined?'background:#f0fdf4;border:1px solid #dcfce7;opacity:.6':'background:#f8fafc;border:1px solid #e2e8f0'}" onclick="stopVoice();navTo(${idx})">
+              <div class="flex justify-between"><span style="font-weight:600">${esc(it.name)}</span>
+                <span style="white-space:nowrap;margin-left:8px;font-weight:700;${c!==undefined&&c!==it.expected?'color:#dc2626':c!==undefined?'color:#16a34a':'color:#94a3b8'}">${c!==undefined?c+'/'+it.expected:it.expected}</span></div>
+              <div class="mono" style="color:#94a3b8">${it.location}</div></div>`}).join('')}
+        </div></details>`;
+    return;
+  }
+}
+
+render();
+</script>
+</body>
+</html>
