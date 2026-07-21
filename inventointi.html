@@ -134,7 +134,7 @@ let S={
   phase:'setup',products:null,shelves:null,
   selectedShelf:null,shelfItems:null,currentIdx:0,
   counted:{},error:null,result:null,
-  allCounted:{} // persists across shelves
+  allCounted:{},camConfirmed:false
 };
 let undoStack=[];
 
@@ -293,9 +293,10 @@ function selectShelf(key){
   const sorted=sortByRoute(items);
   setState({
     selectedShelf:key,shelfItems:sorted,currentIdx:0,
-    counted:{},phase:'counting',result:null,error:null
+    counted:{},phase:'counting',result:null,error:null,camConfirmed:false
   });
   undoStack=[];
+  setTimeout(camStart,300);
 }
 
 /* ═══════════ COUNTING ═══════════ */
@@ -311,16 +312,15 @@ function countItem(vnr,qty){
   // Auto-advance if counted
   const cur=S.shelfItems[S.currentIdx];
   if(cur&&cur.vnr===vnr){
-    // Move to next uncounted
     let next=-1;
     for(let i=S.currentIdx+1;i<S.shelfItems.length;i++){
       if(S.counted[S.shelfItems[i].vnr]===undefined){next=i;break}
     }
     if(next!==-1){
-      setTimeout(()=>setState({currentIdx:next}),600);
+      setTimeout(()=>{setState({currentIdx:next,camConfirmed:false});setTimeout(camStart,200)},600);
     }
   }
-  setState({counted:S.counted,allCounted:S.allCounted,result:{type:'ok',text:'✓ '+esc(item?.name||vnr)+': '+qty+' kpl'}});
+  setState({counted:S.counted,allCounted:S.allCounted,result:{type:'ok',text:'✓ '+esc(item?.name||vnr)+': '+qty+' kpl'},camConfirmed:false});
 }
 
 function popUndo(){
@@ -331,11 +331,17 @@ function popUndo(){
   setState({counted:S.counted,allCounted:S.allCounted,currentIdx:u.idx,result:{type:'ok',text:'↩ Peruttu'}});
 }
 
-function navTo(idx){if(idx>=0&&idx<S.shelfItems.length)setState({currentIdx:idx,result:null})}
+function navTo(idx){
+  if(idx>=0&&idx<S.shelfItems.length){
+    camStop();stopVoice();
+    setState({currentIdx:idx,result:null,camConfirmed:false});
+    setTimeout(camStart,200);
+  }
+}
 
 function finishShelf(){
-  // Save counted to allCounted and go back to shelf select
-  setState({phase:'shelfSelect',selectedShelf:null,shelfItems:null,result:{type:'ok',text:'✓ Hylly valmis'}});
+  camStop();stopVoice();
+  setState({phase:'shelfSelect',selectedShelf:null,shelfItems:null,result:{type:'ok',text:'✓ Hylly valmis'},camConfirmed:false});
 }
 
 /* ═══════════ SPEECH RECOGNITION ═══════════ */
@@ -371,6 +377,77 @@ function startVoice(vnr){
 }
 
 function stopVoice(){speechActive=false;if(speechRec){try{speechRec.abort()}catch(e){}speechRec=null}}
+
+/* ═══════════ CAMERA SCANNER ═══════════ */
+let camStream=null,camRunning=false,camDetector=null,camLast='',camLastT=0;
+
+async function camStart(){
+  camStop();
+  const v=document.getElementById('inv-cam-video');if(!v)return;
+  if(!('BarcodeDetector' in window)){return}
+  try{
+    camDetector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','itf','upc_a','upc_e']});
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}});
+    v.srcObject=camStream;await v.play();camRunning=true;camScan();
+  }catch(e){}
+}
+function camScan(){
+  if(!camRunning)return;
+  const v=document.getElementById('inv-cam-video');if(!v){camRunning=false;return}
+  camDetector.detect(v).then(codes=>{
+    if(codes.length>0){
+      const c=codes[0].rawValue,now=Date.now();
+      if(c!==camLast||now-camLastT>2000){
+        camLast=c;camLastT=now;
+        if(navigator.vibrate)navigator.vibrate(100);
+        const fl=document.getElementById('inv-cam-flash');
+        if(fl){fl.style.opacity='1';setTimeout(()=>{fl.style.opacity='0'},200)}
+        handleCamScan(c);
+      }
+    }
+  }).catch(()=>{});
+  if(camRunning)requestAnimationFrame(camScan);
+}
+function camStop(){camRunning=false;if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}camLast='';camLastT=0}
+
+function handleCamScan(code){
+  if(!S.shelfItems)return;
+  const cur=S.shelfItems[S.currentIdx];
+  if(!cur)return;
+  // Check if scanned code matches current item
+  const matchEan=(a,b)=>a&&a!=='null'&&b&&(a===b||b.endsWith(a)||a.endsWith(b));
+  if(matchEan(cur.ean,code)||cur.vnr===code){
+    // Correct product — stop camera, start voice
+    camStop();
+    setState({result:{type:'ok',text:'✓ '+esc(cur.name)+' — sano määrä'},camConfirmed:true});
+    startVoice(cur.vnr);
+    return;
+  }
+  // Check if it's another product on this shelf
+  const other=S.shelfItems.find(i=>matchEan(i.ean,code)||i.vnr===code);
+  if(other){
+    const idx=S.shelfItems.indexOf(other);
+    camStop();
+    setState({currentIdx:idx,result:{type:'ok',text:'→ '+esc(other.name)+' — sano määrä'},camConfirmed:true});
+    startVoice(other.vnr);
+    return;
+  }
+  // Check if it's a number (manual qty via barcode)
+  const num=parseInt(code,10);
+  if(!isNaN(num)&&code.length<=3){
+    camStop();
+    countItem(cur.vnr,num);
+    return;
+  }
+  setState({result:{type:'fail',text:'EAN ei täsmää — skannaa uudelleen tai ohita'}});
+}
+
+function skipScan(){
+  camStop();
+  const cur=S.shelfItems?S.shelfItems[S.currentIdx]:null;
+  setState({result:null,camConfirmed:true});
+  if(cur)startVoice(cur.vnr);
+}
 
 /* ═══════════ SCAN INPUT ═══════════ */
 function handleScanInput(val){
@@ -533,13 +610,22 @@ function render(){
           <div class="qty-big ${curCounted===curExpected?'qty-match':'qty-diff'}">${curCounted} ${curCounted===curExpected?'✓':curCounted>curExpected?'▲'+(curCounted-curExpected):'▼'+(curExpected-curCounted)}</div>
         </div>`:''}
 
-        <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0">
-          <button class="voice-btn ${speechActive&&speechVnr===cur.vnr?'listening':'idle'}" onclick="${speechActive?'stopVoice()':'startVoice(\\''+cur.vnr+'\\')'}">
-            ${speechActive&&speechVnr===cur.vnr?'⏹':'🎤'}</button>
-        </div>
-        
-        <input type="text" class="scan-input" placeholder="Tai syötä/skannaa" style="margin-bottom:8px"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();this.value='';if(!isNaN(parseInt(v)))countItem('${cur.vnr}',parseInt(v));else handleScanInput(v)}">
+        ${!S.camConfirmed&&!isDone?`
+          <div style="position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:8px">
+            <video id="inv-cam-video" playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:25%;border:2px solid rgba(255,255,255,.7);border-radius:8px;pointer-events:none"></div>
+            <div id="inv-cam-flash" style="position:absolute;inset:0;background:rgba(76,175,80,.3);pointer-events:none;opacity:0;transition:opacity .15s"></div>
+          </div>
+          <div style="text-align:center;font-size:13px;color:#7c3aed;font-weight:600;margin-bottom:8px">📷 Skannaa tuotteen viivakoodi</div>
+          <button class="btn-sm btn-outline" style="width:100%;margin-bottom:8px" onclick="skipScan()">Ohita skannaus →</button>
+        `:`
+          <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0">
+            <button class="voice-btn ${speechActive&&speechVnr===cur.vnr?'listening':'idle'}" onclick="${speechActive?'stopVoice()':'startVoice(\\''+cur.vnr+'\\')'}">
+              ${speechActive&&speechVnr===cur.vnr?'⏹':'🎤'}</button>
+          </div>
+          <input type="text" class="scan-input" placeholder="Syötä määrä tai skannaa" style="margin-bottom:8px"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();this.value='';if(!isNaN(parseInt(v)))countItem('${cur.vnr}',parseInt(v));else handleScanInput(v)}">
+        `}
       </div>`:'<div class="card" style="text-align:center;padding:24px">Hylly tyhjä</div>'}
 
       ${S.result?`<div class="scan-result ${S.result.type==='ok'?'scan-ok':'scan-fail'}">${S.result.text}</div>`:''}
