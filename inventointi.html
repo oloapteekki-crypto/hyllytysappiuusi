@@ -134,7 +134,8 @@ let S={
   phase:'setup',products:null,shelves:null,
   selectedShelf:null,shelfItems:null,currentIdx:0,
   counted:{},error:null,result:null,
-  allCounted:{},camConfirmed:false
+  allCounted:{},camConfirmed:false,
+  device:localStorage.getItem('inventointi_device')||''
 };
 let undoStack=[];
 
@@ -296,7 +297,8 @@ function selectShelf(key){
     counted:{},phase:'counting',result:null,error:null,camConfirmed:false
   });
   undoStack=[];
-  setTimeout(camStart,300);
+  if(S.device==='scanner')setTimeout(()=>{const inp=document.getElementById('inv-scan-field');if(inp)inp.focus()},200);
+  else setTimeout(camStart,300);
 }
 
 /* ═══════════ COUNTING ═══════════ */
@@ -317,7 +319,10 @@ function countItem(vnr,qty){
       if(S.counted[S.shelfItems[i].vnr]===undefined){next=i;break}
     }
     if(next!==-1){
-      setTimeout(()=>{setState({currentIdx:next,camConfirmed:false});setTimeout(camStart,200)},600);
+      setTimeout(()=>{setState({currentIdx:next,camConfirmed:false});
+        if(S.device==='scanner')setTimeout(()=>{const inp=document.getElementById('inv-scan-field');if(inp)inp.focus()},200);
+        else setTimeout(camStart,200);
+      },600);
     }
   }
   setState({counted:S.counted,allCounted:S.allCounted,result:{type:'ok',text:'✓ '+esc(item?.name||vnr)+': '+qty+' kpl'},camConfirmed:false});
@@ -335,7 +340,8 @@ function navTo(idx){
   if(idx>=0&&idx<S.shelfItems.length){
     camStop();stopVoice();
     setState({currentIdx:idx,result:null,camConfirmed:false});
-    setTimeout(camStart,200);
+    if(S.device==='scanner')setTimeout(()=>{const inp=document.getElementById('inv-scan-field');if(inp)inp.focus()},200);
+    else setTimeout(camStart,200);
   }
 }
 
@@ -509,6 +515,11 @@ function render(){
           <option value="">— Valitse —</option>
           ${WORKERS.map(w=>`<option value="${w}" ${w===currentWorker?'selected':''}>${w}</option>`).join('')}
         </select></div>
+      <div class="mb-12"><label class="label">Laite</label>
+        <div class="flex gap-8">
+          <button style="flex:1;padding:12px;border-radius:8px;border:2px solid ${S.device==='phone'?'#7c3aed':'#e9d5ff'};background:${S.device==='phone'?'#ede9fe':'#fff'};font-size:14px;font-weight:600;cursor:pointer" onclick="S.device='phone';localStorage.setItem('inventointi_device','phone');render()">📱 Puhelin</button>
+          <button style="flex:1;padding:12px;border-radius:8px;border:2px solid ${S.device==='scanner'?'#7c3aed':'#e9d5ff'};background:${S.device==='scanner'?'#ede9fe':'#fff'};font-size:14px;font-weight:600;cursor:pointer" onclick="S.device='scanner';localStorage.setItem('inventointi_device','scanner');render()">🔫 Käsipääte</button>
+        </div></div>
       <div class="mb-8"><label class="label">Maxx saldo (InventointialustaXRP)</label>
         <input type="file" id="maxx-file" accept=".csv" style="font-size:14px;width:100%"></div>
       <div class="mb-8"><label class="label">Keräilemätön (Magento inventory)</label>
@@ -611,13 +622,19 @@ function render(){
         </div>`:''}
 
         ${!S.camConfirmed&&!isDone?`
-          <div style="position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:8px">
-            <video id="inv-cam-video" playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
-            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:25%;border:2px solid rgba(255,255,255,.7);border-radius:8px;pointer-events:none"></div>
-            <div id="inv-cam-flash" style="position:absolute;inset:0;background:rgba(76,175,80,.3);pointer-events:none;opacity:0;transition:opacity .15s"></div>
-          </div>
-          <div style="text-align:center;font-size:13px;color:#7c3aed;font-weight:600;margin-bottom:8px">📷 Skannaa tuotteen viivakoodi</div>
-          <button class="btn-sm btn-outline" style="width:100%;margin-bottom:8px" onclick="skipScan()">Ohita skannaus →</button>
+          ${S.device==='scanner'?`
+            <input type="text" id="inv-scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa tuotteen viivakoodi" style="margin-bottom:8px"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();this.value='';handleCamScan(v)}">
+            <button class="btn-sm btn-outline" style="width:100%;margin-bottom:8px" onclick="skipScan()">Ohita skannaus →</button>
+          `:`
+            <div style="position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:8px">
+              <video id="inv-cam-video" playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:25%;border:2px solid rgba(255,255,255,.7);border-radius:8px;pointer-events:none"></div>
+              <div id="inv-cam-flash" style="position:absolute;inset:0;background:rgba(76,175,80,.3);pointer-events:none;opacity:0;transition:opacity .15s"></div>
+            </div>
+            <div style="text-align:center;font-size:13px;color:#7c3aed;font-weight:600;margin-bottom:8px">📷 Skannaa tuotteen viivakoodi</div>
+            <button class="btn-sm btn-outline" style="width:100%;margin-bottom:8px" onclick="skipScan()">Ohita skannaus →</button>
+          `}
         `:`
           <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0">
             <button class="voice-btn ${speechActive&&speechVnr===cur.vnr?'listening':'idle'}" onclick="${speechActive?'stopVoice()':'startVoice(\\''+cur.vnr+'\\')'}">
