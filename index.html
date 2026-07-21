@@ -128,7 +128,7 @@ function pXML(t){const d=new DOMParser().parseFromString(t,"text/xml"),b={};cons
 function pCSV(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const r=Papa.parse(t,{header:!0,skipEmptyLines:!0}),m={};const cols=r.meta?.fields||[];const skuCol=cols.find(c=>c.replace(/^\uFEFF/,'').toLowerCase()==='sku')||'sku';const nameCol=cols.find(c=>c.toLowerCase()==='name')||'name';const eanCol=cols.find(c=>c.toLowerCase()==='ean')||'ean';const locCol=cols.find(c=>c.toLowerCase().includes('storage_location')||c.toLowerCase().includes('location'))||'storage_location';r.data.forEach(row=>{const s=String(row[skuCol]||'').trim();if(!s)return;m[s]={name:String(row[nameCol]||'').trim(),ean:String(row[eanCol]||'').trim(),location:String(row[locCol]||'').trim()}});return m}
 
 /* ═══════════ STATE ═══════════ */
-let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,selectedBatch:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null,scanMode:'scanner',productLookup:null,shelveStartTime:null};
+let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,lastScanResult:null,loadProgress:null,loadInfo:null,selectedCart:null,selectedBatch:null,routeItems:[],unmatchedItems:[],rxItems:[],shelved:{},currentIdx:0,confirmedLoc:null,activeBox:null,scanMode:'scanner',productLookup:null,shelveStartTime:null,pausedTime:0,pauseStart:null};
 
 // ── Session storage: survive page refresh ──
 const STORAGE_KEY='hyllytysappi_state_v2';
@@ -282,7 +282,7 @@ function selectCart(id,batchId){
   }
   
   fbTakeCart(id,batch.id);
-  setState({selectedCart:id,selectedBatch:batch,routeItems:sSort(remaining),rxItems:[],unmatchedItems:[],shelved,currentIdx,phase:'shelve',confirmedLoc,lastScanResult:progress?{type:'ok',text:'↩ Jatkettu edellisestä'}:null,error:null,shelveStartTime:Date.now()});
+  setState({selectedCart:id,selectedBatch:batch,routeItems:sSort(remaining),rxItems:[],unmatchedItems:[],shelved,currentIdx,phase:'shelve',confirmedLoc,lastScanResult:progress?{type:'ok',text:'↩ Jatkettu edellisestä'}:null,error:null,shelveStartTime:Date.now(),pausedTime:0,pauseStart:null});
 }
 
 function confirmLocation(code){if(!code)return;setState({error:null,lastScanResult:null});const cur=S.routeItems[S.currentIdx];if(!cur)return;const sc=code.trim().toUpperCase(),ex=cur.location.trim().toUpperCase();if(sc===ex){setState({confirmedLoc:ex,lastScanResult:{type:'ok',text:'✓ '+cur.location}});return}const oi=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===sc);if(oi!==-1){setState({confirmedLoc:sc,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+S.routeItems[oi].location}});return}setState({error:'Paikka ei reitillä',lastScanResult:{type:'fail',text:'Väärä'}})}
@@ -355,6 +355,25 @@ function confirmEan(code){if(!code)return;stopListening();setState({error:null,l
 
 function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',cur-prev,cur,item?.qty||0,'manual')}S.shelved[v]=cur;setState({shelved:S.shelved})}
 function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',n-prev,n,item?.qty||0,'manual')}S.shelved[v]=n;setState({shelved:S.shelved})}}
+function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;stopListening();const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];
+
+function getElapsed(){
+  if(!S.shelveStartTime)return 0;
+  const raw=Date.now()-S.shelveStartTime;
+  const paused=S.pausedTime+(S.pauseStart?Date.now()-S.pauseStart:0);
+  return Math.max(0,raw-paused);
+}
+function togglePause(){
+  if(S.pauseStart){
+    // Resume
+    S.pausedTime+=(Date.now()-S.pauseStart);
+    setState({pauseStart:null,lastScanResult:{type:'ok',text:'▶ Jatketaan'}});
+  } else {
+    // Pause
+    stopListening();
+    setState({pauseStart:Date.now(),lastScanResult:{type:'ok',text:'⏸ Tauko'}});
+  }
+}
 function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;stopListening();const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
 function fbSaveShelved(cartId,batchId,shelved){
   const key=cartId+'_'+batchId;
@@ -457,7 +476,7 @@ function finishShelving(skip){
   if(S.selectedCart&&S.selectedBatch)fbClearProgress(S.selectedCart,S.selectedBatch.id);
   // Save performance data
   if(currentWorker&&S.shelveStartTime&&dbRef){
-    const ts=tShelved(),tq=tQty(),elapsed=Date.now()-S.shelveStartTime;
+    const ts=tShelved(),tq=tQty(),elapsed=getElapsed();
     const cart=CARTS.find(c=>c.id===S.selectedCart);
     dbRef.child('performance/'+Date.now().toString(36)).set({
       worker:currentWorker,
@@ -855,13 +874,14 @@ function render(){
     const lm=S.confirmedLoc&&cur.location&&cur.location.trim().toUpperCase()===S.confirmedLoc;
     const cb=lm?'confirmEan':'confirmLocation';
 
-    const elapsed=S.shelveStartTime?Math.floor((Date.now()-S.shelveStartTime)/1000):0;
+    const elapsed=Math.floor(getElapsed()/1000);
     const elMin=Math.floor(elapsed/60),elSec=elapsed%60;
+    const isPaused=!!S.pauseStart;
 
     app.innerHTML=`
       <div class="mb-12"><div class="flex justify-between items-center mb-6"><div>${cart?.icon||''} <b>${cart?.name||''} #${S.selectedBatch?.num||''}</b></div>
         <span style="font-size:12px;color:#94a3b8">${ts}/${tq} (${pct}%)</span></div>
-        ${currentWorker?`<div style="font-size:12px;color:#64748b;margin-bottom:4px">👤 ${currentWorker} — ⏱ ${elMin}:${elSec<10?'0':''}${elSec}</div>`:''}
+        ${currentWorker?`<div style="font-size:12px;color:#64748b;margin-bottom:4px">👤 ${currentWorker} — ⏱ ${elMin}:${elSec<10?'0':''}${elSec}${isPaused?' — ⏸ TAUKO':''}</div>`:''}
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
 
       ${S.unmatchedItems.length?`<div class="card" style="border-left:4px solid #f59e0b;background:#fffbeb">
@@ -897,6 +917,7 @@ function render(){
       <div class="flex gap-8 mb-12">
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx===0?'disabled':''} onclick="navTo(S.currentIdx-1)">←</button>
         <button class="btn-sm flex-1" style="background:${undoStack.length?'#fef3c7':'#f1f5f9'};color:${undoStack.length?'#92400e':'#cbd5e1'};border:none" ${undoStack.length?'':'disabled'} onclick="popUndo()">↩ Peru</button>
+        <button class="btn-sm flex-1" style="background:${S.pauseStart?'#f0fdf4':'#fef2f2'};color:${S.pauseStart?'#16a34a':'#64748b'};border:none" onclick="togglePause()">${S.pauseStart?'▶ Jatka':'⏸ Tauko'}</button>
         <button class="btn-sm btn-outline flex-1" ${S.currentIdx>=S.routeItems.length-1?'disabled':''} onclick="navTo(S.currentIdx+1)">→</button></div>
       <button class="btn" style="background:#16a34a;margin-bottom:12px" onclick="finishShelving()">Lopeta → Raportti</button>`;
     updateScanPlaceholder(lm?'Skannaa EAN':'Skannaa paikka');showScanWrap();
@@ -911,7 +932,7 @@ function render(){
       <div class="card"><h1>${cart?.icon||''} ${cart?.name||''} #${S.selectedBatch?.num||''} — Raportti</h1>
         ${(()=>{
           if(!S.shelveStartTime)return'';
-          const el=Math.floor((Date.now()-S.shelveStartTime)/1000);
+          const el=Math.floor(getElapsed()/1000);
           const m=Math.floor(el/60),s=el%60;
           return`<div style="font-size:13px;color:#64748b;margin-bottom:8px">${currentWorker?'👤 '+currentWorker+' — ':''}⏱ ${m} min ${s} s</div>`;
         })()}
