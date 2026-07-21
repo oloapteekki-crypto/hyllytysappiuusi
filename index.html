@@ -195,10 +195,6 @@ async function uploadFiles(){
   if(!csvInput.files.length&&!xmlInput.files.length){setState({error:'Valitse vähintään yksi tiedosto'});return}
   setState({error:null,loadProgress:'Ladataan...'});
   try{
-    // Clear old session data when uploading new files
-    setState({loadProgress:'Poistetaan vanha data...'});
-    await db.ref('sessions').remove();
-    await db.ref('scanLog').remove();
     // Upload CSV if selected
     if(csvInput.files.length){
       setState({loadProgress:'Ladataan tuoterekisteriä...'});
