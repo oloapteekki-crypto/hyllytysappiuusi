@@ -549,8 +549,33 @@ if(viewMode){
       const totalCounted=Object.keys(counted).length;
       const totalProducts=Object.keys(products).length;
 
+      // Shelf progress
+      const shelves={};
+      for(const vnr in products){
+        const p=products[vnr];
+        const loc=p.location||'';
+        const parts=loc.split('-');
+        if(parts.length>=2){
+          const key=parts[0]+'-'+parts[1];
+          if(!shelves[key])shelves[key]={total:0,counted:0};
+          shelves[key].total++;
+          if(counted[vnr])shelves[key].counted++;
+        }
+      }
+      const shelfKeys=Object.keys(shelves);
+      const shelvesDone=shelfKeys.filter(k=>shelves[k].counted===shelves[k].total&&shelves[k].total>0).length;
+      const shelvesTotal=shelfKeys.length;
+      const shelvesRemaining=shelvesTotal-shelvesDone;
+      const shelfPct=shelvesTotal>0?Math.round(shelvesDone/shelvesTotal*100):0;
+
       app.innerHTML=`<div class="card"><h1>📋 Inventointierot — Live</h1>
-        <p class="sub">Inventoitu: ${totalCounted}${totalProducts?'/'+totalProducts:''} — ${devs.length} eroa</p>
+        <p class="sub">Tuotteita: ${totalCounted}${totalProducts?'/'+totalProducts:''} — ${devs.length} eroa</p>
+        <div style="margin-bottom:12px">
+          <div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px">
+            <span>Hyllyjä: ${shelvesDone}/${shelvesTotal}</span>
+            <span>${shelvesRemaining} jäljellä (${shelfPct}%)</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${shelfPct}%"></div></div>
+        </div>
         <div class="flex gap-8 mb-8">
           <button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">📥 Erot CSV</button>
           <button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">📥 Kaikki CSV</button>
