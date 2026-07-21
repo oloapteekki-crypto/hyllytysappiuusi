@@ -208,10 +208,20 @@ function loadFiles(){
     readers.push(Promise.resolve(null));
   }
   
-  Promise.all(readers).then(([maxxText,magText,eanText])=>{
+  Promise.all(readers).then(async([maxxText,magText,eanText])=>{
     const maxx=parseMaxx(maxxText);
     const magento=parseMagento(magText);
-    const eanMap=eanText?parseProductRegister(eanText):{};
+    let eanMap=eanText?parseProductRegister(eanText):{};
+    
+    // If no EAN file provided, try loading from hyllytysappi Firebase
+    if(!eanText){
+      try{
+        setState({result:{type:'ok',text:'Haetaan EAN-koodit...'}});
+        const snap=await db.ref('files/csv').once('value');
+        const csvText=snap.val();
+        if(csvText)eanMap=parseProductRegister(csvText);
+      }catch(e){}
+    }
     
     // Merge: for each Maxx product, add unshipped from Magento
     const products=[];
@@ -571,10 +581,13 @@ if(viewMode){
       readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(magInput.files[0],'utf-8')}));
       if(eanInput.files.length){readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(eanInput.files[0],'utf-8')}))}
       else{readers.push(Promise.resolve(null))}
-      Promise.all(readers).then(([maxxText,magText,eanText])=>{
+      Promise.all(readers).then(async([maxxText,magText,eanText])=>{
         const maxx=parseMaxx(maxxText);
         const magento=parseMagento(magText);
-        const eanMap=eanText?parseProductRegister(eanText):{};
+        let eanMap=eanText?parseProductRegister(eanText):{};
+        if(!eanText){
+          try{const snap=await db.ref('files/csv').once('value');const csv=snap.val();if(csv)eanMap=parseProductRegister(csv)}catch(e){}
+        }
         const products=[];
         for(const vnr in maxx){
           const m=maxx[vnr],mag=magento[vnr]||{unshipped:0};
