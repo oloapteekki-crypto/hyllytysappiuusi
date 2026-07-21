@@ -85,10 +85,11 @@ function fbSaveProducts(products){
 let fbCounted={};
 let viewMode=new URLSearchParams(window.location.search).get('view')==='erot';
 let fbProducts={};
+let fbDataLoaded={counted:false,products:false};
 
 invRef.child('counted').on('value',snap=>{
   fbCounted=snap.val()||{};
-  // Sync to local state if we have products loaded
+  fbDataLoaded.counted=true;
   if(S.products){
     for(const vnr in fbCounted){
       S.allCounted[vnr]=fbCounted[vnr].qty;
@@ -99,6 +100,7 @@ invRef.child('counted').on('value',snap=>{
 
 invRef.child('products').on('value',snap=>{
   fbProducts=snap.val()||{};
+  fbDataLoaded.products=true;
   if(viewMode)render();
 });
 
@@ -710,6 +712,13 @@ if(viewMode){
 
     function renderView(){
       const app=document.getElementById('app');
+      
+      if(!fbDataLoaded.counted||!fbDataLoaded.products){
+        app.innerHTML=`<div class="card"><h1>📋 Inventointierot — Live</h1>
+          <p class="sub">⏳ Ladataan Firebasesta...</p></div>`;
+        return;
+      }
+      
       const counted=fbCounted;
       const products=fbProducts;
       const devs=[];
@@ -743,7 +752,8 @@ if(viewMode){
       const shelfPct=shelvesTotal>0?Math.round(shelvesDone/shelvesTotal*100):0;
 
       app.innerHTML=`<div class="card"><h1>📋 Inventointierot — Live</h1>
-        <p class="sub">Tuotteita: ${totalCounted}${totalProducts?'/'+totalProducts:''} — ${devs.length} eroa</p>
+        <p class="sub">${todayKey()} — Tuotteita: ${totalCounted}${totalProducts?'/'+totalProducts:''} — ${devs.length} eroa
+          ${!totalProducts?'<br>⚠ Tuotteita ei ladattu — lataa CSV:t alta':''}</p>
         <div style="margin-bottom:12px">
           <div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px">
             <span>Hyllyjä: ${shelvesDone}/${shelvesTotal}</span>
