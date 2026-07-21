@@ -256,6 +256,27 @@ function loadFiles(){
   }).catch(e=>{setState({error:'Virhe: '+e.message,result:null})});
 }
 
+function loadFromFB(){
+  setState({error:null,result:{type:'ok',text:'Haetaan Firebasesta...'}});
+  invRef.child('products').once('value',snap=>{
+    const data=snap.val();
+    if(!data||!Object.keys(data).length){setState({error:'Ei tuotteita Firebasessa — lataa tiedostot ensin tietokoneella',result:null});return}
+    const products=[];
+    for(const vnr in data){
+      const p=data[vnr];
+      const loc=pLoc(p.location||'');
+      if(!loc)continue;
+      products.push({vnr,name:p.name||'',ean:p.ean||'',location:p.location,loc,expected:p.expected||0,saldo:p.saldo||0,unshipped:p.unshipped||0,shelfKey:loc.shelfKey});
+    }
+    const shelves={};
+    products.forEach(p=>{if(!shelves[p.shelfKey])shelves[p.shelfKey]={key:p.shelfKey,aisle:p.loc.aisle,shelf:p.loc.shelf,count:0};shelves[p.shelfKey].count++});
+    const shelfList=Object.values(shelves).sort((a,b)=>{const ai=aisleIdx(a.aisle),bi=aisleIdx(b.aisle);if(ai!==bi)return ai-bi;return a.shelf.localeCompare(b.shelf,undefined,{numeric:1})});
+    const existingCounted={};
+    for(const vnr in fbCounted){existingCounted[vnr]=fbCounted[vnr].qty}
+    setState({products,shelves:shelfList,phase:'shelfSelect',result:{type:'ok',text:`✓ ${products.length} tuotetta Firebasesta`},allCounted:existingCounted});
+  });
+}
+
 /* ═══════════ SHELF SELECTION ═══════════ */
 function selectShelf(key){
   const items=S.products.filter(p=>p.shelfKey===key);
@@ -407,7 +428,10 @@ function render(){
         <input type="file" id="mag-file" accept=".csv" style="font-size:14px;width:100%"></div>
       <div class="mb-12"><label class="label">Tuoterekisteri / EAN (valinnainen)</label>
         <input type="file" id="ean-file" accept=".csv" style="font-size:14px;width:100%"></div>
-      <button class="btn" onclick="loadFiles()">Lataa ja yhdistä</button>
+      <button class="btn" onclick="loadFiles()">Lataa tiedostoista</button>
+      <div style="display:flex;align-items:center;gap:12px;margin:12px 0;color:#94a3b8;font-size:12px"><div style="flex:1;height:1px;background:#e9d5ff"></div>tai<div style="flex:1;height:1px;background:#e9d5ff"></div></div>
+      <button class="btn" style="background:#7c3aed" onclick="loadFromFB()">📱 Lataa Firebasesta</button>
+      <p style="font-size:11px;color:#94a3b8;margin-top:4px;text-align:center">Jos tiedostot on jo ladattu tietokoneella</p>
       ${S.error?`<div class="error">${S.error}</div>`:''}
       ${S.result?`<div class="scan-result ${S.result.type==='ok'?'scan-ok':'scan-fail'}">${S.result.text}</div>`:''}</div>`;
     return;
@@ -534,6 +558,36 @@ function render(){
 /* ═══════════ VIEW MODE ═══════════ */
 if(viewMode){
   (function(){
+    // Upload function for desktop view
+    window.uploadFromDesktop=function(){
+      const maxxInput=document.getElementById('v-maxx');
+      const magInput=document.getElementById('v-mag');
+      const eanInput=document.getElementById('v-ean');
+      if(!maxxInput.files.length||!magInput.files.length){alert('Valitse molemmat tiedostot');return}
+      const btn=document.getElementById('v-upload-btn');
+      if(btn)btn.textContent='Ladataan...';
+      const readers=[];
+      readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(maxxInput.files[0],'iso-8859-15')}));
+      readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(magInput.files[0],'utf-8')}));
+      if(eanInput.files.length){readers.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsText(eanInput.files[0],'utf-8')}))}
+      else{readers.push(Promise.resolve(null))}
+      Promise.all(readers).then(([maxxText,magText,eanText])=>{
+        const maxx=parseMaxx(maxxText);
+        const magento=parseMagento(magText);
+        const eanMap=eanText?parseProductRegister(eanText):{};
+        const products=[];
+        for(const vnr in maxx){
+          const m=maxx[vnr],mag=magento[vnr]||{unshipped:0};
+          const loc=pLoc(m.location);if(!loc)continue;
+          products.push({vnr,name:m.name,ean:eanMap[vnr]||'',location:m.location,expected:Math.round(m.saldo+mag.unshipped),saldo:m.saldo,unshipped:mag.unshipped});
+        }
+        const data={};
+        products.forEach(p=>{data[p.vnr]={name:p.name,ean:p.ean,location:p.location,expected:p.expected,saldo:p.saldo,unshipped:p.unshipped}});
+        invRef.child('products').set(data);
+        if(btn)btn.textContent='✓ Ladattu! ('+products.length+' tuotetta)';
+      }).catch(e=>{if(btn)btn.textContent='Virhe: '+e.message});
+    };
+
     function renderView(){
       const app=document.getElementById('app');
       const counted=fbCounted;
@@ -579,7 +633,18 @@ if(viewMode){
         <div class="flex gap-8 mb-8">
           <button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">📥 Erot CSV</button>
           <button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">📥 Kaikki CSV</button>
-        </div></div>
+        </div>
+        <details><summary style="font-size:13px;color:#7c3aed;cursor:pointer">💻 Lataa/päivitä tiedostot</summary>
+          <div style="margin-top:8px">
+            <div class="mb-8"><label class="label">Maxx saldo (InventointialustaXRP)</label>
+              <input type="file" id="v-maxx" accept=".csv" style="font-size:13px;width:100%"></div>
+            <div class="mb-8"><label class="label">Keräilemätön (Magento inventory)</label>
+              <input type="file" id="v-mag" accept=".csv" style="font-size:13px;width:100%"></div>
+            <div class="mb-8"><label class="label">Tuoterekisteri/EAN (valinnainen)</label>
+              <input type="file" id="v-ean" accept=".csv" style="font-size:13px;width:100%"></div>
+            <button id="v-upload-btn" class="btn" style="background:#6d28d9" onclick="uploadFromDesktop()">Lataa Firebaseen</button>
+          </div></details>
+        </div>
         ${devs.length?devs.map(d=>`<div class="deviation ${d.diff>0?'dev-plus':'dev-minus'}">
           <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${esc(d.name)}</div>
             <div class="mono" style="color:#64748b">${d.location} | VNR ${d.vnr}</div>
