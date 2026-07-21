@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#7c3aed">
 <title>Inventointi — Olo-apteekki</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;background:#faf5ff;color:#1e293b}
 .app{max-width:500px;margin:0 auto;padding:16px 12px;min-height:100dvh}
@@ -58,6 +60,47 @@ const WORKERS=[
   'Milla S.','Mio R.','Nea H.','Ninni T.','Robert J.','Tilda T.'
 ].sort();
 let currentWorker=localStorage.getItem('inventointi_worker')||'';
+
+/* ═══════════ FIREBASE ═══════════ */
+firebase.initializeApp({apiKey:"AIzaSyBA_nMeugv0lSxjVm1il1iJo7v33Fs__X8",authDomain:"hyllytysappi.firebaseapp.com",databaseURL:"https://hyllytysappi-default-rtdb.europe-west1.firebasedatabase.app",projectId:"hyllytysappi",storageBucket:"hyllytysappi.firebasestorage.app",messagingSenderId:"312430303554",appId:"1:312430303554:web:1fa95efa74fa370bdc10db"});
+const db=firebase.database();
+function todayKey(){return new Date().toISOString().slice(0,10)}
+const invRef=db.ref('inventointi/'+todayKey());
+
+// Save a single counted item to Firebase
+function fbSaveCount(vnr,qty,name,location,expected){
+  invRef.child('counted/'+vnr).set({qty,name,location,expected,worker:currentWorker,t:Date.now()});
+}
+function fbDeleteCount(vnr){
+  invRef.child('counted/'+vnr).remove();
+}
+// Save product list (once, when files loaded)
+function fbSaveProducts(products){
+  const data={};
+  products.forEach(p=>{data[p.vnr]={name:p.name,ean:p.ean||'',location:p.location,expected:p.expected,saldo:p.saldo,unshipped:p.unshipped}});
+  invRef.child('products').set(data);
+}
+
+// Listen for real-time updates (for view mode and multi-device)
+let fbCounted={};
+let viewMode=new URLSearchParams(window.location.search).get('view')==='erot';
+let fbProducts={};
+
+invRef.child('counted').on('value',snap=>{
+  fbCounted=snap.val()||{};
+  // Sync to local state if we have products loaded
+  if(S.products){
+    for(const vnr in fbCounted){
+      S.allCounted[vnr]=fbCounted[vnr].qty;
+    }
+  }
+  if(viewMode||S.phase==='deviations')render();
+});
+
+invRef.child('products').on('value',snap=>{
+  fbProducts=snap.val()||{};
+  if(viewMode)render();
+});
 
 /* ═══════════ ROUTE (same as hyllytysappi) ═══════════ */
 const PR=[{id:"L1",asc:1},{id:"FA",asc:1},{id:"L2",asc:0},{id:"L3",asc:1},{id:"L4",asc:0},{id:"L5",asc:1},{id:"A2",asc:0},{id:"A3",asc:1},{id:"A4",asc:0},{id:"A5",asc:1},{id:"A6",asc:0},{id:"A1",asc:1},{id:"A7",asc:0},{id:"B1",asc:1},{id:"B2",asc:0},{id:"B3",asc:1},{id:"B4",asc:0},{id:"UU",asc:1}];
@@ -200,11 +243,16 @@ function loadFiles(){
       return a.shelf.localeCompare(b.shelf,undefined,{numeric:1});
     });
     
+    // Load existing Firebase counts
+    const existingCounted={};
+    for(const vnr in fbCounted){existingCounted[vnr]=fbCounted[vnr].qty}
+    
     setState({
       products,shelves:shelfList,phase:'shelfSelect',
       result:{type:'ok',text:`✓ ${products.length} tuotetta, ${shelfList.length} hyllyä`},
-      allCounted:{}
+      allCounted:existingCounted
     });
+    fbSaveProducts(products);
   }).catch(e=>{setState({error:'Virhe: '+e.message,result:null})});
 }
 
@@ -227,6 +275,7 @@ function countItem(vnr,qty){
   if(undoStack.length>50)undoStack.shift();
   S.counted[vnr]=qty;
   S.allCounted[vnr]=qty;
+  fbSaveCount(vnr,qty,item?.name||'',item?.location||'',item?.expected||0);
   
   // Auto-advance if counted
   const cur=S.shelfItems[S.currentIdx];
@@ -246,8 +295,8 @@ function countItem(vnr,qty){
 function popUndo(){
   if(!undoStack.length)return;
   const u=undoStack.pop();
-  if(u.prev===undefined)delete S.counted[u.vnr]; else S.counted[u.vnr]=u.prev;
-  if(u.prev===undefined)delete S.allCounted[u.vnr]; else S.allCounted[u.vnr]=u.prev;
+  if(u.prev===undefined){delete S.counted[u.vnr];delete S.allCounted[u.vnr];fbDeleteCount(u.vnr)}
+  else{S.counted[u.vnr]=u.prev;S.allCounted[u.vnr]=u.prev;const item=S.shelfItems?.find(i=>i.vnr===u.vnr);fbSaveCount(u.vnr,u.prev,item?.name||'',item?.location||'',item?.expected||0)}
   setState({counted:S.counted,allCounted:S.allCounted,currentIdx:u.idx,result:{type:'ok',text:'↩ Peruttu'}});
 }
 
@@ -480,6 +529,56 @@ function render(){
         </div></details>`;
     return;
   }
+}
+
+/* ═══════════ VIEW MODE ═══════════ */
+if(viewMode){
+  (function(){
+    function renderView(){
+      const app=document.getElementById('app');
+      const counted=fbCounted;
+      const products=fbProducts;
+      const devs=[];
+      for(const vnr in counted){
+        const c=counted[vnr],p=products[vnr]||{};
+        const expected=p.expected||0;
+        const diff=c.qty-expected;
+        if(diff!==0)devs.push({vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected,counted:c.qty,diff,worker:c.worker||''});
+      }
+      devs.sort((a,b)=>a.diff-b.diff);
+      const totalCounted=Object.keys(counted).length;
+      const totalProducts=Object.keys(products).length;
+
+      app.innerHTML=`<div class="card"><h1>📋 Inventointierot — Live</h1>
+        <p class="sub">Inventoitu: ${totalCounted}${totalProducts?'/'+totalProducts:''} — ${devs.length} eroa</p>
+        <div class="flex gap-8 mb-8">
+          <button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">📥 Erot CSV</button>
+          <button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">📥 Kaikki CSV</button>
+        </div></div>
+        ${devs.length?devs.map(d=>`<div class="deviation ${d.diff>0?'dev-plus':'dev-minus'}">
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${esc(d.name)}</div>
+            <div class="mono" style="color:#64748b">${d.location} | VNR ${d.vnr}</div>
+            <div style="font-size:11px;color:#94a3b8">👤 ${d.worker}</div></div>
+          <div style="text-align:right;white-space:nowrap;margin-left:8px">
+            <div style="font-weight:700">${d.counted} / ${d.expected}</div>
+            <div style="font-size:14px;font-weight:700">${d.diff>0?'+':''}${d.diff}</div></div></div>`).join('')
+        :'<div class="card" style="text-align:center;padding:24px"><div style="font-size:36px;margin-bottom:8px">✓</div><h2 style="color:#16a34a">Ei eroja</h2></div>'}
+        <div style="text-align:center;margin-top:12px;font-size:11px;color:#94a3b8">Päivittyy automaattisesti</div>`;
+    }
+    window.dlViewCSV=function(){
+      const rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+      for(const vnr in fbCounted){const c=fbCounted[vnr],p=fbProducts[vnr]||{};const diff=c.qty-(p.expected||0);
+        if(diff!==0)rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||''])}
+      downloadCSV(rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'),'erot_'+todayKey()+'.csv');
+    };
+    window.dlAllCSV=function(){
+      const rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+      for(const vnr in fbCounted){const c=fbCounted[vnr],p=fbProducts[vnr]||{};
+        rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,c.qty-(p.expected||0),c.worker||''])}
+      downloadCSV(rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'),'inventointi_'+todayKey()+'.csv');
+    };
+    render=renderView;
+  })();
 }
 
 render();
