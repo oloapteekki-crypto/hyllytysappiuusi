@@ -762,6 +762,13 @@ if(viewMode){
     else{readers.push(Promise.resolve(null))}
     Promise.all(readers).then(async function(results){
       if(btn)btn.textContent='Poistetaan vanha data...';
+      var keepCounted=document.getElementById('v-keep-counted')&&document.getElementById('v-keep-counted').checked;
+      // Save existing counted data if keeping
+      var savedCounted=null,savedDismissed=null;
+      if(keepCounted){
+        try{var snap1=await invRef.child('counted').once('value');savedCounted=snap1.val()}catch(e){}
+        try{var snap2=await invRef.child('dismissed').once('value');savedDismissed=snap2.val()}catch(e){}
+      }
       invRef.child('counted').off();invRef.child('products').off();
       fbCounted={};fbProducts={};
       await db.ref('inventointi').remove();
@@ -775,6 +782,9 @@ if(viewMode){
       if(btn)btn.textContent='Tallennetaan '+products.length+' tuotetta...';
       console.log('Sample 9269664:',JSON.stringify(data['9269664']));
       await invRef.child('products').set(data);
+      // Restore counted data if keeping
+      if(keepCounted&&savedCounted){await invRef.child('counted').set(savedCounted)}
+      if(keepCounted&&savedDismissed){await invRef.child('dismissed').set(savedDismissed)}
       invRef.child('counted').on('value',function(snap){fbCounted=snap.val()||{};render()});
       invRef.child('products').on('value',function(snap){fbProducts=snap.val()||{};render()});
       fbDismissed={};
@@ -832,6 +842,8 @@ if(viewMode){
     h+='<div class="mb-8"><label class="label">Maxx saldo</label><input type="file" id="v-maxx" accept=".csv" style="font-size:13px;width:100%"></div>';
     h+='<div class="mb-8"><label class="label">Ker\u00e4ilem\u00e4t\u00f6n</label><input type="file" id="v-mag" accept=".csv" style="font-size:13px;width:100%"></div>';
     h+='<div class="mb-8"><label class="label">EAN (valinnainen)</label><input type="file" id="v-ean" accept=".csv" style="font-size:13px;width:100%"></div>';
+    h+='<div class="mb-12" style="padding:10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0"><label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="v-keep-counted" checked> S\u00e4ilyt\u00e4 aiemmat inventointitulokset</label>';
+    h+='<div style="font-size:11px;color:#94a3b8;margin-top:4px">Ruksilla: p\u00e4ivitt\u00e4\u00e4 odotetut saldot, jo inventoidut hyllyt s\u00e4ilyv\u00e4t. Ilman: aloittaa puhtaalta p\u00f6yd\u00e4lt\u00e4.</div></div>';
     h+='<button id="v-upload-btn" class="btn" style="background:#6d28d9" onclick="uploadFromDesktop()">Lataa Firebaseen</button></div></details>';
 
     if(shelvesTotal>0){
