@@ -151,9 +151,11 @@ function showScanWrap(){
   if(S.device!=='scanner'||!wrap)return;
   wrap.style.display='block';
   var inp=document.getElementById('inv-scan-field');
-  if(inp)inp.placeholder=S.camConfirmed?'Syötä määrä tai skannaa':'Skannaa tuotteen viivakoodi';
-  if(!scanFieldFocused){
-    if(inp){inp.focus();setTimeout(function(){inp.blur()},100);scanFieldFocused=true}
+  if(inp){
+    inp.placeholder=S.camConfirmed?'Syötä määrä':'Skannaa viivakoodi';
+    // Focus then blur - MT90 "Fill in EditText directly" remembers the field
+    inp.focus();
+    setTimeout(function(){inp.blur()},50);
   }
 }
 function hideScanWrap(){
@@ -167,7 +169,10 @@ window.addEventListener('beforeunload',function(e){
   if(S.phase==='counting'||S.phase==='shelfSelect'){e.preventDefault();e.returnValue='Inventointi on kesken.'}
 });
 
-function setState(u){Object.assign(S,u);render()}
+function setState(u){Object.assign(S,u);render();
+  if(S.phase==='counting'&&S.device==='scanner')showScanWrap();
+  else if(S.phase!=='counting')hideScanWrap();
+}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 /* ═══════════ CSV PARSING ═══════════ */
