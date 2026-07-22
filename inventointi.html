@@ -774,6 +774,13 @@ if(viewMode){
         products.push({vnr:vnr,name:m.name,ean:eanMap[vnr]||'',location:m.location,expected:Math.round(m.saldo+mag.unshipped),saldo:m.saldo,unshipped:mag.unshipped})}
       var data={};products.forEach(function(p){data[p.vnr]={name:p.name,ean:p.ean,location:p.location,expected:p.expected,saldo:p.saldo,unshipped:p.unshipped}});
       if(btn)btn.textContent='Tallennetaan '+products.length+' tuotetta...';
+      console.log('Saving to:',invRef.toString());
+      console.log('First product:',JSON.stringify(data[Object.keys(data)[0]]));
+      console.log('VNR 9269664:',JSON.stringify(data['9269664']));
+      await invRef.child('products').set(data);
+      // Verify write
+      var verify=await invRef.child('products/9269664/expected').once('value');
+      console.log('Verify 9269664 expected:',verify.val());
       await invRef.child('products').set(data);
       // Reattach listeners
       invRef.child('counted').on('value',function(snap){
@@ -785,7 +792,10 @@ if(viewMode){
         fbProducts=snap.val()||{};
         if(viewMode)render();
       });
-      if(btn)btn.textContent='✓ OK! ('+products.length+' tuotetta)';
+      if(btn){
+        var sample=data['9269664'];
+        btn.textContent='✓ '+products.length+' tuotetta (9269664 exp='+((sample&&sample.expected)||'?')+')';
+      }
       render();
     }).catch(function(e){if(btn)btn.textContent='Virhe: '+e.message});
   };
