@@ -141,6 +141,11 @@ let S={
 };
 let undoStack=[];
 
+// Prevent accidental page refresh
+window.addEventListener('beforeunload',function(e){
+  if(S.phase==='counting'||S.phase==='shelfSelect'){e.preventDefault();e.returnValue='Inventointi on kesken.'}
+});
+
 function setState(u){Object.assign(S,u);render()}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
@@ -393,36 +398,34 @@ async function camStart(){
   camStop();
   const v=document.getElementById('inv-cam-video');if(!v)return;
   
-  // Check BarcodeDetector support
   const hasBD='BarcodeDetector' in window;
   if(hasBD)camDetector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','itf','upc_a','upc_e']});
   
-  try{
-    // iOS needs simpler constraints
-    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-    const constraints=isIOS?
-      {video:{facingMode:{exact:'environment'}}}:
-      {video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}};
+  async function tryStream(constraints){
     camStream=await navigator.mediaDevices.getUserMedia(constraints);
-    v.setAttribute('autoplay','');
-    v.setAttribute('playsinline','');
-    v.setAttribute('webkit-playsinline','');
     v.srcObject=camStream;
+    // iOS needs to wait for loadedmetadata before play
+    await new Promise(function(resolve){
+      v.onloadedmetadata=function(){resolve()};
+      setTimeout(resolve,2000); // fallback timeout
+    });
     await v.play();
     camRunning=true;
     if(hasBD){camScan()}
-    else{
-      // No BarcodeDetector - show manual input hint
-      setState({result:{type:'fail',text:'Automaattinen tunnistus ei tuettu — syötä koodi käsin'}});
-    }
-  }catch(e){
-    if(e.name==='OverconstrainedError'){
-      // Fallback: try without exact facingMode
+    else{setState({result:{type:'fail',text:'Automaattinen tunnistus ei tuettu — syötä koodi käsin'}})}
+  }
+  
+  try{
+    await tryStream({video:{facingMode:{exact:'environment'}}});
+  }catch(e1){
+    try{
+      await tryStream({video:{facingMode:'environment'}});
+    }catch(e2){
       try{
-        camStream=await navigator.mediaDevices.getUserMedia({video:true});
-        v.srcObject=camStream;await v.play();camRunning=true;
-        if(hasBD)camScan();
-      }catch(e2){}
+        await tryStream({video:true});
+      }catch(e3){
+        setState({result:{type:'fail',text:'Kamera ei käynnisty — syötä koodi käsin'}});
+      }
     }
   }
 }
