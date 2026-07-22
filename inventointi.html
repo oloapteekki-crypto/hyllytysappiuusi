@@ -170,7 +170,7 @@ window.addEventListener('beforeunload',function(e){
 });
 
 function setState(u){Object.assign(S,u);render();
-  if(S.phase==='counting'&&S.device==='scanner')showScanWrap();
+  if(S.phase==='counting'&&S.device==='scanner'&&!speechActive)showScanWrap();
   else if(S.phase!=='counting')hideScanWrap();
 }
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
