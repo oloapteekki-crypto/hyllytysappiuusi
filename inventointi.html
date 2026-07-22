@@ -742,10 +742,16 @@ function render(){
 
 /* ═══════════ VIEW MODE ═══════════ */
 if(viewMode){
+  var fbDismissed={};
+  invRef.child('dismissed').on('value',function(snap){fbDismissed=snap.val()||{};render()});
+
+  window.dismissDev=function(vnr){invRef.child('dismissed/'+vnr).set({t:Date.now()})};
+  window.undismissDev=function(vnr){invRef.child('dismissed/'+vnr).remove()};
+  window.dismissAll=function(){if(!confirm('Kuittaa kaikki erot?'))return;
+    for(var vnr in fbCounted){var c=fbCounted[vnr],p=fbProducts[vnr]||{};if(c.qty!==(p.expected||0))invRef.child('dismissed/'+vnr).set({t:Date.now()})}};
+
   window.uploadFromDesktop=function(){
-    var maxxInput=document.getElementById('v-maxx');
-    var magInput=document.getElementById('v-mag');
-    var eanInput=document.getElementById('v-ean');
+    var maxxInput=document.getElementById('v-maxx'),magInput=document.getElementById('v-mag'),eanInput=document.getElementById('v-ean');
     if(!maxxInput.files.length||!magInput.files.length){alert('Valitse molemmat tiedostot');return}
     var btn=document.getElementById('v-upload-btn');
     if(btn)btn.textContent='Ladataan...';
@@ -756,68 +762,32 @@ if(viewMode){
     else{readers.push(Promise.resolve(null))}
     Promise.all(readers).then(async function(results){
       if(btn)btn.textContent='Poistetaan vanha data...';
-      // Detach listeners to prevent interference
-      invRef.child('counted').off();
-      invRef.child('products').off();
+      invRef.child('counted').off();invRef.child('products').off();
       fbCounted={};fbProducts={};
       await db.ref('inventointi').remove();
-      var maxx=parseMaxx(results[0]);
-      var magento=parseMagento(results[1]);
+      var maxx=parseMaxx(results[0]),magento=parseMagento(results[1]);
       var eanMap=results[2]?parseProductRegister(results[2]):{};
       if(!results[2]){try{var snap=await db.ref('files/csv').once('value');var csv=snap.val();if(csv)eanMap=parseProductRegister(csv)}catch(e){}}
       var products=[];
-      for(var vnr in maxx){var m=maxx[vnr],mag=magento[vnr]||{unshipped:0};
-        var loc=pLoc(m.location);if(!loc)continue;
+      for(var vnr in maxx){var m=maxx[vnr],mag=magento[vnr]||{unshipped:0};var loc=pLoc(m.location);if(!loc)continue;
         products.push({vnr:vnr,name:m.name,ean:eanMap[vnr]||'',location:m.location,expected:Math.round(m.saldo+mag.unshipped),saldo:m.saldo,unshipped:mag.unshipped})}
       var data={};products.forEach(function(p){data[p.vnr]={name:p.name,ean:p.ean,location:p.location,expected:p.expected,saldo:p.saldo,unshipped:p.unshipped}});
       if(btn)btn.textContent='Tallennetaan '+products.length+' tuotetta...';
-      console.log('Saving to:',invRef.toString());
-      console.log('First product:',JSON.stringify(data[Object.keys(data)[0]]));
-      console.log('VNR 9269664:',JSON.stringify(data['9269664']));
+      console.log('Sample 9269664:',JSON.stringify(data['9269664']));
       await invRef.child('products').set(data);
-      // Verify write
-      var verify=await invRef.child('products/9269664/expected').once('value');
-      console.log('Verify 9269664 expected:',verify.val());
-      await invRef.child('products').set(data);
-      // Reattach listeners
-      invRef.child('counted').on('value',function(snap){
-        fbCounted=snap.val()||{};
-        if(S.products){for(var v in fbCounted){S.allCounted[v]=fbCounted[v].qty}}
-        if(viewMode||S.phase==='deviations')render();
-      });
-      invRef.child('products').on('value',function(snap){
-        fbProducts=snap.val()||{};
-        if(viewMode)render();
-      });
-      if(btn){
-        var sample=data['9269664'];
-        btn.textContent='✓ '+products.length+' tuotetta (9269664 exp='+((sample&&sample.expected)||'?')+')';
-      }
+      invRef.child('counted').on('value',function(snap){fbCounted=snap.val()||{};render()});
+      invRef.child('products').on('value',function(snap){fbProducts=snap.val()||{};render()});
+      fbDismissed={};
+      invRef.child('dismissed').on('value',function(snap){fbDismissed=snap.val()||{};render()});
+      if(btn)btn.textContent='OK! ('+products.length+' tuotetta, exp='+((data['9269664']||{}).expected||'?')+')';
       render();
     }).catch(function(e){if(btn)btn.textContent='Virhe: '+e.message});
   };
-  window.dismissDev=function(vnr){
-    invRef.child('dismissed/'+vnr).set({t:Date.now()});
-  };
-  window.undismissDev=function(vnr){
-    invRef.child('dismissed/'+vnr).remove();
-  };
-  window.dismissAll=function(){
-    if(!confirm('Kuittaa kaikki erot käsitellyiksi?'))return;
-    for(var vnr in fbCounted){
-      var c=fbCounted[vnr],p=fbProducts[vnr]||{};
-      if(c.qty!==(p.expected||0))invRef.child('dismissed/'+vnr).set({t:Date.now()});
-    }
-  };
 
-  var fbDismissed={};
-  invRef.child('dismissed').on('value',function(snap){
-    fbDismissed=snap.val()||{};
-    if(viewMode)render();
-  });
+  window.dlViewCSV=function(){
     var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
     for(var vnr in fbCounted){var c=fbCounted[vnr],p=fbProducts[vnr]||{};var diff=c.qty-(p.expected||0);
-      if(diff!==0)rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||''])}
+      if(diff!==0&&!fbDismissed[vnr])rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||''])}
     downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'erot_'+todayKey()+'.csv');
   };
   window.dlAllCSV=function(){
@@ -829,11 +799,9 @@ if(viewMode){
 
   render=function(){
     var app=document.getElementById('app');
-    var counted=fbCounted||{};
-    var products=fbProducts||{};
-    var totalCounted=Object.keys(counted).length;
-    var totalProducts=Object.keys(products).length;
-    var devs=[];var dismissedCount=0;
+    var counted=fbCounted||{},products=fbProducts||{};
+    var totalCounted=Object.keys(counted).length,totalProducts=Object.keys(products).length;
+    var devs=[],dismissedCount=0;
     for(var vnr in counted){var c=counted[vnr],p=products[vnr]||{};var exp=p.expected||0;var diff=c.qty-exp;
       if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else{devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||''})}}}
     devs.sort(function(a,b){return a.diff-b.diff});
@@ -842,56 +810,39 @@ if(viewMode){
       if(pts.length>=2){var key=pts[0]+'-'+pts[1];if(!shelves[key])shelves[key]={total:0,counted:0};shelves[key].total++;if(counted[v])shelves[key].counted++}}
     var shelfKeys=Object.keys(shelves);
     var shelvesDone=shelfKeys.filter(function(k){return shelves[k].counted===shelves[k].total&&shelves[k].total>0}).length;
-    var shelvesTotal=shelfKeys.length;
-    var shelvesRemaining=shelvesTotal-shelvesDone;
+    var shelvesTotal=shelfKeys.length,shelvesRemaining=shelvesTotal-shelvesDone;
     var shelfPct=shelvesTotal>0?Math.round(shelvesDone/shelvesTotal*100):0;
 
-    var h='<div class="card"><h1>Inventointierot — Live</h1>';
-    h+='<p class="sub">'+todayKey()+' — Tuotteita: '+totalCounted+(totalProducts?'/'+totalProducts:'')+' — '+devs.length+' eroa'+(dismissedCount?' — ✓ '+dismissedCount+' kuitattu':'')+'</p>';
+    var h='<div class="card"><h1>Inventointierot \u2014 Live</h1>';
+    h+='<p class="sub">'+todayKey()+' \u2014 '+devs.length+' eroa'+(dismissedCount?' \u2014 \u2713 '+dismissedCount+' kuitattu':'')+'</p>';
     if(totalProducts>0){
       h+='<div style="margin-bottom:12px"><div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px">';
-      h+='<span>Hyllyjä: '+shelvesDone+'/'+shelvesTotal+'</span><span>'+shelvesRemaining+' jäljellä ('+shelfPct+'%)</span></div>';
-      h+='<div class="progress-bar"><div class="progress-fill" style="width:'+shelfPct+'%"></div></div></div>';
-    }
+      h+='<span>Hyllyt: '+shelvesDone+'/'+shelvesTotal+'</span><span>'+shelvesRemaining+' j\u00e4ljell\u00e4 ('+shelfPct+'%)</span></div>';
+      h+='<div class="progress-bar"><div class="progress-fill" style="width:'+shelfPct+'%"></div></div></div>'}
     h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">Erot CSV</button>';
     h+='<button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">Kaikki CSV</button></div>';
-    if(devs.length>0){h+='<div class="flex gap-8 mb-8"><button class="btn-sm flex-1" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac" onclick="dismissAll()">✓ Kuittaa kaikki</button></div>'}
-    if(dismissedCount>0){h+='<details style="margin-bottom:8px"><summary style="font-size:12px;color:#16a34a;cursor:pointer">✓ Kuitatut ('+dismissedCount+')</summary><div style="margin-top:4px">';
+    if(devs.length>0){h+='<button class="btn-sm" style="width:100%;margin-bottom:8px;background:#f0fdf4;color:#16a34a;border:1px solid #86efac" onclick="dismissAll()">\u2713 Kuittaa kaikki</button>'}
+    if(dismissedCount>0){h+='<details style="margin-bottom:8px"><summary style="font-size:12px;color:#16a34a;cursor:pointer">\u2713 Kuitatut ('+dismissedCount+')</summary><div style="margin-top:4px">';
       for(var vnr2 in counted){var c2=counted[vnr2],p2=products[vnr2]||{};var diff2=c2.qty-(p2.expected||0);
-        if(diff2!==0&&fbDismissed[vnr2]){h+='<div style="padding:4px 8px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center"><span>'+(c2.name||p2.name||vnr2)+' ('+c2.qty+'/'+(p2.expected||0)+')</span><button style="font-size:10px;padding:2px 8px;border:1px solid #e2e8f0;border-radius:4px;background:#fff;cursor:pointer" onclick="undismissDev(\''+vnr2+'\')">Palauta</button></div>'}}
+        if(diff2!==0&&fbDismissed[vnr2]){h+='<div style="padding:4px 8px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center"><span>'+esc(c2.name||p2.name||vnr2)+' ('+c2.qty+'/'+(p2.expected||0)+')</span><button style="font-size:10px;padding:2px 8px;border:1px solid #e2e8f0;border-radius:4px;background:#fff;cursor:pointer" onclick="undismissDev(\''+vnr2+'\')">Palauta</button></div>'}}
       h+='</div></details>'}
     h+='</div>';
 
-    h+='<details class="card"><summary style="font-size:14px;font-weight:600;color:#7c3aed;cursor:pointer">Lataa/päivitä tiedostot</summary><div style="margin-top:8px">';
+    h+='<details class="card"><summary style="font-size:14px;font-weight:600;color:#7c3aed;cursor:pointer">Lataa tiedostot</summary><div style="margin-top:8px">';
     h+='<div class="mb-8"><label class="label">Maxx saldo</label><input type="file" id="v-maxx" accept=".csv" style="font-size:13px;width:100%"></div>';
-    h+='<div class="mb-8"><label class="label">Keräilemätön</label><input type="file" id="v-mag" accept=".csv" style="font-size:13px;width:100%"></div>';
+    h+='<div class="mb-8"><label class="label">Ker\u00e4ilem\u00e4t\u00f6n</label><input type="file" id="v-mag" accept=".csv" style="font-size:13px;width:100%"></div>';
     h+='<div class="mb-8"><label class="label">EAN (valinnainen)</label><input type="file" id="v-ean" accept=".csv" style="font-size:13px;width:100%"></div>';
     h+='<button id="v-upload-btn" class="btn" style="background:#6d28d9" onclick="uploadFromDesktop()">Lataa Firebaseen</button></div></details>';
 
-    // Shelf status list
     if(shelvesTotal>0){
-      var sortedKeys=shelfKeys.sort(function(a,b){
-        var pa=a.split('-'),pb=b.split('-');
-        var ai=PO.indexOf(pa[0]),bi=PO.indexOf(pb[0]);
-        if(ai===-1)ai=999;if(bi===-1)bi=999;
-        if(ai!==bi)return ai-bi;
-        return pa[1].localeCompare(pb[1],undefined,{numeric:true});
-      });
+      var sortedKeys=shelfKeys.sort(function(a,b){var pa=a.split('-'),pb=b.split('-');var ai=PO.indexOf(pa[0]),bi=PO.indexOf(pb[0]);if(ai===-1)ai=999;if(bi===-1)bi=999;if(ai!==bi)return ai-bi;return pa[1].localeCompare(pb[1],undefined,{numeric:true})});
       h+='<details class="card"><summary style="font-size:14px;font-weight:600;color:#475569;cursor:pointer">Hyllyt ('+shelvesDone+'/'+shelvesTotal+')</summary>';
       h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px">';
-      for(var si=0;si<sortedKeys.length;si++){
-        var sk=sortedKeys[si],sh=shelves[sk];
-        var done=sh.counted===sh.total&&sh.total>0;
-        var started=sh.counted>0&&!done;
-        var bg=done?'#f0fdf4':started?'#fffbeb':'#f8fafc';
-        var border=done?'#86efac':started?'#fde68a':'#e2e8f0';
-        var color=done?'#16a34a':started?'#92400e':'#94a3b8';
-        h+='<div style="padding:6px;border-radius:6px;text-align:center;background:'+bg+';border:1px solid '+border+'">';
-        h+='<div style="font-size:12px;font-weight:700;color:'+color+'">'+sk+'</div>';
-        h+='<div style="font-size:10px;color:'+color+'">'+sh.counted+'/'+sh.total+'</div></div>';
-      }
-      h+='</div></details>';
-    }
+      for(var si=0;si<sortedKeys.length;si++){var sk=sortedKeys[si],sh=shelves[sk];
+        var done=sh.counted===sh.total&&sh.total>0;var started=sh.counted>0&&!done;
+        var bg=done?'#f0fdf4':started?'#fffbeb':'#f8fafc';var border=done?'#86efac':started?'#fde68a':'#e2e8f0';var color=done?'#16a34a':started?'#92400e':'#94a3b8';
+        h+='<div style="padding:6px;border-radius:6px;text-align:center;background:'+bg+';border:1px solid '+border+'"><div style="font-size:12px;font-weight:700;color:'+color+'">'+sk+'</div><div style="font-size:10px;color:'+color+'">'+sh.counted+'/'+sh.total+'</div></div>'}
+      h+='</div></details>'}
 
     if(devs.length){for(var i=0;i<devs.length;i++){var d=devs[i];
       h+='<div class="deviation '+(d.diff>0?'dev-plus':'dev-minus')+'">';
@@ -900,11 +851,11 @@ if(viewMode){
       h+='<div style="font-size:11px;color:#94a3b8">'+d.worker+'</div></div>';
       h+='<div style="text-align:right;white-space:nowrap;margin-left:8px"><div style="font-weight:700">'+d.counted+' / '+d.expected+'</div>';
       h+='<div style="font-size:14px;font-weight:700">'+(d.diff>0?'+':'')+d.diff+'</div>';
-      h+='<button style="margin-top:4px;font-size:10px;padding:2px 8px;border:1px solid #86efac;border-radius:4px;background:#f0fdf4;color:#16a34a;cursor:pointer" onclick="dismissDev(\''+d.vnr+'\')">✓ Kuitattu</button></div></div>';
-    }}else if(totalCounted>0){h+='<div class="card" style="text-align:center;padding:24px"><div style="font-size:36px;margin-bottom:8px">✓</div><h2 style="color:#16a34a">Ei eroja</h2></div>';
-    }else if(!totalProducts){h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Ei dataa — avaa "Lataa tiedostot" yllä</div>';
-    }else{h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Inventointia ei aloitettu</div>'}
-    h+='<div style="text-align:center;margin-top:12px;font-size:11px;color:#94a3b8">Päivittyy automaattisesti</div>';
+      h+='<button style="margin-top:4px;font-size:10px;padding:2px 8px;border:1px solid #86efac;border-radius:4px;background:#f0fdf4;color:#16a34a;cursor:pointer" onclick="dismissDev(\''+d.vnr+'\')">\u2713 Kuitattu</button></div></div>'}}
+    else if(totalCounted>0){h+='<div class="card" style="text-align:center;padding:24px"><div style="font-size:36px;margin-bottom:8px">\u2713</div><h2 style="color:#16a34a">Ei eroja</h2></div>'}
+    else if(!totalProducts){h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Ei dataa</div>'}
+    else{h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Inventointia ei aloitettu</div>'}
+    h+='<div style="text-align:center;margin-top:12px;font-size:11px;color:#94a3b8">P\u00e4ivittyy automaattisesti</div>';
     app.innerHTML=h;
   };
 }
