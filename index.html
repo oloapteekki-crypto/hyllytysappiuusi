@@ -530,20 +530,18 @@ async function camStart(){
   camStop();
   const v=document.getElementById('cam-video');if(!v)return;
   if(!('BarcodeDetector' in window)){alert('Kamera-skannaus ei tuettu tässä selaimessa');return}
-  try{
-    camDetector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','itf','upc_a','upc_e']});
-    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-    const constraints=isIOS?
-      {video:{facingMode:{exact:'environment'}}}:
-      {video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}};
+  camDetector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','itf','upc_a','upc_e']});
+  
+  async function tryStream(constraints){
     camStream=await navigator.mediaDevices.getUserMedia(constraints);
-    v.setAttribute('autoplay','');v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');
-    v.srcObject=camStream;await v.play();camRunning=true;camScan();
-  }catch(e){
-    if(e.name==='OverconstrainedError'){
-      try{camStream=await navigator.mediaDevices.getUserMedia({video:true});v.srcObject=camStream;await v.play();camRunning=true;camScan()}catch(e2){alert('Kamera-virhe: '+e2.message)}
-    }else{alert(e.name==='NotAllowedError'?'Kamera estetty — tarkista asetukset':'Kamera-virhe: '+e.message)}
+    v.srcObject=camStream;
+    await new Promise(function(resolve){v.onloadedmetadata=function(){resolve()};setTimeout(resolve,2000)});
+    await v.play();camRunning=true;camScan();
   }
+  try{await tryStream({video:{facingMode:{exact:'environment'}}})}
+  catch(e1){try{await tryStream({video:{facingMode:'environment'}})}
+  catch(e2){try{await tryStream({video:true})}
+  catch(e3){alert('Kamera-virhe: '+e3.message)}}}
 }
 
 function camScan(){
