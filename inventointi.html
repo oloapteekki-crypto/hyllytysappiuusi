@@ -639,11 +639,11 @@ function render(){
           `}
         `:`
           <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0">
-            <button class="voice-btn ${speechActive&&speechVnr===cur.vnr?'listening':'idle'}" onclick="${speechActive?'stopVoice()':'startVoice(\\''+cur.vnr+'\\')'}">
+            <button class="voice-btn ${speechActive&&speechVnr===cur.vnr?'listening':'idle'}" onclick="${speechActive?'stopVoice()':('startVoice(\''+cur.vnr+'\')')}">
               ${speechActive&&speechVnr===cur.vnr?'⏹':'🎤'}</button>
           </div>
           <input type="text" class="scan-input" placeholder="Syötä määrä tai skannaa" style="margin-bottom:8px"
-            onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();this.value='';if(!isNaN(parseInt(v)))countItem('${cur.vnr}',parseInt(v));else handleScanInput(v)}">
+            onkeydown="if(event.key==='Enter'){event.preventDefault();var v=this.value.trim();this.value='';if(!isNaN(parseInt(v)))countItem('${cur.vnr}',parseInt(v));else handleScanInput(v)}">
         `}
       </div>`:'<div class="card" style="text-align:center;padding:24px">Hylly tyhjä</div>'}
 
@@ -763,6 +763,7 @@ if(viewMode){
   };
 }
 
-render();</script>
+render();
+</script>
 </body>
 </html>
