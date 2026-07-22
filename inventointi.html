@@ -844,6 +844,31 @@ if(viewMode){
     h+='<div class="mb-8"><label class="label">EAN (valinnainen)</label><input type="file" id="v-ean" accept=".csv" style="font-size:13px;width:100%"></div>';
     h+='<button id="v-upload-btn" class="btn" style="background:#6d28d9" onclick="uploadFromDesktop()">Lataa Firebaseen</button></div></details>';
 
+    // Shelf status list
+    if(shelvesTotal>0){
+      var sortedKeys=shelfKeys.sort(function(a,b){
+        var pa=a.split('-'),pb=b.split('-');
+        var ai=PO.indexOf(pa[0]),bi=PO.indexOf(pb[0]);
+        if(ai===-1)ai=999;if(bi===-1)bi=999;
+        if(ai!==bi)return ai-bi;
+        return pa[1].localeCompare(pb[1],undefined,{numeric:true});
+      });
+      h+='<details class="card"><summary style="font-size:14px;font-weight:600;color:#475569;cursor:pointer">Hyllyt ('+shelvesDone+'/'+shelvesTotal+')</summary>';
+      h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px">';
+      for(var si=0;si<sortedKeys.length;si++){
+        var sk=sortedKeys[si],sh=shelves[sk];
+        var done=sh.counted===sh.total&&sh.total>0;
+        var started=sh.counted>0&&!done;
+        var bg=done?'#f0fdf4':started?'#fffbeb':'#f8fafc';
+        var border=done?'#86efac':started?'#fde68a':'#e2e8f0';
+        var color=done?'#16a34a':started?'#92400e':'#94a3b8';
+        h+='<div style="padding:6px;border-radius:6px;text-align:center;background:'+bg+';border:1px solid '+border+'">';
+        h+='<div style="font-size:12px;font-weight:700;color:'+color+'">'+sk+'</div>';
+        h+='<div style="font-size:10px;color:'+color+'">'+sh.counted+'/'+sh.total+'</div></div>';
+      }
+      h+='</div></details>';
+    }
+
     if(devs.length){for(var i=0;i<devs.length;i++){var d=devs[i];
       h+='<div class="deviation '+(d.diff>0?'dev-plus':'dev-minus')+'">';
       h+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">'+esc(d.name)+'</div>';
