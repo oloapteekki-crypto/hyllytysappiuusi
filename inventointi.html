@@ -182,11 +182,11 @@ function parseMaxx(text){
   const data={};
   for(let i=3;i<lines.length;i++){
     const cols=lines[i].split(';');
-    if(cols.length<11)continue;
+    if(cols.length<10)continue;
     const name=cols[0].trim();
     const vnr=cols[3].trim();
     const location=cols[4].trim();
-    const saldoStr=cols[9].trim().replace(',','.');
+    const saldoStr=(cols[9]||'').trim().replace(',','.');
     const saldo=parseFloat(saldoStr)||0;
     if(!vnr)continue;
     data[vnr]={name,vnr,location,saldo};
