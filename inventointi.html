@@ -796,7 +796,25 @@ if(viewMode){
       render();
     }).catch(function(e){if(btn)btn.textContent='Virhe: '+e.message});
   };
-  window.dlViewCSV=function(){
+  window.dismissDev=function(vnr){
+    invRef.child('dismissed/'+vnr).set({t:Date.now()});
+  };
+  window.undismissDev=function(vnr){
+    invRef.child('dismissed/'+vnr).remove();
+  };
+  window.dismissAll=function(){
+    if(!confirm('Kuittaa kaikki erot käsitellyiksi?'))return;
+    for(var vnr in fbCounted){
+      var c=fbCounted[vnr],p=fbProducts[vnr]||{};
+      if(c.qty!==(p.expected||0))invRef.child('dismissed/'+vnr).set({t:Date.now()});
+    }
+  };
+
+  var fbDismissed={};
+  invRef.child('dismissed').on('value',function(snap){
+    fbDismissed=snap.val()||{};
+    if(viewMode)render();
+  });
     var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
     for(var vnr in fbCounted){var c=fbCounted[vnr],p=fbProducts[vnr]||{};var diff=c.qty-(p.expected||0);
       if(diff!==0)rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||''])}
@@ -815,9 +833,9 @@ if(viewMode){
     var products=fbProducts||{};
     var totalCounted=Object.keys(counted).length;
     var totalProducts=Object.keys(products).length;
-    var devs=[];
+    var devs=[];var dismissedCount=0;
     for(var vnr in counted){var c=counted[vnr],p=products[vnr]||{};var exp=p.expected||0;var diff=c.qty-exp;
-      if(diff!==0)devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||''})}
+      if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else{devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||''})}}}
     devs.sort(function(a,b){return a.diff-b.diff});
     var shelves={};
     for(var v in products){var pr=products[v];var lc=pr.location||'';var pts=lc.split('-');
@@ -829,14 +847,20 @@ if(viewMode){
     var shelfPct=shelvesTotal>0?Math.round(shelvesDone/shelvesTotal*100):0;
 
     var h='<div class="card"><h1>Inventointierot — Live</h1>';
-    h+='<p class="sub">'+todayKey()+' — Tuotteita: '+totalCounted+(totalProducts?'/'+totalProducts:'')+' — '+devs.length+' eroa</p>';
+    h+='<p class="sub">'+todayKey()+' — Tuotteita: '+totalCounted+(totalProducts?'/'+totalProducts:'')+' — '+devs.length+' eroa'+(dismissedCount?' — ✓ '+dismissedCount+' kuitattu':'')+'</p>';
     if(totalProducts>0){
       h+='<div style="margin-bottom:12px"><div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px">';
       h+='<span>Hyllyjä: '+shelvesDone+'/'+shelvesTotal+'</span><span>'+shelvesRemaining+' jäljellä ('+shelfPct+'%)</span></div>';
       h+='<div class="progress-bar"><div class="progress-fill" style="width:'+shelfPct+'%"></div></div></div>';
     }
     h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">Erot CSV</button>';
-    h+='<button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">Kaikki CSV</button></div></div>';
+    h+='<button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">Kaikki CSV</button></div>';
+    if(devs.length>0){h+='<div class="flex gap-8 mb-8"><button class="btn-sm flex-1" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac" onclick="dismissAll()">✓ Kuittaa kaikki</button></div>'}
+    if(dismissedCount>0){h+='<details style="margin-bottom:8px"><summary style="font-size:12px;color:#16a34a;cursor:pointer">✓ Kuitatut ('+dismissedCount+')</summary><div style="margin-top:4px">';
+      for(var vnr2 in counted){var c2=counted[vnr2],p2=products[vnr2]||{};var diff2=c2.qty-(p2.expected||0);
+        if(diff2!==0&&fbDismissed[vnr2]){h+='<div style="padding:4px 8px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center"><span>'+(c2.name||p2.name||vnr2)+' ('+c2.qty+'/'+(p2.expected||0)+')</span><button style="font-size:10px;padding:2px 8px;border:1px solid #e2e8f0;border-radius:4px;background:#fff;cursor:pointer" onclick="undismissDev(\''+vnr2+'\')">Palauta</button></div>'}}
+      h+='</div></details>'}
+    h+='</div>';
 
     h+='<details class="card"><summary style="font-size:14px;font-weight:600;color:#7c3aed;cursor:pointer">Lataa/päivitä tiedostot</summary><div style="margin-top:8px">';
     h+='<div class="mb-8"><label class="label">Maxx saldo</label><input type="file" id="v-maxx" accept=".csv" style="font-size:13px;width:100%"></div>';
@@ -875,7 +899,8 @@ if(viewMode){
       h+='<div class="mono" style="color:#64748b">'+d.location+' | VNR '+d.vnr+'</div>';
       h+='<div style="font-size:11px;color:#94a3b8">'+d.worker+'</div></div>';
       h+='<div style="text-align:right;white-space:nowrap;margin-left:8px"><div style="font-weight:700">'+d.counted+' / '+d.expected+'</div>';
-      h+='<div style="font-size:14px;font-weight:700">'+(d.diff>0?'+':'')+d.diff+'</div></div></div>';
+      h+='<div style="font-size:14px;font-weight:700">'+(d.diff>0?'+':'')+d.diff+'</div>';
+      h+='<button style="margin-top:4px;font-size:10px;padding:2px 8px;border:1px solid #86efac;border-radius:4px;background:#f0fdf4;color:#16a34a;cursor:pointer" onclick="dismissDev(\''+d.vnr+'\')">✓ Kuitattu</button></div></div>';
     }}else if(totalCounted>0){h+='<div class="card" style="text-align:center;padding:24px"><div style="font-size:36px;margin-bottom:8px">✓</div><h2 style="color:#16a34a">Ei eroja</h2></div>';
     }else if(!totalProducts){h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Ei dataa — avaa "Lataa tiedostot" yllä</div>';
     }else{h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Inventointia ei aloitettu</div>'}
