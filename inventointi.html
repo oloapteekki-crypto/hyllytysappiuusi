@@ -50,7 +50,7 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 </style>
 </head>
 <body>
-<div id="inv-scan-wrap" style="display:none;max-width:500px;margin:0 auto;padding:0 12px 8px">
+<div id="inv-scan-wrap" style="max-width:500px;margin:0 auto;padding:0 12px 8px;position:absolute;left:-9999px;opacity:0">
   <input type="text" id="inv-scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa viivakoodi"
     onkeydown="if(event.key==='Enter'){event.preventDefault();var v=this.value.trim();this.value='';if(S.phase==='counting'&&!S.camConfirmed){handleCamScan(v)}else if(S.phase==='counting'){if(!isNaN(parseInt(v)))countItem(S.shelfItems[S.currentIdx].vnr,parseInt(v));else handleScanInput(v)}}">
 </div>
@@ -149,19 +149,16 @@ let scanFieldFocused=false;
 function showScanWrap(){
   var wrap=document.getElementById('inv-scan-wrap');
   if(S.device!=='scanner'||!wrap)return;
-  wrap.style.display='block';
+  wrap.style.position='static';wrap.style.left='auto';wrap.style.opacity='1';
   var inp=document.getElementById('inv-scan-field');
   if(inp){
     inp.placeholder=S.camConfirmed?'Syötä määrä':'Skannaa viivakoodi';
-    // Focus then blur - MT90 "Fill in EditText directly" remembers the field
     inp.focus();
-    setTimeout(function(){inp.blur()},50);
   }
 }
 function hideScanWrap(){
   var wrap=document.getElementById('inv-scan-wrap');
-  if(wrap)wrap.style.display='none';
-  scanFieldFocused=false;
+  if(wrap){wrap.style.position='absolute';wrap.style.left='-9999px';wrap.style.opacity='0'}
 }
 
 // Prevent accidental page refresh
