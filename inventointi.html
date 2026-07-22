@@ -50,6 +50,10 @@ h2{font-size:16px;font-weight:700;margin-bottom:8px}
 </style>
 </head>
 <body>
+<div id="inv-scan-wrap" style="display:none;max-width:500px;margin:0 auto;padding:0 12px 8px">
+  <input type="text" id="inv-scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa viivakoodi"
+    onkeydown="if(event.key==='Enter'){event.preventDefault();var v=this.value.trim();this.value='';if(S.phase==='counting'&&!S.camConfirmed){handleCamScan(v)}else if(S.phase==='counting'){if(!isNaN(parseInt(v)))countItem(S.shelfItems[S.currentIdx].vnr,parseInt(v));else handleScanInput(v)}}">
+</div>
 <div class="app" id="app"></div>
 <script>
 /* ═══════════ WORKERS ═══════════ */
@@ -140,6 +144,23 @@ let S={
   device:localStorage.getItem('inventointi_device')||''
 };
 let undoStack=[];
+let scanFieldFocused=false;
+
+function showScanWrap(){
+  var wrap=document.getElementById('inv-scan-wrap');
+  if(S.device!=='scanner'||!wrap)return;
+  wrap.style.display='block';
+  var inp=document.getElementById('inv-scan-field');
+  if(inp)inp.placeholder=S.camConfirmed?'Syötä määrä tai skannaa':'Skannaa tuotteen viivakoodi';
+  if(!scanFieldFocused){
+    if(inp){inp.focus();setTimeout(function(){inp.blur()},100);scanFieldFocused=true}
+  }
+}
+function hideScanWrap(){
+  var wrap=document.getElementById('inv-scan-wrap');
+  if(wrap)wrap.style.display='none';
+  scanFieldFocused=false;
+}
 
 // Prevent accidental page refresh
 window.addEventListener('beforeunload',function(e){
@@ -304,7 +325,7 @@ function selectShelf(key){
     counted:{},phase:'counting',result:null,error:null,camConfirmed:false
   });
   undoStack=[];
-  if(S.device==='scanner')setTimeout(()=>{const inp=document.getElementById('inv-scan-field');if(inp)inp.focus()},200);
+  if(S.device==='scanner')setTimeout(showScanWrap,200);
   else setTimeout(camStart,300);
 }
 
@@ -327,7 +348,7 @@ function countItem(vnr,qty){
     }
     if(next!==-1){
       setTimeout(()=>{setState({currentIdx:next,camConfirmed:false});
-        if(S.device==='scanner')setTimeout(()=>{const inp=document.getElementById('inv-scan-field');if(inp)inp.focus()},200);
+        if(S.device==='scanner')setTimeout(showScanWrap,200);
         else setTimeout(camStart,200);
       },600);
     }
@@ -347,13 +368,13 @@ function navTo(idx){
   if(idx>=0&&idx<S.shelfItems.length){
     camStop();stopVoice();
     setState({currentIdx:idx,result:null,camConfirmed:false});
-    if(S.device==='scanner')setTimeout(()=>{const inp=document.getElementById('inv-scan-field');if(inp)inp.focus()},200);
+    if(S.device==='scanner')setTimeout(showScanWrap,200);
     else setTimeout(camStart,200);
   }
 }
 
 function finishShelf(){
-  camStop();stopVoice();
+  camStop();stopVoice();hideScanWrap();
   setState({phase:'shelfSelect',selectedShelf:null,shelfItems:null,result:{type:'ok',text:'✓ Hylly valmis'},camConfirmed:false});
 }
 
@@ -483,7 +504,8 @@ function handleCamScan(code){
   if(other){
     const idx=S.shelfItems.indexOf(other);
     camStop();
-    setState({currentIdx:idx,result:{type:'ok',text:'→ '+esc(other.name)+' — sano määrä'},camConfirmed:true});
+    if(navigator.vibrate)navigator.vibrate([200,100,200]);
+    setState({currentIdx:idx,result:{type:'fail',text:'⚠ VÄÄRÄ TUOTE — vaihdettu: '+esc(other.name)},camConfirmed:true});
     setTimeout(function(){startVoice(other.vnr)},300);
     return;
   }
@@ -672,8 +694,7 @@ function render(){
 
         ${!S.camConfirmed&&!isDone?`
           ${S.device==='scanner'?`
-            <input type="text" id="inv-scan-field" class="scan-input" inputmode="numeric" placeholder="Skannaa tuotteen viivakoodi" style="margin-bottom:8px"
-              onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();this.value='';handleCamScan(v)}">
+            <div style="text-align:center;font-size:13px;color:#7c3aed;font-weight:600;margin-bottom:8px">🔫 Skannaa tuotteen viivakoodi</div>
             <button class="btn-sm btn-outline" style="width:100%;margin-bottom:8px" onclick="skipScan()">Ohita skannaus →</button>
           `:`
             <div style="position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:4/3;margin-bottom:8px">
