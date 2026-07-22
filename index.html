@@ -355,7 +355,6 @@ function confirmEan(code){if(!code)return;stopListening();setState({error:null,l
 
 function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',cur-prev,cur,item?.qty||0,'manual')}S.shelved[v]=cur;setState({shelved:S.shelved})}
 function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',n-prev,n,item?.qty||0,'manual')}S.shelved[v]=n;setState({shelved:S.shelved})}}
-function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;stopListening();const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];
 
 function getElapsed(){
   if(!S.shelveStartTime)return 0;
@@ -365,11 +364,9 @@ function getElapsed(){
 }
 function togglePause(){
   if(S.pauseStart){
-    // Resume
     S.pausedTime+=(Date.now()-S.pauseStart);
     setState({pauseStart:null,lastScanResult:{type:'ok',text:'▶ Jatketaan'}});
   } else {
-    // Pause
     stopListening();
     setState({pauseStart:Date.now(),lastScanResult:{type:'ok',text:'⏸ Tauko'}});
   }
