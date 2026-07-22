@@ -361,35 +361,55 @@ function finishShelf(){
 let speechRec=null,speechActive=false,speechVnr=null;
 
 function startVoice(vnr){
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Puheentunnistus ei tuettu');return}
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    setState({result:{type:'fail',text:'Puheentunnistus ei tuettu — syötä käsin'}});return}
   stopVoice();
   speechVnr=vnr;
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  speechRec=new SR();
-  speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
-  speechActive=true;
   
-  speechRec.onresult=function(e){
-    const text=e.results[0][0].transcript.trim().toLowerCase();
-    const numMap={'nolla':0,'yksi':1,'kaksi':2,'kolme':3,'neljä':4,'viisi':5,'kuusi':6,'seitsemän':7,'kahdeksan':8,'yhdeksän':9,'kymmenen':10,
-      'yksitoista':11,'kaksitoista':12,'kolmetoista':13,'neljätoista':14,'viisitoista':15,
-      'kuusitoista':16,'seitsemäntoista':17,'kahdeksantoista':18,'yhdeksäntoista':19,'kaksikymmentä':20};
-    let num=parseInt(text,10);
-    if(isNaN(num)&&numMap[text]!==undefined)num=numMap[text];
-    if(isNaN(num)){setState({result:{type:'fail',text:'🎤 "'+text+'" — ei tunnistettu'}});speechActive=false;render();return}
-    countItem(speechVnr,num);
-    speechActive=false;
-  };
-  speechRec.onerror=function(e){
-    if(e.error==='no-speech'){if(speechActive){try{speechRec.start()}catch(ex){}}}
-    else{speechActive=false;setState({result:{type:'fail',text:'🎤 Virhe: '+e.error}})}
-  };
-  speechRec.onend=function(){if(speechActive){try{speechRec.start()}catch(e){}}};
-  try{speechRec.start()}catch(e){}
-  setState({result:{type:'ok',text:'🎤 Kuuntelen...'}});
+  // Small delay to ensure previous session is fully closed
+  setTimeout(function(){
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    speechRec=new SR();
+    speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
+    speechActive=true;
+    
+    speechRec.onresult=function(e){
+      const text=e.results[0][0].transcript.trim().toLowerCase();
+      const numMap={'nolla':0,'yksi':1,'kaksi':2,'kolme':3,'neljä':4,'viisi':5,'kuusi':6,'seitsemän':7,'kahdeksan':8,'yhdeksän':9,'kymmenen':10,
+        'yksitoista':11,'kaksitoista':12,'kolmetoista':13,'neljätoista':14,'viisitoista':15,
+        'kuusitoista':16,'seitsemäntoista':17,'kahdeksantoista':18,'yhdeksäntoista':19,'kaksikymmentä':20};
+      let num=parseInt(text,10);
+      if(isNaN(num)&&numMap[text]!==undefined)num=numMap[text];
+      if(isNaN(num)){setState({result:{type:'fail',text:'🎤 "'+text+'" — ei tunnistettu'}});speechActive=false;render();return}
+      countItem(speechVnr,num);
+      speechActive=false;
+    };
+    speechRec.onerror=function(e){
+      if(e.error==='no-speech'||e.error==='aborted'){
+        if(speechActive){setTimeout(function(){if(speechActive&&speechRec){try{speechRec.start()}catch(ex){startVoice(vnr)}}},200)}
+      } else if(e.error==='not-allowed'){
+        speechActive=false;
+        setState({result:{type:'fail',text:'🎤 Mikrofoni estetty — tarkista oikeudet'}});
+      } else {
+        speechActive=false;
+        setState({result:{type:'fail',text:'🎤 Virhe: '+e.error}});
+      }
+    };
+    speechRec.onend=function(){
+      if(speechActive){setTimeout(function(){if(speechActive){try{speechRec.start()}catch(e){startVoice(vnr);};}},200)}
+    };
+    try{speechRec.start();setState({result:{type:'ok',text:'🎤 Kuuntelen... sano määrä'}})}
+    catch(e){
+      // Retry once after delay
+      setTimeout(function(){
+        try{speechRec.start();setState({result:{type:'ok',text:'🎤 Kuuntelen... sano määrä'}})}
+        catch(e2){speechActive=false;setState({result:{type:'fail',text:'🎤 Ei käynnisty — syötä käsin'}})}
+      },500);
+    }
+  },200);
 }
 
-function stopVoice(){speechActive=false;if(speechRec){try{speechRec.abort()}catch(e){}speechRec=null}}
+function stopVoice(){speechActive=false;if(speechRec){try{speechRec.stop()}catch(e){}try{speechRec.abort()}catch(e){}speechRec=null}}
 
 /* ═══════════ CAMERA SCANNER ═══════════ */
 let camStream=null,camRunning=false,camDetector=null,camLast='',camLastT=0;
@@ -452,31 +472,28 @@ function handleCamScan(code){
   if(!S.shelfItems)return;
   const cur=S.shelfItems[S.currentIdx];
   if(!cur)return;
-  // Check if scanned code matches current item
   const matchEan=(a,b)=>a&&a!=='null'&&b&&(a===b||b.endsWith(a)||a.endsWith(b));
   if(matchEan(cur.ean,code)||cur.vnr===code){
-    // Correct product — stop camera, start voice
     camStop();
     setState({result:{type:'ok',text:'✓ '+esc(cur.name)+' — sano määrä'},camConfirmed:true});
-    startVoice(cur.vnr);
+    setTimeout(function(){startVoice(cur.vnr)},300);
     return;
   }
-  // Check if it's another product on this shelf
   const other=S.shelfItems.find(i=>matchEan(i.ean,code)||i.vnr===code);
   if(other){
     const idx=S.shelfItems.indexOf(other);
     camStop();
     setState({currentIdx:idx,result:{type:'ok',text:'→ '+esc(other.name)+' — sano määrä'},camConfirmed:true});
-    startVoice(other.vnr);
+    setTimeout(function(){startVoice(other.vnr)},300);
     return;
   }
-  // Check if it's a number (manual qty via barcode)
   const num=parseInt(code,10);
   if(!isNaN(num)&&code.length<=3){
     camStop();
     countItem(cur.vnr,num);
     return;
   }
+  // Mismatch - DON'T stop camera, just show error and keep scanning
   setState({result:{type:'fail',text:'EAN ei täsmää — skannaa uudelleen tai ohita'}});
 }
 
