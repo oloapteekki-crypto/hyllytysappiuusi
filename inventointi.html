@@ -605,42 +605,57 @@ function handleScanInput(val){
 
 /* ═══════════ CSV EXPORT ═══════════ */
 function generateCSV(){
-  const rows=[['VNR','Nimi','EAN','Paikka','Maxx Saldo','Keräilemätön','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
+  const rows=[['VNR','Nimi','EAN','Paikka','Maxx Saldo','Keräilemätön','Odotettu','Inventoitu','Erotus','Inventoija','Päivä','Klo']];
+  const items=[];
   S.products.forEach(p=>{
     if(S.allCounted[p.vnr]!==undefined){
-      const counted=S.allCounted[p.vnr];
-      const diff=counted-p.expected;
-      const countDate=(fbCounted[p.vnr]&&fbCounted[p.vnr].date)||'';
-      rows.push([p.vnr,p.name,p.ean,p.location,p.saldo,p.unshipped,p.expected,counted,diff,currentWorker,countDate]);
+      const c=fbCounted[p.vnr]||{};
+      items.push({p,counted:S.allCounted[p.vnr],t:c.t||0,date:c.date||'',worker:c.worker||''});
     }
+  });
+  items.sort((a,b)=>a.t-b.t);
+  items.forEach(i=>{
+    const diff=i.counted-i.p.expected;
+    const klo=i.t?new Date(i.t).toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'}):'';
+    rows.push([i.p.vnr,i.p.name,i.p.ean,i.p.location,i.p.saldo,i.p.unshipped,i.p.expected,i.counted,diff,i.worker,i.date,klo]);
   });
   return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
 }
 
 function generateDeviationCSV(){
-  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
+  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä','Klo']];
+  const items=[];
   S.products.forEach(p=>{
     if(S.allCounted[p.vnr]!==undefined){
       const counted=S.allCounted[p.vnr];
       const diff=counted-p.expected;
-      const countDate=(fbCounted[p.vnr]&&fbCounted[p.vnr].date)||'';
-      if(diff!==0)rows.push([p.vnr,p.name,p.ean,p.location,p.expected,counted,diff,currentWorker,countDate]);
+      if(diff!==0){const c=fbCounted[p.vnr]||{};items.push({p,counted,diff,t:c.t||0,date:c.date||'',worker:c.worker||''})}
     }
+  });
+  items.sort((a,b)=>a.t-b.t);
+  items.forEach(i=>{
+    const klo=i.t?new Date(i.t).toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'}):'';
+    rows.push([i.p.vnr,i.p.name,i.p.ean,i.p.location,i.p.expected,i.counted,i.diff,i.worker,i.date,klo]);
   });
   return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
 }
 
 function generateTodayCSV(){
   const today=todayKey();
-  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Klo']];
+  const items=[];
   for(const vnr in fbCounted){
     const c=fbCounted[vnr];
     if(c.date===today){
       const p=(S.products||[]).find(x=>x.vnr===vnr)||{};
-      const expected=p.expected||0;
-      rows.push([vnr,c.name||p.name||'',p.ean||'',c.location||p.location||'',expected,c.qty,c.qty-expected,c.worker||'']);
+      items.push({vnr,name:c.name||p.name||'',ean:p.ean||'',location:c.location||p.location||'',expected:p.expected||0,qty:c.qty,worker:c.worker||'',t:c.t||0});
     }
   }
+  items.sort((a,b)=>a.t-b.t);
+  items.forEach(i=>{
+    const klo=i.t?new Date(i.t).toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'}):'';
+    rows.push([i.vnr,i.name,i.ean,i.location,i.expected,i.qty,i.qty-i.expected,i.worker,klo]);
+  });
   return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
 }
 
