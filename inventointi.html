@@ -69,7 +69,35 @@ let currentWorker=localStorage.getItem('inventointi_worker')||'';
 firebase.initializeApp({apiKey:"AIzaSyBA_nMeugv0lSxjVm1il1iJo7v33Fs__X8",authDomain:"hyllytysappi.firebaseapp.com",databaseURL:"https://hyllytysappi-default-rtdb.europe-west1.firebasedatabase.app",projectId:"hyllytysappi",storageBucket:"hyllytysappi.firebasestorage.app",messagingSenderId:"312430303554",appId:"1:312430303554:web:1fa95efa74fa370bdc10db"});
 const db=firebase.database();
 function todayKey(){return new Date().toISOString().slice(0,10)}
-const invRef=db.ref('inventointi/'+todayKey());
+const invRef=db.ref('inventointi');
+
+// One-time migration: move data from date-based paths to flat path
+(async function(){
+  try{
+    const snap=await db.ref('inventointi').once('value');
+    const data=snap.val();if(!data)return;
+    // Check if there are date-keyed children (e.g. "2026-07-22")
+    const dateKeys=Object.keys(data).filter(k=>k.match(/^\d{4}-\d{2}-\d{2}$/));
+    if(!dateKeys.length)return;
+    console.log('Migrating date-based data:',dateKeys);
+    // Merge all date-based counted into flat counted
+    var mergedCounted=data.counted||{};
+    var mergedProducts=data.products||{};
+    var mergedDismissed=data.dismissed||{};
+    for(var i=0;i<dateKeys.length;i++){
+      var dk=dateKeys[i],dd=data[dk];
+      if(dd.counted){for(var vnr in dd.counted){if(!mergedCounted[vnr])mergedCounted[vnr]=dd.counted[vnr]}}
+      if(dd.products&&!Object.keys(mergedProducts).length){mergedProducts=dd.products}
+      if(dd.dismissed){for(var vnr2 in dd.dismissed){if(!mergedDismissed[vnr2])mergedDismissed[vnr2]=dd.dismissed[vnr2]}}
+    }
+    // Write merged data and remove old date keys
+    if(Object.keys(mergedCounted).length)await invRef.child('counted').set(mergedCounted);
+    if(Object.keys(mergedProducts).length)await invRef.child('products').set(mergedProducts);
+    if(Object.keys(mergedDismissed).length)await invRef.child('dismissed').set(mergedDismissed);
+    for(var j=0;j<dateKeys.length;j++){await db.ref('inventointi/'+dateKeys[j]).remove()}
+    console.log('Migration done');
+  }catch(e){console.log('Migration skip:',e)}
+})();
 
 // Save a single counted item to Firebase
 function fbSaveCount(vnr,qty,name,location,expected){
