@@ -73,7 +73,7 @@ const invRef=db.ref('inventointi/'+todayKey());
 
 // Save a single counted item to Firebase
 function fbSaveCount(vnr,qty,name,location,expected){
-  invRef.child('counted/'+vnr).set({qty,name,location,expected,worker:currentWorker,t:Date.now()});
+  invRef.child('counted/'+vnr).set({qty,name,location,expected,worker:currentWorker,t:Date.now(),date:todayKey()});
 }
 function fbDeleteCount(vnr){
   invRef.child('counted/'+vnr).remove();
@@ -141,7 +141,8 @@ let S={
   selectedShelf:null,shelfItems:null,currentIdx:0,
   counted:{},error:null,result:null,
   allCounted:{},camConfirmed:false,
-  device:localStorage.getItem('inventointi_device')||''
+  device:localStorage.getItem('inventointi_device')||'',
+  checkListItems:null
 };
 let undoStack=[];
 let scanFieldFocused=false;
@@ -319,16 +320,53 @@ function loadFromFB(){
 }
 
 /* ═══════════ SHELF SELECTION ═══════════ */
+function loadCheckList(){
+  const fileInput=document.getElementById('checklist-file');
+  if(!fileInput||!fileInput.files.length){setState({error:'Valitse tiedosto'});return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result;
+    const vnrs=text.replace(/\r/g,'').split('\n').map(l=>l.split(/[,;]/)[0].trim()).filter(v=>v&&v.match(/^\d+$/));
+    if(!vnrs.length){setState({error:'Ei VNR-koodeja tiedostossa'});return}
+    // Match VNRs to products
+    const items=[];
+    vnrs.forEach(vnr=>{
+      const p=S.products.find(x=>x.vnr===vnr);
+      if(p)items.push(p);
+    });
+    if(!items.length){setState({error:'Yhtään VNR:ää ei löytynyt tuoterekisteristä ('+vnrs.length+' VNR:ää luettu)'});return}
+    setState({checkListItems:sortByRoute(items),result:{type:'ok',text:'✓ '+items.length+'/'+vnrs.length+' tuotetta löytyi'}});
+  };
+  reader.readAsText(fileInput.files[0],'utf-8');
+}
+
 function selectShelf(key){
-  const items=S.products.filter(p=>p.shelfKey===key);
-  const sorted=sortByRoute(items);
+  var items;
+  if(key==='__CHECK__'){
+    if(!S.checkListItems||!S.checkListItems.length){setState({error:'Ei tarkistettavia'});return}
+    items=S.checkListItems;
+  } else {
+    items=S.products.filter(p=>p.shelfKey===key);
+    items=sortByRoute(items);
+  }
+  const existingCounted={};
+  items.forEach(i=>{if(S.allCounted[i.vnr]!==undefined)existingCounted[i.vnr]=S.allCounted[i.vnr]});
+  let startIdx=0;
+  for(let i=0;i<items.length;i++){
+    if(existingCounted[items[i].vnr]===undefined){startIdx=i;break}
+  }
+  const allDone=items.every(i=>existingCounted[i.vnr]!==undefined);
   setState({
-    selectedShelf:key,shelfItems:sorted,currentIdx:0,
-    counted:{},phase:'counting',result:null,error:null,camConfirmed:false
+    selectedShelf:key,shelfItems:items,currentIdx:startIdx,
+    counted:existingCounted,phase:'counting',
+    result:allDone?{type:'ok',text:'✓ Kaikki inventoitu — voit tarkistaa tai palata'}:null,
+    error:null,camConfirmed:false
   });
   undoStack=[];
-  if(S.device==='scanner')setTimeout(showScanWrap,200);
-  else setTimeout(camStart,300);
+  if(!allDone){
+    if(S.device==='scanner')setTimeout(showScanWrap,200);
+    else setTimeout(camStart,300);
+  }
 }
 
 /* ═══════════ COUNTING ═══════════ */
@@ -345,8 +383,15 @@ function countItem(vnr,qty){
   const cur=S.shelfItems[S.currentIdx];
   if(cur&&cur.vnr===vnr){
     let next=-1;
+    // Search forward first
     for(let i=S.currentIdx+1;i<S.shelfItems.length;i++){
       if(S.counted[S.shelfItems[i].vnr]===undefined){next=i;break}
+    }
+    // If nothing forward, search from beginning
+    if(next===-1){
+      for(let i=0;i<S.currentIdx;i++){
+        if(S.counted[S.shelfItems[i].vnr]===undefined){next=i;break}
+      }
     }
     if(next!==-1){
       setTimeout(()=>{setState({currentIdx:next,camConfirmed:false});
@@ -381,58 +426,75 @@ function finishShelf(){
 }
 
 /* ═══════════ SPEECH RECOGNITION ═══════════ */
-let speechRec=null,speechActive=false,speechVnr=null;
+let speechRec=null,speechActive=false,speechVnr=null,speechPendingQty=null;
 
 function startVoice(vnr){
   if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
     setState({result:{type:'fail',text:'Puheentunnistus ei tuettu — syötä käsin'}});return}
   stopVoice();
   speechVnr=vnr;
-  
-  // Small delay to ensure previous session is fully closed
+  speechPendingQty=null;
+  listenForNumber(vnr);
+}
+
+function listenForNumber(vnr){
+  stopVoice();speechVnr=vnr;
   setTimeout(function(){
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    speechRec=new SR();
-    speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    speechRec=new SR();speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
     speechActive=true;
-    
     speechRec.onresult=function(e){
-      const text=e.results[0][0].transcript.trim().toLowerCase();
-      const numMap={'nolla':0,'yksi':1,'kaksi':2,'kolme':3,'neljä':4,'viisi':5,'kuusi':6,'seitsemän':7,'kahdeksan':8,'yhdeksän':9,'kymmenen':10,
+      var text=e.results[0][0].transcript.trim().toLowerCase();
+      var numMap={'nolla':0,'yksi':1,'kaksi':2,'kolme':3,'neljä':4,'viisi':5,'kuusi':6,'seitsemän':7,'kahdeksan':8,'yhdeksän':9,'kymmenen':10,
         'yksitoista':11,'kaksitoista':12,'kolmetoista':13,'neljätoista':14,'viisitoista':15,
         'kuusitoista':16,'seitsemäntoista':17,'kahdeksantoista':18,'yhdeksäntoista':19,'kaksikymmentä':20};
-      let num=parseInt(text,10);
+      var num=parseInt(text,10);
       if(isNaN(num)&&numMap[text]!==undefined)num=numMap[text];
-      if(isNaN(num)){setState({result:{type:'fail',text:'🎤 "'+text+'" — ei tunnistettu'}});speechActive=false;render();return}
-      countItem(speechVnr,num);
-      speechActive=false;
+      if(isNaN(num)){setState({result:{type:'fail',text:'🎤 "'+text+'" — sano uudelleen'}});speechActive=false;setTimeout(function(){listenForNumber(vnr)},500);return}
+      speechPendingQty=num;speechActive=false;
+      setState({result:{type:'ok',text:'🎤 '+num+' — oikein vai väärin?'}});
+      setTimeout(function(){listenForConfirm(vnr,num)},300);
     };
     speechRec.onerror=function(e){
-      if(e.error==='no-speech'||e.error==='aborted'){
-        if(speechActive){setTimeout(function(){if(speechActive&&speechRec){try{speechRec.start()}catch(ex){startVoice(vnr)}}},200)}
-      } else if(e.error==='not-allowed'){
-        speechActive=false;
-        setState({result:{type:'fail',text:'🎤 Mikrofoni estetty — tarkista oikeudet'}});
-      } else {
-        speechActive=false;
-        setState({result:{type:'fail',text:'🎤 Virhe: '+e.error}});
-      }
+      if(e.error==='no-speech'||e.error==='aborted'){if(speechActive){setTimeout(function(){if(speechActive&&speechRec){try{speechRec.start()}catch(ex){listenForNumber(vnr)}}},200)}}
+      else if(e.error==='not-allowed'){speechActive=false;setState({result:{type:'fail',text:'🎤 Mikrofoni estetty'}})}
+      else{speechActive=false;setState({result:{type:'fail',text:'🎤 Virhe: '+e.error}})}
     };
-    speechRec.onend=function(){
-      if(speechActive){setTimeout(function(){if(speechActive){try{speechRec.start()}catch(e){startVoice(vnr);};}},200)}
-    };
+    speechRec.onend=function(){if(speechActive){setTimeout(function(){if(speechActive){try{speechRec.start()}catch(e){listenForNumber(vnr)}}},200)}};
     try{speechRec.start();setState({result:{type:'ok',text:'🎤 Kuuntelen... sano määrä'}})}
-    catch(e){
-      // Retry once after delay
-      setTimeout(function(){
-        try{speechRec.start();setState({result:{type:'ok',text:'🎤 Kuuntelen... sano määrä'}})}
-        catch(e2){speechActive=false;setState({result:{type:'fail',text:'🎤 Ei käynnisty — syötä käsin'}})}
-      },500);
-    }
+    catch(e){setTimeout(function(){try{speechRec.start()}catch(e2){speechActive=false;setState({result:{type:'fail',text:'🎤 Ei käynnisty — syötä käsin'}})}},500)}
   },200);
 }
 
-function stopVoice(){speechActive=false;if(speechRec){try{speechRec.stop()}catch(e){}try{speechRec.abort()}catch(e){}speechRec=null}}
+function listenForConfirm(vnr,qty){
+  stopVoice();speechVnr=vnr;
+  setTimeout(function(){
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    speechRec=new SR();speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
+    speechActive=true;
+    speechRec.onresult=function(e){
+      var text=e.results[0][0].transcript.trim().toLowerCase();speechActive=false;
+      if(text==='oikein'||text==='kyllä'||text==='joo'||text==='jep'||text==='ok'||text==='okei'){
+        countItem(vnr,qty);speechPendingQty=null;
+      }else if(text==='väärin'||text==='ei'||text==='uudelleen'||text==='uusiksi'){
+        speechPendingQty=null;setState({result:{type:'fail',text:'🎤 Peruttu — sano uudelleen'}});
+        setTimeout(function(){listenForNumber(vnr)},500);
+      }else{
+        var numMap={'nolla':0,'yksi':1,'kaksi':2,'kolme':3,'neljä':4,'viisi':5,'kuusi':6,'seitsemän':7,'kahdeksan':8,'yhdeksän':9,'kymmenen':10,
+          'yksitoista':11,'kaksitoista':12,'kolmetoista':13,'neljätoista':14,'viisitoista':15,
+          'kuusitoista':16,'seitsemäntoista':17,'kahdeksantoista':18,'yhdeksäntoista':19,'kaksikymmentä':20};
+        var num=parseInt(text,10);if(isNaN(num)&&numMap[text]!==undefined)num=numMap[text];
+        if(!isNaN(num)){speechPendingQty=num;setState({result:{type:'ok',text:'🎤 '+num+' — oikein vai väärin?'}});setTimeout(function(){listenForConfirm(vnr,num)},300)}
+        else{setState({result:{type:'fail',text:'🎤 "'+text+'" — sano oikein tai väärin'}});setTimeout(function(){listenForConfirm(vnr,qty)},500)}
+      }
+    };
+    speechRec.onerror=function(e){if(e.error==='no-speech'||e.error==='aborted'){if(speechActive){setTimeout(function(){if(speechActive&&speechRec){try{speechRec.start()}catch(ex){listenForConfirm(vnr,qty)}}},200)}}else{speechActive=false}};
+    speechRec.onend=function(){if(speechActive){setTimeout(function(){if(speechActive){try{speechRec.start()}catch(e){listenForConfirm(vnr,qty)}}},200)}};
+    try{speechRec.start()}catch(e){setTimeout(function(){try{speechRec.start()}catch(e2){speechActive=false}},500)}
+  },200);
+}
+
+function stopVoice(){speechActive=false;speechPendingQty=null;if(speechRec){try{speechRec.stop()}catch(e){}try{speechRec.abort()}catch(e){}speechRec=null}}
 
 /* ═══════════ CAMERA SCANNER ═══════════ */
 let camStream=null,camRunning=false,camDetector=null,camLast='',camLastT=0;
@@ -543,27 +605,42 @@ function handleScanInput(val){
 
 /* ═══════════ CSV EXPORT ═══════════ */
 function generateCSV(){
-  const rows=[['VNR','Nimi','EAN','Paikka','Maxx Saldo','Keräilemätön','Odotettu','Inventoitu','Erotus','Inventoija','Aika']];
-  const now=new Date().toLocaleString('fi-FI');
+  const rows=[['VNR','Nimi','EAN','Paikka','Maxx Saldo','Keräilemätön','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
   S.products.forEach(p=>{
     if(S.allCounted[p.vnr]!==undefined){
       const counted=S.allCounted[p.vnr];
       const diff=counted-p.expected;
-      rows.push([p.vnr,p.name,p.ean,p.location,p.saldo,p.unshipped,p.expected,counted,diff,currentWorker,now]);
+      const countDate=(fbCounted[p.vnr]&&fbCounted[p.vnr].date)||'';
+      rows.push([p.vnr,p.name,p.ean,p.location,p.saldo,p.unshipped,p.expected,counted,diff,currentWorker,countDate]);
     }
   });
   return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
 }
 
 function generateDeviationCSV(){
-  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
   S.products.forEach(p=>{
     if(S.allCounted[p.vnr]!==undefined){
       const counted=S.allCounted[p.vnr];
       const diff=counted-p.expected;
-      if(diff!==0)rows.push([p.vnr,p.name,p.ean,p.location,p.expected,counted,diff,currentWorker]);
+      const countDate=(fbCounted[p.vnr]&&fbCounted[p.vnr].date)||'';
+      if(diff!==0)rows.push([p.vnr,p.name,p.ean,p.location,p.expected,counted,diff,currentWorker,countDate]);
     }
   });
+  return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+}
+
+function generateTodayCSV(){
+  const today=todayKey();
+  const rows=[['VNR','Nimi','EAN','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+  for(const vnr in fbCounted){
+    const c=fbCounted[vnr];
+    if(c.date===today){
+      const p=(S.products||[]).find(x=>x.vnr===vnr)||{};
+      const expected=p.expected||0;
+      rows.push([vnr,c.name||p.name||'',p.ean||'',c.location||p.location||'',expected,c.qty,c.qty-expected,c.worker||'']);
+    }
+  }
   return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
 }
 
@@ -620,8 +697,24 @@ function render(){
       ${S.result?`<div class="scan-result ${S.result.type==='ok'?'scan-ok':'scan-fail'}" style="margin-bottom:12px">${S.result.text}</div>`:''}
       <div class="flex gap-8 mb-12">
         <button class="btn-sm btn-outline flex-1" onclick="setState({phase:'deviations'})">⚠ Erot (${deviations})</button>
-        <button class="btn-sm btn-outline flex-1" onclick="downloadCSV(generateCSV(),'inventointi_'+new Date().toISOString().slice(0,10)+'.csv')">📥 CSV</button>
+        <button class="btn-sm btn-outline flex-1" onclick="downloadCSV(generateCSV(),'inventointi_kaikki.csv')">📥 Kaikki</button>
+        <button class="btn-sm btn-outline flex-1" onclick="downloadCSV(generateTodayCSV(),'inventointi_${new Date().toISOString().slice(0,10)}.csv')">📥 Tänään</button>
       </div></div>
+
+      <details class="card">
+        <summary style="font-size:14px;font-weight:600;color:#7c3aed;cursor:pointer">🔍 Tarkistettavat (CSV-lista)</summary>
+        <div style="margin-top:8px">
+          <p style="font-size:12px;color:#64748b;margin-bottom:8px">Lataa CSV jossa VNR per rivi. Tuotteet näkyvät omana "hyllynä".</p>
+          <input type="file" id="checklist-file" accept=".csv,.txt" style="font-size:13px;width:100%;margin-bottom:8px">
+          <button class="btn-sm" style="width:100%;background:#ede9fe;color:#6d28d9" onclick="loadCheckList()">Lataa tarkistuslista</button>
+        </div>
+      </details>
+
+      ${S.checkListItems?`<div class="shelf-btn" style="margin-bottom:12px;border-color:#7c3aed;background:#ede9fe" onclick="selectShelf('__CHECK__')">
+        <div style="font-size:16px;font-weight:700">🔍 Tarkistettavat</div>
+        <div style="font-size:11px;color:#7c3aed">${S.checkListItems.filter(i=>S.allCounted[i.vnr]!==undefined).length}/${S.checkListItems.length}</div>
+      </div>`:''}
+
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
         ${S.shelves.map(sh=>{
           const items=S.products.filter(p=>p.shelfKey===sh.key);
@@ -673,7 +766,7 @@ function render(){
     app.innerHTML=`
       <div class="card">
         <div class="flex justify-between items-center">
-          <h2 style="margin:0;color:#6d28d9">📍 ${S.selectedShelf}</h2>
+          <h2 style="margin:0;color:#6d28d9">📍 ${S.selectedShelf==='__CHECK__'?'🔍 Tarkistettavat':S.selectedShelf}</h2>
           <span style="font-size:12px;color:#94a3b8">${countedHere}/${totalHere} (${pct}%)</span></div>
         ${currentWorker?`<div style="font-size:11px;color:#7c3aed;margin-top:2px">👤 ${currentWorker}</div>`:''}
         <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -795,16 +888,30 @@ if(viewMode){
   };
 
   window.dlViewCSV=function(){
-    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
     for(var vnr in fbCounted){var c=fbCounted[vnr],p=fbProducts[vnr]||{};var diff=c.qty-(p.expected||0);
-      if(diff!==0&&!fbDismissed[vnr])rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||''])}
-    downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'erot_'+todayKey()+'.csv');
+      if(diff!==0&&!fbDismissed[vnr])rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||'',c.date||''])}
+    downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'erot_kaikki.csv');
   };
   window.dlAllCSV=function(){
-    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
     for(var vnr in fbCounted){var c=fbCounted[vnr],p=fbProducts[vnr]||{};
+      rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,c.qty-(p.expected||0),c.worker||'',c.date||''])}
+    downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'inventointi_kaikki.csv');
+  };
+  window.dlTodayCSV=function(){
+    var today=todayKey();
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+    for(var vnr in fbCounted){var c=fbCounted[vnr];if(c.date!==today)continue;var p=fbProducts[vnr]||{};
       rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,c.qty-(p.expected||0),c.worker||''])}
-    downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'inventointi_'+todayKey()+'.csv');
+    downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'inventointi_'+today+'.csv');
+  };
+  window.dlTodayDevsCSV=function(){
+    var today=todayKey();
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+    for(var vnr in fbCounted){var c=fbCounted[vnr];if(c.date!==today)continue;var p=fbProducts[vnr]||{};var diff=c.qty-(p.expected||0);
+      if(diff!==0)rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||''])}
+    downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'erot_'+today+'.csv');
   };
 
   render=function(){
@@ -813,7 +920,7 @@ if(viewMode){
     var totalCounted=Object.keys(counted).length,totalProducts=Object.keys(products).length;
     var devs=[],dismissedCount=0;
     for(var vnr in counted){var c=counted[vnr],p=products[vnr]||{};var exp=p.expected||0;var diff=c.qty-exp;
-      if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else{devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||''})}}}
+      if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else{devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||'',date:c.date||''})}}}
     devs.sort(function(a,b){return a.diff-b.diff});
     var shelves={};
     for(var v in products){var pr=products[v];var lc=pr.location||'';var pts=lc.split('-');
@@ -829,8 +936,10 @@ if(viewMode){
       h+='<div style="margin-bottom:12px"><div class="flex justify-between" style="font-size:12px;color:#475569;margin-bottom:4px">';
       h+='<span>Hyllyt: '+shelvesDone+'/'+shelvesTotal+'</span><span>'+shelvesRemaining+' j\u00e4ljell\u00e4 ('+shelfPct+'%)</span></div>';
       h+='<div class="progress-bar"><div class="progress-fill" style="width:'+shelfPct+'%"></div></div></div>'}
-    h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">Erot CSV</button>';
-    h+='<button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">Kaikki CSV</button></div>';
+    h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">Erot (kaikki)</button>';
+    h+='<button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">Kaikki</button></div>';
+    h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlTodayDevsCSV()">Erot (t\\u00e4n\\u00e4\\u00e4n)</button>';
+    h+='<button class="btn-sm btn-outline flex-1" onclick="dlTodayCSV()">T\\u00e4n\\u00e4\\u00e4n</button></div>';
     if(devs.length>0){h+='<button class="btn-sm" style="width:100%;margin-bottom:8px;background:#f0fdf4;color:#16a34a;border:1px solid #86efac" onclick="dismissAll()">\u2713 Kuittaa kaikki</button>'}
     if(dismissedCount>0){h+='<details style="margin-bottom:8px"><summary style="font-size:12px;color:#16a34a;cursor:pointer">\u2713 Kuitatut ('+dismissedCount+')</summary><div style="margin-top:4px">';
       for(var vnr2 in counted){var c2=counted[vnr2],p2=products[vnr2]||{};var diff2=c2.qty-(p2.expected||0);
@@ -860,7 +969,7 @@ if(viewMode){
       h+='<div class="deviation '+(d.diff>0?'dev-plus':'dev-minus')+'">';
       h+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">'+esc(d.name)+'</div>';
       h+='<div class="mono" style="color:#64748b">'+d.location+' | VNR '+d.vnr+'</div>';
-      h+='<div style="font-size:11px;color:#94a3b8">'+d.worker+'</div></div>';
+      h+='<div style="font-size:11px;color:#94a3b8">'+d.worker+(d.date?' \\u2014 '+d.date:'')+'</div></div>';
       h+='<div style="text-align:right;white-space:nowrap;margin-left:8px"><div style="font-weight:700">'+d.counted+' / '+d.expected+'</div>';
       h+='<div style="font-size:14px;font-weight:700">'+(d.diff>0?'+':'')+d.diff+'</div>';
       h+='<button style="margin-top:4px;font-size:10px;padding:2px 8px;border:1px solid #86efac;border-radius:4px;background:#f0fdf4;color:#16a34a;cursor:pointer" onclick="dismissDev(\''+d.vnr+'\')">\u2713 Kuitattu</button></div></div>'}}
