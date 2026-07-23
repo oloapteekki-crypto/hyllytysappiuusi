@@ -454,7 +454,8 @@ function finishShelf(){
 }
 
 /* ═══════════ SPEECH RECOGNITION ═══════════ */
-let speechRec=null,speechActive=false,speechVnr=null,speechPendingQty=null;
+let speechRec=null,speechActive=false,speechVnr=null,speechPendingQty=null,speechRetries=0,speechLastStart=0;
+const MAX_RETRIES=3;const MIN_RETRY_DELAY=1000;
 
 function startVoice(vnr){
   if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
@@ -466,7 +467,14 @@ function startVoice(vnr){
 }
 
 function listenForNumber(vnr){
-  stopVoice();speechVnr=vnr;
+  stopVoice();speechVnr=vnr;speechRetries=0;
+  _startNumberListener(vnr);
+}
+function _startNumberListener(vnr){
+  var now=Date.now();
+  if(now-speechLastStart<MIN_RETRY_DELAY){speechRetries++}else{speechRetries=0}
+  if(speechRetries>=MAX_RETRIES){speechActive=false;setState({result:{type:'fail',text:'🎤 Mikrofoni ei toimi — syötä käsin'}});return}
+  speechLastStart=now;
   setTimeout(function(){
     var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     speechRec=new SR();speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
@@ -478,24 +486,31 @@ function listenForNumber(vnr){
         'kuusitoista':16,'seitsemäntoista':17,'kahdeksantoista':18,'yhdeksäntoista':19,'kaksikymmentä':20};
       var num=parseInt(text,10);
       if(isNaN(num)&&numMap[text]!==undefined)num=numMap[text];
-      if(isNaN(num)){setState({result:{type:'fail',text:'🎤 "'+text+'" — sano uudelleen'}});speechActive=false;setTimeout(function(){listenForNumber(vnr)},500);return}
+      if(isNaN(num)){setState({result:{type:'fail',text:'🎤 "'+text+'" — sano uudelleen'}});speechActive=false;setTimeout(function(){_startNumberListener(vnr)},500);return}
       speechPendingQty=num;speechActive=false;
       setState({result:{type:'ok',text:'🎤 '+num+' — oikein vai väärin?'}});
       setTimeout(function(){listenForConfirm(vnr,num)},300);
     };
     speechRec.onerror=function(e){
-      if(e.error==='no-speech'||e.error==='aborted'){if(speechActive){setTimeout(function(){if(speechActive&&speechRec){try{speechRec.start()}catch(ex){listenForNumber(vnr)}}},200)}}
+      if(e.error==='no-speech'||e.error==='aborted'){if(speechActive){setTimeout(function(){if(speechActive){_startNumberListener(vnr)}},MIN_RETRY_DELAY)}}
       else if(e.error==='not-allowed'){speechActive=false;setState({result:{type:'fail',text:'🎤 Mikrofoni estetty'}})}
       else{speechActive=false;setState({result:{type:'fail',text:'🎤 Virhe: '+e.error}})}
     };
-    speechRec.onend=function(){if(speechActive){setTimeout(function(){if(speechActive){try{speechRec.start()}catch(e){listenForNumber(vnr)}}},200)}};
+    speechRec.onend=function(){if(speechActive){setTimeout(function(){if(speechActive){_startNumberListener(vnr)}},MIN_RETRY_DELAY)}};
     try{speechRec.start();setState({result:{type:'ok',text:'🎤 Kuuntelen... sano määrä'}})}
     catch(e){setTimeout(function(){try{speechRec.start()}catch(e2){speechActive=false;setState({result:{type:'fail',text:'🎤 Ei käynnisty — syötä käsin'}})}},500)}
   },200);
 }
 
 function listenForConfirm(vnr,qty){
-  stopVoice();speechVnr=vnr;
+  stopVoice();speechVnr=vnr;speechRetries=0;
+  _startConfirmListener(vnr,qty);
+}
+function _startConfirmListener(vnr,qty){
+  var now=Date.now();
+  if(now-speechLastStart<MIN_RETRY_DELAY){speechRetries++}else{speechRetries=0}
+  if(speechRetries>=MAX_RETRIES){speechActive=false;setState({result:{type:'fail',text:'🎤 Mikrofoni ei toimi — syötä käsin'}});return}
+  speechLastStart=now;
   setTimeout(function(){
     var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     speechRec=new SR();speechRec.lang='fi-FI';speechRec.continuous=false;speechRec.interimResults=false;
@@ -516,8 +531,8 @@ function listenForConfirm(vnr,qty){
         else{setState({result:{type:'fail',text:'🎤 "'+text+'" — sano oikein tai väärin'}});setTimeout(function(){listenForConfirm(vnr,qty)},500)}
       }
     };
-    speechRec.onerror=function(e){if(e.error==='no-speech'||e.error==='aborted'){if(speechActive){setTimeout(function(){if(speechActive&&speechRec){try{speechRec.start()}catch(ex){listenForConfirm(vnr,qty)}}},200)}}else{speechActive=false}};
-    speechRec.onend=function(){if(speechActive){setTimeout(function(){if(speechActive){try{speechRec.start()}catch(e){listenForConfirm(vnr,qty)}}},200)}};
+    speechRec.onerror=function(e){if(e.error==='no-speech'||e.error==='aborted'){if(speechActive){setTimeout(function(){if(speechActive){_startConfirmListener(vnr,qty)}},MIN_RETRY_DELAY)}}else{speechActive=false}};
+    speechRec.onend=function(){if(speechActive){setTimeout(function(){if(speechActive){_startConfirmListener(vnr,qty)}},MIN_RETRY_DELAY)}};
     try{speechRec.start()}catch(e){setTimeout(function(){try{speechRec.start()}catch(e2){speechActive=false}},500)}
   },200);
 }
