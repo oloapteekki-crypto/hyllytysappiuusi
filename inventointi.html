@@ -946,29 +946,45 @@ if(viewMode){
   };
 
   window.dlViewCSV=function(){
-    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä','Klo']];
+    var items=[];
     for(var vnr in fbCounted){var c=fbCounted[vnr],p=fbProducts[vnr]||{};var diff=c.qty-(p.expected||0);
-      if(diff!==0&&!fbDismissed[vnr])rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||'',c.date||''])}
+      if(diff!==0&&!fbDismissed[vnr])items.push({vnr:vnr,c:c,p:p,diff:diff})}
+    items.sort(function(a,b){return(a.c.t||0)-(b.c.t||0)});
+    items.forEach(function(i){var klo=i.c.t?new Date(i.c.t).toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'}):'';
+      rows.push([i.vnr,i.c.name||i.p.name||'',i.c.location||i.p.location||'',i.p.expected||0,i.c.qty,i.diff,i.c.worker||'',i.c.date||'',klo])});
     downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'erot_kaikki.csv');
   };
   window.dlAllCSV=function(){
-    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä']];
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Päivä','Klo']];
+    var items=[];
     for(var vnr in fbCounted){var c=fbCounted[vnr],p=fbProducts[vnr]||{};
-      rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,c.qty-(p.expected||0),c.worker||'',c.date||''])}
+      items.push({vnr:vnr,c:c,p:p})}
+    items.sort(function(a,b){return(a.c.t||0)-(b.c.t||0)});
+    items.forEach(function(i){var klo=i.c.t?new Date(i.c.t).toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'}):'';
+      rows.push([i.vnr,i.c.name||i.p.name||'',i.c.location||i.p.location||'',i.p.expected||0,i.c.qty,i.c.qty-(i.p.expected||0),i.c.worker||'',i.c.date||'',klo])});
     downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'inventointi_kaikki.csv');
   };
   window.dlTodayCSV=function(){
     var today=todayKey();
-    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Klo']];
+    var items=[];
     for(var vnr in fbCounted){var c=fbCounted[vnr];if(c.date!==today)continue;var p=fbProducts[vnr]||{};
-      rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,c.qty-(p.expected||0),c.worker||''])}
+      items.push({vnr:vnr,c:c,p:p})}
+    items.sort(function(a,b){return(a.c.t||0)-(b.c.t||0)});
+    items.forEach(function(i){var klo=i.c.t?new Date(i.c.t).toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'}):'';
+      rows.push([i.vnr,i.c.name||i.p.name||'',i.c.location||i.p.location||'',i.p.expected||0,i.c.qty,i.c.qty-(i.p.expected||0),i.c.worker||'',klo])});
     downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'inventointi_'+today+'.csv');
   };
   window.dlTodayDevsCSV=function(){
     var today=todayKey();
-    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija']];
+    var rows=[['VNR','Nimi','Paikka','Odotettu','Inventoitu','Erotus','Inventoija','Klo']];
+    var items=[];
     for(var vnr in fbCounted){var c=fbCounted[vnr];if(c.date!==today)continue;var p=fbProducts[vnr]||{};var diff=c.qty-(p.expected||0);
-      if(diff!==0)rows.push([vnr,c.name||p.name||'',c.location||p.location||'',p.expected||0,c.qty,diff,c.worker||''])}
+      if(diff!==0)items.push({vnr:vnr,c:c,p:p,diff:diff})}
+    items.sort(function(a,b){return(a.c.t||0)-(b.c.t||0)});
+    items.forEach(function(i){var klo=i.c.t?new Date(i.c.t).toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit'}):'';
+      rows.push([i.vnr,i.c.name||i.p.name||'',i.c.location||i.p.location||'',i.p.expected||0,i.c.qty,i.diff,i.c.worker||'',klo])});
     downloadCSV(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'erot_'+today+'.csv');
   };
 
@@ -976,9 +992,9 @@ if(viewMode){
     var app=document.getElementById('app');
     var counted=fbCounted||{},products=fbProducts||{};
     var totalCounted=Object.keys(counted).length,totalProducts=Object.keys(products).length;
-    var devs=[],dismissedCount=0;
+    var devs=[],dismissedCount=0;var today=todayKey();
     for(var vnr in counted){var c=counted[vnr],p=products[vnr]||{};var exp=p.expected||0;var diff=c.qty-exp;
-      if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else{devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||'',date:c.date||''})}}}
+      if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else if(c.date===today){devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||'',date:c.date||''})}}}
     devs.sort(function(a,b){return a.diff-b.diff});
     var shelves={};
     for(var v in products){var pr=products[v];var lc=pr.location||'';var pts=lc.split('-');
