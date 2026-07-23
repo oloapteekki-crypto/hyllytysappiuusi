@@ -981,8 +981,8 @@ if(viewMode){
       h+='<div class="progress-bar"><div class="progress-fill" style="width:'+shelfPct+'%"></div></div></div>'}
     h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlViewCSV()">Erot (kaikki)</button>';
     h+='<button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">Kaikki</button></div>';
-    h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlTodayDevsCSV()">Erot (t\\u00e4n\\u00e4\\u00e4n)</button>';
-    h+='<button class="btn-sm btn-outline flex-1" onclick="dlTodayCSV()">T\\u00e4n\\u00e4\\u00e4n</button></div>';
+    h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlTodayDevsCSV()">Erot (t\u00e4n\u00e4\u00e4n)</button>';
+    h+='<button class="btn-sm btn-outline flex-1" onclick="dlTodayCSV()">T\u00e4n\u00e4\u00e4n</button></div>';
     if(devs.length>0){h+='<button class="btn-sm" style="width:100%;margin-bottom:8px;background:#f0fdf4;color:#16a34a;border:1px solid #86efac" onclick="dismissAll()">\u2713 Kuittaa kaikki</button>'}
     if(dismissedCount>0){h+='<details style="margin-bottom:8px"><summary style="font-size:12px;color:#16a34a;cursor:pointer">\u2713 Kuitatut ('+dismissedCount+')</summary><div style="margin-top:4px">';
       for(var vnr2 in counted){var c2=counted[vnr2],p2=products[vnr2]||{};var diff2=c2.qty-(p2.expected||0);
