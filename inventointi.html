@@ -997,7 +997,8 @@ if(viewMode){
     var totalCounted=Object.keys(counted).length,totalProducts=Object.keys(products).length;
     var devs=[],dismissedCount=0;var today=todayKey();
     for(var vnr in counted){var c=counted[vnr],p=products[vnr]||{};var exp=p.expected||0;var diff=c.qty-exp;
-      if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else if(c.date===today){devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||'',date:c.date||''})}}}
+      var us=p.unshipped||0;var maxxSaldo=c.qty-us;
+      if(diff!==0){if(fbDismissed[vnr]){dismissedCount++}else if(c.date===today){devs.push({vnr:vnr,name:c.name||p.name||'?',location:c.location||p.location||'',expected:exp,counted:c.qty,diff:diff,worker:c.worker||'',date:c.date||'',unshipped:us,maxx:maxxSaldo})}}}
     devs.sort(function(a,b){return a.diff-b.diff});
     var shelves={};
     for(var v in products){var pr=products[v];var lc=pr.location||'';var pts=lc.split('-');
@@ -1017,10 +1018,11 @@ if(viewMode){
     h+='<button class="btn-sm btn-outline flex-1" onclick="dlAllCSV()">Kaikki</button></div>';
     h+='<div class="flex gap-8 mb-8"><button class="btn-sm btn-outline flex-1" onclick="dlTodayDevsCSV()">Erot (t\u00e4n\u00e4\u00e4n)</button>';
     h+='<button class="btn-sm btn-outline flex-1" onclick="dlTodayCSV()">T\u00e4n\u00e4\u00e4n</button></div>';
-    if(devs.length>0){h+='<button class="btn-sm" style="width:100%;margin-bottom:8px;background:#f0fdf4;color:#16a34a;border:1px solid #86efac" onclick="dismissAll()">\u2713 Kuittaa kaikki</button>'}
-    if(dismissedCount>0){h+='<details style="margin-bottom:8px"><summary style="font-size:12px;color:#16a34a;cursor:pointer">\u2713 Kuitatut ('+dismissedCount+')</summary><div style="margin-top:4px">';
+    if(devs.length>0){h+='<button class="btn-sm" style="width:100%;margin-bottom:8px;background:#f0fdf4;color:#16a34a;border:1px solid #86efac" onclick="dismissAll()">\u2713 Merkitse kaikki siirretyiksi</button>'}
+    if(dismissedCount>0){h+='<details style="margin-bottom:8px"><summary style="font-size:12px;color:#16a34a;cursor:pointer">\u2713 Siirretty Maxxiin ('+dismissedCount+')</summary><div style="margin-top:4px">';
       for(var vnr2 in counted){var c2=counted[vnr2],p2=products[vnr2]||{};var diff2=c2.qty-(p2.expected||0);
-        if(diff2!==0&&fbDismissed[vnr2]){h+='<div style="padding:4px 8px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center"><span>'+esc(c2.name||p2.name||vnr2)+' ('+c2.qty+'/'+(p2.expected||0)+')</span><button style="font-size:10px;padding:2px 8px;border:1px solid #e2e8f0;border-radius:4px;background:#fff;cursor:pointer" onclick="undismissDev(\''+vnr2+'\')">Palauta</button></div>'}}
+        if(diff2!==0&&fbDismissed[vnr2]){var us2=p2.unshipped||0;var maxx2=c2.qty-us2;
+          h+='<div style="padding:4px 8px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;align-items:center"><span>'+esc(c2.name||p2.name||vnr2)+' | Maxx\u2192'+maxx2+'</span><button style="font-size:10px;padding:2px 8px;border:1px solid #e2e8f0;border-radius:4px;background:#fff;cursor:pointer" onclick="undismissDev(\''+vnr2+'\')">Palauta</button></div>'}}
       h+='</div></details>'}
     h+='</div>';
 
@@ -1046,10 +1048,13 @@ if(viewMode){
       h+='<div class="deviation '+(d.diff>0?'dev-plus':'dev-minus')+'">';
       h+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">'+esc(d.name)+'</div>';
       h+='<div class="mono" style="color:#64748b">'+d.location+' | VNR '+d.vnr+'</div>';
-      h+='<div style="font-size:11px;color:#94a3b8">'+d.worker+(d.date?' \\u2014 '+d.date:'')+'</div></div>';
-      h+='<div style="text-align:right;white-space:nowrap;margin-left:8px"><div style="font-weight:700">'+d.counted+' / '+d.expected+'</div>';
-      h+='<div style="font-size:14px;font-weight:700">'+(d.diff>0?'+':'')+d.diff+'</div>';
-      h+='<button style="margin-top:4px;font-size:10px;padding:2px 8px;border:1px solid #86efac;border-radius:4px;background:#f0fdf4;color:#16a34a;cursor:pointer" onclick="dismissDev(\''+d.vnr+'\')">\u2713 Kuitattu</button></div></div>'}}
+      h+='<div style="font-size:11px;color:#94a3b8">'+d.worker+(d.date?' \u2014 '+d.date:'')+'</div></div>';
+      h+='<div style="text-align:right;white-space:nowrap;margin-left:8px">';
+      h+='<div style="font-size:11px;color:#94a3b8">Hyllyss\u00e4: '+d.counted+' | Odotettu: '+d.expected+'</div>';
+      h+='<div style="font-size:18px;font-weight:800;color:#6d28d9;margin:2px 0">Maxx \u2192 '+d.maxx+'</div>';
+      h+='<div style="font-size:10px;color:#94a3b8">'+(d.unshipped?'Ker\u00e4ilem\u00e4t\u00f6n: '+d.unshipped:'')+'</div>';
+      h+='<button style="margin-top:4px;font-size:11px;padding:4px 12px;border:1px solid #86efac;border-radius:6px;background:#f0fdf4;color:#16a34a;cursor:pointer;font-weight:600" onclick="dismissDev(\''+d.vnr+'\')">\u2713 Siirretty</button>';
+      h+='</div></div>'}}
     else if(totalCounted>0){h+='<div class="card" style="text-align:center;padding:24px"><div style="font-size:36px;margin-bottom:8px">\u2713</div><h2 style="color:#16a34a">Ei eroja</h2></div>'}
     else if(!totalProducts){h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Ei dataa</div>'}
     else{h+='<div class="card" style="text-align:center;padding:24px;color:#94a3b8">Inventointia ei aloitettu</div>'}
