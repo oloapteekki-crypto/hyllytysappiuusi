@@ -224,15 +224,20 @@ const GCS_CSV='https://storage.googleapis.com/olo-export-data/hyllytys-app-expor
 
 async function loadCSVData(){
   // Try GCS first, then Firebase
+  var gcsError='',fbError='';
   try{
     const resp=await fetch(GCS_CSV,{cache:'no-store'});
-    if(resp.ok){const text=await resp.text();if(text.includes('sku'))return pCSV(text)}
-  }catch(e){}
+    if(resp.ok){const text=await resp.text();if(text.includes('sku'))return pCSV(text);else gcsError='CSV ei sisällä oikeita sarakkeita'}
+    else gcsError='HTTP '+resp.status;
+  }catch(e){gcsError=e.message}
   // Fallback: Firebase
-  const csvSnap=await filesRef.child('csv').once('value');
-  const csvText=csvSnap.val();
-  if(!csvText)throw new Error('Tuoterekisteriä ei löydy');
-  return pCSV(csvText);
+  try{
+    const csvSnap=await filesRef.child('csv').once('value');
+    const csvText=csvSnap.val();
+    if(csvText)return pCSV(csvText);
+    fbError='ei dataa';
+  }catch(e){fbError=e.message}
+  throw new Error('Tuoterekisteriä ei saatu ladattua. GCS: '+gcsError+', Firebase: '+fbError);
 }
 
 async function loadFromFirebase(){
