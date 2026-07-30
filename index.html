@@ -286,7 +286,17 @@ function selectCart(id,batchId){
   const ci=getBatchEnriched(id,batch);
   const prev=fbData.shelved[id+'_'+batch.id]||{};
   const remaining=[];
-  ci.forEach(i=>{const left=i.qty-(prev[i.vnr]||0);if(left>0)remaining.push({...i,qty:left})});
+  const alreadyShelved=[];
+  ci.forEach(i=>{const left=i.qty-(prev[i.vnr]||0);if(left>0)remaining.push({...i,qty:left});else alreadyShelved.push(i)});
+  
+  // Debug: count items that didn't make it to this cart
+  const allBatchItems=[];
+  for(const k in fbData.scannedBoxes){const b=fbData.scannedBoxes[k];
+    if(b.t>batch.since&&(batch.until===Infinity?true:b.t<=batch.until)&&b.items)b.items.forEach(i=>allBatchItems.push(i))}
+  const notInCart=[];
+  allBatchItems.forEach(item=>{const e=enrichItem(item);if(e.cartId!==id)notInCart.push(e)});
+  if(notInCart.length)console.log('Ei tässä kärryssä ('+id+'):',notInCart.length,'tuotetta',notInCart.map(i=>i.vnr+' '+i.name+' → '+(i.cartId||'UUSI/RX')).join(', '));
+  if(alreadyShelved.length)console.log('Jo hyllytetty:',alreadyShelved.length,'tuotetta');
   
   // Check for saved progress (from crashed session)
   const progress=fbGetProgress(id,batch.id);
@@ -820,7 +830,7 @@ function render(){
           ${batchItems.length>0?`<button class="btn-sm" style="margin-top:6px;width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;font-size:12px" onclick="if(confirm('${c.name} #${batchNum} valmis hyllytykseen?')){fbCloseCartBatch('${c.id}');setState({phase:'cartSelect'})}">Kärry valmis → Hyllytykseen</button>`:''}
           </div>`}).join('')}
         ${rxQ?`<div style="padding:8px 12px;border-radius:8px;background:#fef2f2;font-size:13px;margin-bottom:6px">💊 Reseptilääkkeet: ${rxQ} kpl</div>`:''}
-        ${newQ?`<div style="padding:8px 12px;border-radius:8px;background:#fffbeb;font-size:13px;margin-bottom:6px">📦 UUSI-hyllyyn: ${newQ} kpl</div>`:''}
+        ${newQ?`<div style="padding:8px 12px;border-radius:8px;background:#fffbeb;font-size:13px;margin-bottom:6px;border:1px solid #fde68a">📦 UUSI-hyllyyn: ${newQ} kpl <span style="font-size:11px;color:#92400e">(ei kärryissä — varastopaikkaa ei löydy)</span></div>`:''}
         ${palletQ?`<div style="padding:8px 12px;border-radius:8px;background:#f8fafc;font-size:13px;margin-bottom:6px;border:1px solid #e2e8f0">🏗 Lavapaikat (L4/L5): ${palletQ} kpl</div>`:''}</div>
 
       ${sc>0?`<details class="card"><summary>Skannatut laatikot (${sc})</summary>
