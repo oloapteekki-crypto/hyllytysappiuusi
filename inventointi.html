@@ -286,10 +286,12 @@ function loadFiles(){
         setState({result:{type:'ok',text:'Haetaan EAN-koodit...'}});
         var resp=await fetch('https://storage.googleapis.com/olo-export-data/hyllytys-app-export000000000000.csv',{cache:'no-store'});
         if(resp.ok){var gcsText=await resp.text();if(gcsText.includes('sku'))eanMap=parseProductRegister(gcsText)}
-      }catch(e){}
+        else{console.log('GCS EAN error: HTTP '+resp.status)}
+      }catch(e){console.log('GCS EAN error:',e.message)}
       if(!Object.keys(eanMap).length){
-        try{const snap=await db.ref('files/csv').once('value');const csvText=snap.val();if(csvText)eanMap=parseProductRegister(csvText)}catch(e){}
+        try{const snap=await db.ref('files/csv').once('value');const csvText=snap.val();if(csvText)eanMap=parseProductRegister(csvText)}catch(e){console.log('Firebase EAN error:',e.message)}
       }
+      if(!Object.keys(eanMap).length){setState({result:{type:'fail',text:'⚠ EAN-koodeja ei saatu ladattua — viivakoodit eivät toimi'}})}
     }
     
     // Merge: for each Maxx product, add unshipped from Magento
