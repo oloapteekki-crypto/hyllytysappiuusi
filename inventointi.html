@@ -284,10 +284,12 @@ function loadFiles(){
     if(!eanText){
       try{
         setState({result:{type:'ok',text:'Haetaan EAN-koodit...'}});
-        const snap=await db.ref('files/csv').once('value');
-        const csvText=snap.val();
-        if(csvText)eanMap=parseProductRegister(csvText);
+        var resp=await fetch('https://storage.googleapis.com/olo-export-data/hyllytys-app-export000000000000.csv',{cache:'no-store'});
+        if(resp.ok){var gcsText=await resp.text();if(gcsText.includes('sku'))eanMap=parseProductRegister(gcsText)}
       }catch(e){}
+      if(!Object.keys(eanMap).length){
+        try{const snap=await db.ref('files/csv').once('value');const csvText=snap.val();if(csvText)eanMap=parseProductRegister(csvText)}catch(e){}
+      }
     }
     
     // Merge: for each Maxx product, add unshipped from Magento
@@ -928,7 +930,8 @@ if(viewMode){
       await db.ref('inventointi').remove();
       var maxx=parseMaxx(results[0]),magento=parseMagento(results[1]);
       var eanMap=results[2]?parseProductRegister(results[2]):{};
-      if(!results[2]){try{var snap=await db.ref('files/csv').once('value');var csv=snap.val();if(csv)eanMap=parseProductRegister(csv)}catch(e){}}
+      if(!results[2]){try{var resp2=await fetch('https://storage.googleapis.com/olo-export-data/hyllytys-app-export000000000000.csv',{cache:'no-store'});if(resp2.ok){var gt=await resp2.text();if(gt.includes('sku'))eanMap=parseProductRegister(gt)}}catch(e){}
+        if(!Object.keys(eanMap).length){try{var snap=await db.ref('files/csv').once('value');var csv=snap.val();if(csv)eanMap=parseProductRegister(csv)}catch(e){}}}
       var products=[];
       for(var vnr in maxx){var m=maxx[vnr],mag=magento[vnr]||{unshipped:0};var loc=pLoc(m.location);if(!loc)continue;
         products.push({vnr:vnr,name:m.name,ean:eanMap[vnr]||'',location:m.location,expected:Math.round(m.saldo+mag.unshipped),saldo:m.saldo,unshipped:mag.unshipped})}
