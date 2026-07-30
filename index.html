@@ -220,14 +220,25 @@ async function uploadFiles(){
   }catch(e){setState({error:'Latausvirhe: '+e.message,loadProgress:null})}
 }
 
+const GCS_CSV='https://storage.googleapis.com/olo-export-data/hyllytys-app-export000000000000.csv';
+
+async function loadCSVData(){
+  // Try GCS first, then Firebase
+  try{
+    const resp=await fetch(GCS_CSV,{cache:'no-store'});
+    if(resp.ok){const text=await resp.text();if(text.includes('sku'))return pCSV(text)}
+  }catch(e){}
+  // Fallback: Firebase
+  const csvSnap=await filesRef.child('csv').once('value');
+  const csvText=csvSnap.val();
+  if(!csvText)throw new Error('Tuoterekisteriä ei löydy');
+  return pCSV(csvText);
+}
+
 async function loadFromFirebase(){
   setState({error:null,loadProgress:'Haetaan tuoterekisteriä...'});
   try{
-    // Load CSV
-    const csvSnap=await filesRef.child('csv').once('value');
-    const csvText=csvSnap.val();
-    if(!csvText)throw new Error('Tuoterekisteriä ei löydy — lataa tiedostot ensin tietokoneella');
-    const master=pCSV(csvText);
+    const master=await loadCSVData();
     
     // Load XMLs
     setState({loadProgress:'Haetaan XML-tiedostoja...'});
