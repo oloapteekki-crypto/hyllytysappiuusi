@@ -134,9 +134,11 @@ let S={phase:'setup',xmlBoxes:null,boxAltKeys:null,masterData:null,error:null,la
 const STORAGE_KEY='hyllytysappi_state_v2';
 function saveState(){
   try{
-    const toSave={phase:S.phase,selectedCart:S.selectedCart,routeItems:S.routeItems,
+    const toSave={phase:S.phase,selectedCart:S.selectedCart,selectedBatch:S.selectedBatch,
+      routeItems:S.routeItems,
       unmatchedItems:S.unmatchedItems,rxItems:S.rxItems,shelved:S.shelved,
       currentIdx:S.currentIdx,confirmedLoc:S.confirmedLoc,scanMode:S.scanMode,
+      shelveStartTime:S.shelveStartTime,pausedTime:S.pausedTime,
       xmlBoxes:S.phase==='scan'?S.xmlBoxes:null,
       boxAltKeys:S.phase==='scan'?S.boxAltKeys:null,
       masterData:S.phase==='scan'?S.masterData:null};
@@ -311,7 +313,7 @@ function selectCart(id,batchId){
   setState({selectedCart:id,selectedBatch:batch,routeItems:sSort(remaining),rxItems:[],unmatchedItems:[],shelved,currentIdx,phase:'shelve',confirmedLoc,lastScanResult:progress?{type:'ok',text:'↩ Jatkettu edellisestä'}:null,error:null,shelveStartTime:Date.now(),pausedTime:0,pauseStart:null});
 }
 
-function confirmLocation(code){if(!code)return;setState({error:null,lastScanResult:null});const cur=S.routeItems[S.currentIdx];if(!cur)return;const sc=code.trim().toUpperCase(),ex=cur.location.trim().toUpperCase();if(sc===ex){setState({confirmedLoc:ex,lastScanResult:{type:'ok',text:'✓ '+cur.location}});return}const oi=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===sc);if(oi!==-1){setState({confirmedLoc:sc,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+S.routeItems[oi].location}});return}setState({error:'Paikka ei reitillä',lastScanResult:{type:'fail',text:'Väärä'}})}
+function confirmLocation(code){if(!code||S.pauseStart)return;setState({error:null,lastScanResult:null});const cur=S.routeItems[S.currentIdx];if(!cur)return;const sc=code.trim().toUpperCase(),ex=cur.location.trim().toUpperCase();if(sc===ex){setState({confirmedLoc:ex,lastScanResult:{type:'ok',text:'✓ '+cur.location}});return}const oi=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===sc);if(oi!==-1){setState({confirmedLoc:sc,currentIdx:oi,lastScanResult:{type:'ok',text:'✓ '+S.routeItems[oi].location}});return}setState({error:'Paikka ei reitillä',lastScanResult:{type:'fail',text:'Väärä'}})}
 
 /* ═══════════ SPEECH RECOGNITION ═══════════ */
 let speechRec=null,speechActive=false;
@@ -377,7 +379,7 @@ function autoAdvance(){
   finishShelving(true);
 }
 
-function confirmEan(code){if(!code)return;stopListening();setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prev:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;logShelveEvent(cur.vnr,cur.name,cur.location,1,p+1,cur.qty,'scan');if(p+1>=cur.qty){setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' — 🎤 sano loppumäärä'}});startListening(cur.vnr,cur.qty)}return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prev:p,idx:si,name:o.name});S.shelved[o.vnr]=p+1;logShelveEvent(o.vnr,o.name,o.location,1,p+1,o.qty,'scan');if(p+1>=o.qty){setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' — 🎤 sano loppumäärä'}});startListening(o.vnr,o.qty)}return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
+function confirmEan(code){if(!code||S.pauseStart)return;stopListening();setState({error:null,lastScanResult:null});if(!S.confirmedLoc){setState({error:'Skannaa paikka ensin'});return}const cur=S.routeItems[S.currentIdx];const m=(i,c)=>i.ean&&i.ean!=='null'&&(i.ean===c||c.endsWith(i.ean)||i.ean.endsWith(c));if(cur&&m(cur,code)){const p=S.shelved[cur.vnr]||0;pushUndo({type:'shelve',vnr:cur.vnr,prev:p,idx:S.currentIdx,name:cur.name});S.shelved[cur.vnr]=p+1;logShelveEvent(cur.vnr,cur.name,cur.location,1,p+1,cur.qty,'scan');if(p+1>=cur.qty){setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,lastScanResult:{type:'ok',text:'✓ '+(p+1)+'/'+cur.qty+' — 🎤 sano loppumäärä'}});startListening(cur.vnr,cur.qty)}return}const si=S.routeItems.findIndex(i=>i.location&&i.location.trim().toUpperCase()===S.confirmedLoc&&m(i,code));if(si!==-1){const o=S.routeItems[si],p=S.shelved[o.vnr]||0;if(p<o.qty){pushUndo({type:'shelve',vnr:o.vnr,prev:p,idx:si,name:o.name});S.shelved[o.vnr]=p+1;logShelveEvent(o.vnr,o.name,o.location,1,p+1,o.qty,'scan');if(p+1>=o.qty){setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' Valmis!'}});setTimeout(()=>autoAdvance(),800)}else{setState({shelved:S.shelved,currentIdx:si,lastScanResult:{type:'ok',text:'✓ '+esc(o.name)+' '+(p+1)+'/'+o.qty+' — 🎤 sano loppumäärä'}});startListening(o.vnr,o.qty)}return}setState({error:'Jo valmis'});return}setState({error:'EAN ei tunnistettu'})}
 
 function adjustQty(v,d){const prev=S.shelved[v]||0;const cur=Math.max(0,prev+d);if(cur!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',cur-prev,cur,item?.qty||0,'manual')}S.shelved[v]=cur;setState({shelved:S.shelved})}
 function setQtyManual(v){const inp=document.getElementById('qty-manual-'+v);if(!inp)return;const n=parseInt(inp.value,10);if(!isNaN(n)&&n>=0){const prev=S.shelved[v]||0;if(n!==prev){const item=S.routeItems.find(i=>i.vnr===v);pushUndo({type:'shelve',vnr:v,prev:prev,idx:S.currentIdx,name:item?.name||v});logShelveEvent(v,item?.name||v,item?.location||'',n-prev,n,item?.qty||0,'manual')}S.shelved[v]=n;setState({shelved:S.shelved})}}
@@ -394,7 +396,7 @@ function togglePause(){
     setState({pauseStart:null,lastScanResult:{type:'ok',text:'▶ Jatketaan'}});
   } else {
     stopListening();
-    setState({pauseStart:Date.now(),lastScanResult:{type:'ok',text:'⏸ Tauko'}});
+    setState({pauseStart:Date.now(),lastScanResult:{type:'ok',text:'⏸ Tauko — skannaus estetty'}});
   }
 }
 function navTo(idx){if(idx<0||idx>=S.routeItems.length)return;stopListening();const c=S.routeItems[S.currentIdx],n=S.routeItems[idx];const cl=c?.location?.trim().toUpperCase()||'',nl=n?.location?.trim().toUpperCase()||'';setState({currentIdx:idx,confirmedLoc:cl===nl&&S.confirmedLoc===cl?S.confirmedLoc:null,lastScanResult:null,error:null})}
@@ -498,11 +500,11 @@ function finishShelving(skip){
   if(S.selectedCart&&S.selectedBatch)fbReleaseCart(S.selectedCart,S.selectedBatch.id);
   if(S.selectedCart&&S.selectedBatch)fbClearProgress(S.selectedCart,S.selectedBatch.id);
   // Save performance data
-  if(currentWorker&&S.shelveStartTime&&dbRef){
+  if(S.shelveStartTime&&dbRef){
     const ts=tShelved(),tq=tQty(),elapsed=getElapsed();
     const cart=CARTS.find(c=>c.id===S.selectedCart);
     dbRef.child('performance/'+Date.now().toString(36)).set({
-      worker:currentWorker,
+      worker:currentWorker||'(ei valittu)',
       cart:S.selectedCart,
       cartName:(cart?.name||'')+' #'+(S.selectedBatch?.num||''),
       batch:S.selectedBatch?.id||'',
