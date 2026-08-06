@@ -170,7 +170,24 @@ function popUndo(){
 
 // ── Prevent page refresh ──
 window.addEventListener('beforeunload',function(e){
-  if(S.phase!=='setup'){saveState();e.preventDefault();e.returnValue='Hyllytyserä on kesken.'}
+  if(S.phase!=='setup'){
+    saveState();
+    // Save performance if shelving
+    if(S.phase==='shelve'&&S.shelveStartTime&&dbRef){
+      const ts=tShelved(),tq=tQty(),elapsed=getElapsed();
+      const cart=CARTS.find(c=>c.id===S.selectedCart);
+      dbRef.child('performance/'+Date.now().toString(36)).set({
+        worker:currentWorker||'(ei valittu)',
+        cart:S.selectedCart,
+        cartName:(cart?.name||'')+' #'+(S.selectedBatch?.num||''),
+        batch:S.selectedBatch?.id||'',
+        start:S.shelveStartTime,end:Date.now(),elapsed,
+        shelved:ts,expected:tq,items:S.routeItems.length,
+        partial:true
+      });
+    }
+    e.preventDefault();e.returnValue='Hyllytyserä on kesken.';
+  }
 });
 
 function setState(u){
@@ -283,6 +300,7 @@ function addBox(code){
 }
 
 function selectCart(id,batchId){
+  if(!currentWorker){setState({error:'Valitse ensin käyttäjä aloitusnäkymästä'});return}
   const batches=getCartBatchList(id);
   const batch=batches.find(b=>b.id===batchId)||batches[batches.length-1];
   const ci=getBatchEnriched(id,batch);
